@@ -64,7 +64,7 @@
       line: "The follicle has become the corpus luteum, and progesterone is rising to hold the lining in place.",
       what: [
         "After the egg is released, the empty follicle becomes the corpus luteum. It makes progesterone, which peaks about a week after ovulation, plus some estrogen.",
-        "If the egg isn't fertilised, the corpus luteum breaks down about two weeks after ovulation. Hormones fall, the lining sheds, and that is day 1 of your next cycle.",
+        "If the egg isn't fertilized, the corpus luteum breaks down about two weeks after ovulation. Hormones fall, the lining sheds, and that is day 1 of your next cycle.",
         "Progesterone raises your resting body temperature by roughly 0.2–0.5 °C, which is how temperature tracking confirms that ovulation happened."
       ],
       hormones: "Progesterone peaks about a week after ovulation, then falls if there's no pregnancy. Estrogen has a smaller second rise.",
@@ -108,17 +108,17 @@
     "variation": d => ({ t: "Your cycle length varies by " + d.span + " days", b: "A gap of more than about a week between your shortest and longest cycles is considered irregular. If this is new for you, it's worth mentioning to a clinician. Predictions will be wider until things settle." }),
     "period-long": d => ({ t: "A recent period lasted " + d.len + " days", b: "Periods longer than 7 days are considered prolonged. Worth mentioning to a clinician, especially if the flow was heavy." }),
     "no-period": d => ({ t: "It's been " + d.days + " days since your last period started", b: "If you could be pregnant, take a test. Otherwise, going 3 months or more without a period is worth discussing with a clinician." }),
-    "heavy": () => ({ t: "You logged signs of very heavy bleeding", b: "Soaking a pad or tampon every hour for several hours, or passing large clots, can mean heavy menstrual bleeding, which is treatable and can lead to anaemia. Contact a clinician. If you feel faint or dizzy, get urgent care." }),
+    "heavy": () => ({ t: "You logged signs of very heavy bleeding", b: "Soaking a pad or tampon every hour for several hours, or passing large clots, can mean heavy menstrual bleeding, which is treatable and can lead to anemia. Contact a clinician. If you feel faint or dizzy, get urgent care." }),
     "pain": () => ({ t: "You've logged severe pain several times", b: "Pain that disrupts your day isn't something to push through. Conditions like endometriosis are often missed for years, so it's worth raising. The doctor summary in this app can help." }),
     "spotting": () => ({ t: "Spotting between periods", b: "Light spotting between periods happens, sometimes around ovulation. If it's new, frequent or heavy, mention it to a clinician." })
   };
 
   const SYMPTOMS = [
-    ["cramps", "Cramps"], ["headache", "Headache"], ["bloating", "Bloating"], ["breast", "Breast tenderness"],
-    ["backache", "Back ache"], ["nausea", "Nausea"], ["fatigue", "Tired"], ["insomnia", "Poor sleep"],
-    ["cravings", "Cravings"], ["acne", "Breakouts"], ["irritable", "Irritable"], ["anxious", "Anxious"], ["lowmood", "Low mood"]
+    ["cramps", "Cramps", "😖"], ["headache", "Headache", "🤕"], ["bloating", "Bloating", "🎈"], ["breast", "Breast tenderness", "💗"],
+    ["backache", "Back ache", "🦴"], ["nausea", "Nausea", "🤢"], ["fatigue", "Tired", "😴"], ["insomnia", "Poor sleep", "🌙"],
+    ["cravings", "Cravings", "🍫"], ["acne", "Breakouts", "🔴"], ["irritable", "Irritable", "😠"], ["anxious", "Anxious", "😰"], ["lowmood", "Low mood", "🌧️"]
   ];
-  const ALERT_SYMPTOMS = [["clots", "Clots bigger than a coin"], ["soaking", "Soaking a pad or tampon every hour"]];
+  const ALERT_SYMPTOMS = [["clots", "Clots bigger than a coin", "🩸"], ["soaking", "Soaking a pad or tampon every hour", "⚠️"]];
   const FLOW = [["0", "None"], ["1", "Spotting"], ["2", "Light"], ["3", "Medium"], ["4", "Heavy"]];
   const MOOD = [["1", "😞", "Very low"], ["2", "😕", "Low"], ["3", "😐", "Okay"], ["4", "🙂", "Good"], ["5", "😄", "Great"]];
   const ENERGY = [["1", "Very low"], ["2", "Low"], ["3", "Okay"], ["4", "Good"], ["5", "High"]];
@@ -132,6 +132,7 @@
     ["Temperature", "A sustained rise confirms ovulation after the fact, using the \"3 over 6\" rule: three days in a row higher than the previous six, the third at least 0.2 °C above them."],
     ["Fertile window", "The 5 days before ovulation plus ovulation day. When your cycles vary a lot, the window gets a lighter extension to show the uncertainty, and the app tells you that a calendar can't pinpoint it."],
     ["The hills", "The two hills on the Today screen are schematic estrogen (front) and progesterone (back) curves, stretched to your cycle. They show typical shapes, not your measured levels."],
+    ["Outlook and wheel", "The 7-day outlook, the cycle wheel and the cycle strips all use the same estimates as the calendar, so they always agree with each other. The wheel is drawn to scale for your own cycle length."],
     ["Your patterns", "Mood, energy and pain are averaged for each phase using only days you logged. Almanac only says something when both phases have at least 4 logged days and the difference is meaningful."]
   ];
 
@@ -152,5 +153,117 @@
   // on the day: about 10% five days before ovulation, rising to about 33% on ovulation day itself.
   const FERTILE_FACT = "In a landmark study of 221 women (Wilcox et al., 1995), the fertile window spanned 6 days and ended on the day of ovulation. The chance of conceiving from sex five days before ovulation was about 10%, rising to about 33% on ovulation day itself.";
 
-  root.AlmanacContent = { PHASES, MYTHS, SEE_DOCTOR, URGENT, FLAGS, SYMPTOMS, ALERT_SYMPTOMS, FLOW, MOOD, ENERGY, PAIN, MUCUS, HOW, SOURCES, FERTILE_FACT };
+
+  const ANATOMY = {
+    winter: "The uterine lining is shedding and hormones are at their lowest.",
+    spring: "A follicle in the ovary is growing while the lining rebuilds.",
+    summer: "The mature follicle releases its egg. The lining is thick.",
+    autumn: "The empty follicle becomes the corpus luteum, and the lining is at its thickest."
+  };
+
+  const MUCUS_INFO = [
+    ["dry", "Dry", "Little or nothing noticeable. Low fertility.", 1],
+    ["sticky", "Sticky", "Tacky, crumbly or paste-like. Low fertility.", 2],
+    ["creamy", "Creamy", "Like lotion, white or cloudy. Fertility is rising.", 3],
+    ["watery", "Watery", "Wet, clear and thin. High fertility.", 4],
+    ["eggwhite", "Egg-white", "Clear, slippery and stretchy. Peak fertility, and ovulation is close.", 5]
+  ];
+
+  const GUIDES = [
+    { id: "temp", ico: "thermo", title: "Tracking your temperature", fig: "bbt",
+      intro: "A basal body temperature (BBT) chart shows whether you ovulated, and roughly when, after it has happened.",
+      steps: [
+        "Use the same thermometer at the same time every morning, before you sit up, drink or talk.",
+        "Aim for at least 3 hours of unbroken sleep beforehand.",
+        "Log it in Almanac's day sheet under Fertility signs (°C or °F).",
+        "After ovulation, progesterone lifts your temperature by roughly 0.2–0.5 °C (0.4–1 °F), and it stays up until your next period.",
+        "Almanac looks for three days in a row above the previous six, with the third at least 0.2 °C higher. This is the \"3 over 6\" rule."],
+      notes: [
+        "Fever, alcohol, poor sleep, travel and shift work can throw readings off. Skip those days.",
+        "Temperature confirms ovulation after the fact, so it can't tell you when you're about to ovulate."] },
+    { id: "lh", ico: "strip", title: "Using ovulation (LH) tests", fig: "lh",
+      intro: "These urine tests detect the LH surge that happens roughly 24 to 36 hours before ovulation.",
+      steps: [
+        "Start testing a few days before you expect to ovulate. Almanac's fertile-window estimate shows roughly when. Follow your kit's instructions, because brands differ.",
+        "A positive result means the surge has started. Ovulation usually follows within about a day or two.",
+        "Log a positive in Almanac and it uses it as evidence for this cycle."],
+      notes: [
+        "Conditions such as PCOS, and the transition to menopause, can cause high LH levels and confusing results.",
+        "LH tests predict ovulation. They don't prove it happened. Temperature does that."] },
+    { id: "mucus", ico: "mucus", title: "Reading cervical mucus", fig: "mucus",
+      intro: "Cervical mucus changes as estrogen rises and falls. It's your body's own fertility signal, and it costs nothing to watch.",
+      steps: [
+        "Notice what you see or feel through the day, or check with clean fingers or toilet paper.",
+        "Log the most fertile type you noticed that day.",
+        "Look at the pattern across days: it typically goes dry, then sticky, creamy, watery, then egg-white around ovulation, then back to thick or dry."],
+      notes: [
+        "Semen, lubricant, infections, breastfeeding and some medicines can change what you see.",
+        "Wet or egg-white mucus means estrogen is high and you're likely in or near your fertile window."] },
+    { id: "products", ico: "shield", title: "Period products and safety", fig: null,
+      intro: "Every product works. The safety points below are the ones worth knowing.",
+      steps: [
+        "Tampons: change at least every 4 to 8 hours, and never leave one in for more than 8 hours. Use the lowest absorbency that handles your flow.",
+        "If you'll sleep more than 8 hours, put in a fresh tampon just before bed and change it as soon as you wake, or use a pad overnight.",
+        "Menstrual cups: most can be worn for up to about 12 hours. Follow the maker's cleaning instructions.",
+        "Pads and period underwear aren't linked to toxic shock syndrome."],
+      notes: [
+        "Toxic shock syndrome (TSS) is rare but serious. If you suddenly get a high fever with a sunburn-like rash, dizziness or fainting, vomiting or diarrhea, or confusion, remove the tampon or cup and get urgent medical care."] },
+    { id: "pms", ico: "heart", title: "PMS and PMDD", fig: null,
+      intro: "Premenstrual syndrome (PMS) is a pattern of physical and emotional symptoms in the one to two weeks before a period that eases within a few days of bleeding starting.",
+      steps: [
+        "Common PMS symptoms: bloating, breast tenderness, tiredness, cravings, headaches, irritability or low mood.",
+        "Premenstrual dysphoric disorder (PMDD) is a severe form, affecting around 3–8% of people. Intense irritability, anger, anxiety or depression disrupt work, study or relationships. It's recognized and treatable (therapy, medication and hormonal options).",
+        "Logging mood daily for two or more cycles shows whether your low days cluster just before your period. That's valuable information for a clinician."],
+      notes: [
+        "If you ever feel unsafe, or have thoughts of harming yourself, contact your local emergency number or a crisis line right away."] },
+    { id: "bc", ico: "pill", title: "Contraception and your bleeding", fig: null,
+      intro: "Hormonal methods change how your cycle works, so they change what bleeding means.",
+      steps: [
+        "On the combined pill, patch or ring, the bleed in the hormone-free break is a withdrawal bleed, not a natural period.",
+        "Hormonal IUDs, implants and injections often make bleeding lighter or irregular, or stop it. Irregular spotting is common in the first months.",
+        "Many hormonal methods change or stop ovulation. That's why Almanac hides phases and fertile windows in that mode.",
+        "Copper IUDs have no hormones and can make periods heavier or more painful for some people."],
+      notes: ["Almanac can't tell you whether a method is working. For that, talk to a clinician."] }
+  ];
+
+  const LIFE = [
+    ["First periods", "Most people get their first period (menarche) between about 10 and 15, at an average of around 12. Cycles are often irregular for the first few years and can run up to 45 days."],
+    ["Pregnancy", "Periods stop. If you could be pregnant, a test is most reliable from the first day of a missed period."],
+    ["After birth and breastfeeding", "Periods may stay away for months, particularly with frequent breastfeeding. You can ovulate, and so become pregnant, before your first period returns."],
+    ["Perimenopause", "The years leading up to menopause, usually starting in the 40s. Cycles lengthen, shorten or skip, and flow can change. Pregnancy is still possible."],
+    ["Menopause", "Menopause is confirmed after 12 months in a row without a period, at an average age of about 51. Any bleeding after that should be checked by a clinician."]
+  ];
+
+  const GLOSSARY = [
+    ["Amenorrhea", "No periods. Usually defined as 3 months or more without one, when you're not pregnant."],
+    ["Basal body temperature (BBT)", "Your lowest resting temperature, taken first thing in the morning. It rises slightly after ovulation."],
+    ["Cervical mucus", "Fluid from the cervix that changes through the cycle. Clear, stretchy mucus signals high fertility."],
+    ["Corpus luteum", "The temporary structure left behind after the follicle releases its egg. It makes progesterone."],
+    ["Dysmenorrhea", "Painful periods."],
+    ["Endometrium", "The lining of the uterus, which thickens each cycle and sheds as your period."],
+    ["Estrogen", "A hormone made by growing follicles. It thickens the lining, peaks just before ovulation, and makes cervical mucus clearer."],
+    ["Fertile window", "The 6 days that can lead to pregnancy: the 5 days before ovulation plus ovulation day."],
+    ["Follicle", "A fluid-filled sac in the ovary that holds an immature egg."],
+    ["FSH (follicle-stimulating hormone)", "Made by the pituitary gland. It prompts follicles in the ovary to grow."],
+    ["Heavy menstrual bleeding", "Bleeding that is heavy enough to disrupt daily life, such as soaking through protection hourly or passing large clots."],
+    ["LH (luteinizing hormone)", "Surges before ovulation and triggers the egg's release. This is what ovulation tests detect."],
+    ["Luteal phase", "From ovulation until your next period, usually 12 to 14 days."],
+    ["Menarche", "A person's first period."],
+    ["Menopause", "Confirmed after 12 consecutive months without a period."],
+    ["Mittelschmerz", "A brief one-sided pain in the lower belly around ovulation that some people feel."],
+    ["Ovulation", "The release of an egg from the ovary."],
+    ["Perimenopause", "The transition before menopause, when cycles become irregular."],
+    ["PMDD", "Premenstrual dysphoric disorder: severe premenstrual mood symptoms that disrupt life. Treatable."],
+    ["PMS", "Premenstrual syndrome: physical and emotional symptoms in the days before a period."],
+    ["Progesterone", "A hormone made mainly after ovulation. It holds the lining in place and raises body temperature slightly."],
+    ["Prostaglandins", "Chemicals that make the uterus contract. They're the main cause of period cramps."]
+  ];
+
+  const MORE_SOURCES = [
+    "U.S. Food and Drug Administration (FDA) and CDC, Tampon safety and toxic shock syndrome (change tampons every 4–8 hours; never more than 8; warning signs).",
+    "ACOG, Premenstrual syndrome and PMDD (PMDD in roughly 3–8% of people). acog.org",
+    "NHS, Mayo Clinic and ACOG, Perimenopause and menopause (menopause confirmed after 12 months without a period; average age about 51)."
+  ];
+
+  root.AlmanacContent = { PHASES, MYTHS, SEE_DOCTOR, URGENT, FLAGS, SYMPTOMS, ALERT_SYMPTOMS, FLOW, MOOD, ENERGY, PAIN, MUCUS, HOW, SOURCES, FERTILE_FACT, ANATOMY, MUCUS_INFO, GUIDES, LIFE, GLOSSARY, MORE_SOURCES };
 })(typeof self !== "undefined" ? self : this);

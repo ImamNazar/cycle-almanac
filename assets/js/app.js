@@ -5,7 +5,7 @@
    ========================================================================== */
 (function () {
   "use strict";
-  const A = window.Almanac, C = window.AlmanacContent, SC = window.AlmanacScene;
+  const A = window.Almanac, C = window.AlmanacContent, SC = window.AlmanacScene, F = window.AlmanacFigures;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -136,13 +136,14 @@
     const P = C.PHASES[c.phase];
     const hormonal = S.mode === "hormonal";
     h += `<section class="card status" aria-labelledby="st-h"><p class="eyebrow">${greeting()}</p>
-      <h1 class="status__h" id="st-h">Day ${c.day} <span class="status__ph">${hormonal ? P.name : P.name}</span></h1>
+      <span class="status__badge" aria-hidden="true">${F.PHICON[c.phase] || ""}</span>
+      <h1 class="status__h" id="st-h">Day ${c.day} <span class="status__ph">${P.name}</span></h1>
       <p class="status__sci">${P.sci}</p><p class="status__line">${P.line}</p>
       ${hormonal ? "" : ribbon(c)}
       <ul class="facts">${nextFact(c)}${hormonal ? "" : fertileFact(c)}</ul>
       ${hormonal ? "" : `<p class="fine">Fertile-window dates are estimates and <b>not birth control</b>.</p>`}
       <div class="actions">${actionsFor(c)}</div></section>`;
-    h += todayLogCard() + flagsHTML() + seasonCard(c);
+    h += outlookCard() + todayLogCard() + flagsHTML() + seasonCard(c);
     return h;
   }
   function actionsFor(c) {
@@ -151,19 +152,71 @@
     if (!c.inPeriod) return `<button class="btn" data-act="log" type="button">Log today</button><button class="btn btn--ghost" data-act="start-period" type="button">Period started today</button>`;
     return `<button class="btn" data-act="log" type="button">Log today</button>`;
   }
+  /* ---- one-tap logging on Today: mood plus the symptoms people commonly report in this season */
+  const PHASE_SYMS = {
+    winter: ["cramps", "backache", "fatigue", "headache", "bloating", "nausea"],
+    spring: ["headache", "fatigue", "acne", "insomnia", "anxious", "lowmood"],
+    summer: ["bloating", "breast", "headache", "cramps", "cravings", "irritable"],
+    autumn: ["bloating", "breast", "irritable", "cravings", "insomnia", "lowmood"]
+  };
+  const symName = id => C.SYMPTOMS.concat(C.ALERT_SYMPTOMS).find(x => x[0] === id) || [id, id, ""];
   function todayLogCard() {
-    const L = data.logs[isoNow()];
-    if (!L) return `<section class="card card--tight"><h2 class="h3">How are you today?</h2><p class="muted">A 5-second log helps Almanac learn your patterns.</p><div class="actions"><button class="btn btn--ghost" data-act="log" type="button">Log today</button></div></section>`;
-    const chips = [];
-    if (L.flow != null) chips.push("Flow: " + C.FLOW[L.flow][1].toLowerCase());
-    if (L.mood) chips.push(C.MOOD[L.mood - 1][1] + " " + C.MOOD[L.mood - 1][2].toLowerCase());
-    if (L.energy) chips.push("Energy: " + C.ENERGY[L.energy - 1][1].toLowerCase());
-    if (L.pain != null) chips.push("Pain: " + C.PAIN[L.pain][1].toLowerCase());
-    (L.sym || []).forEach(s => { const f = C.SYMPTOMS.concat(C.ALERT_SYMPTOMS).find(x => x[0] === s); if (f) chips.push(f[1]); });
-    if (L.bbt != null) chips.push(cToUnit(L.bbt).toFixed(2) + "°" + data.settings.unit);
-    return `<section class="card card--tight"><div class="row"><h2 class="h3">Today's log</h2><button class="link" data-act="log" type="button">Edit</button></div>
-      <div class="chips">${chips.map(x => `<span class="chip">${esc(x)}</span>`).join("") || '<span class="muted">Nothing logged yet.</span>'}</div></section>`;
+    const L = data.logs[isoNow()] || {}, c = AN.current;
+    const ids = (c && PHASE_SYMS[c.phase]) || ["cramps", "headache", "bloating", "fatigue", "irritable", "insomnia"];
+    const extra = (L.sym || []).filter(x => !ids.includes(x));
+    const moods = C.MOOD.map(m => `<button type="button" class="qm${L.mood === +m[0] ? " on" : ""}" data-act="quick" data-k="mood" data-v="${m[0]}" aria-pressed="${L.mood === +m[0]}"><span class="qm__e">${m[1]}</span><small>${m[2]}</small></button>`).join("");
+    const syms = ids.concat(extra).map(id => { const x = symName(id), on = (L.sym || []).includes(id); return `<button type="button" class="chip chip--btn${on ? " on" : ""}" data-act="quick-sym" data-v="${id}" aria-pressed="${on}">${x[2]} ${x[1]}</button>`; }).join("");
+    const also = [];
+    if (L.flow != null) also.push("Flow: " + C.FLOW[L.flow][1].toLowerCase());
+    if (L.energy) also.push("Energy: " + C.ENERGY[L.energy - 1][1].toLowerCase());
+    if (L.pain != null) also.push("Pain: " + C.PAIN[L.pain][1].toLowerCase());
+    if (L.bbt != null) also.push(cToUnit(L.bbt).toFixed(2) + "°" + data.settings.unit);
+    if (L.lh) also.push("LH " + (L.lh === "pos" ? "positive" : "negative"));
+    if (L.mucus) also.push("Mucus: " + L.mucus.replace("eggwhite", "egg-white"));
+    return `<section class="card" aria-labelledby="ql-h"><div class="row"><h2 class="h3 ih" id="ql-h">${F.ICON.smile}How are you today?</h2><button class="link" data-act="log" type="button">More</button></div>
+      <div class="qmoods" role="group" aria-label="Mood">${moods}</div>
+      <p class="qlabel">${c && PHASE_SYMS[c.phase] ? "Commonly reported in " + pName(c.phase).toLowerCase() : "Feeling anything?"}</p>
+      <div class="chips" role="group" aria-label="Symptoms">${syms}</div>
+      ${also.length ? `<div class="chips chips--also">${also.map(x => `<span class="chip">${esc(x)}</span>`).join("")}</div>` : ""}
+      <p class="fine">Tap to log. Tap again to undo. <b>More</b> adds flow, energy, pain, temperature and notes.</p></section>`;
   }
+
+  /* ---- the next seven days */
+  function outlookDay(d) {
+    const c = AN.current, S = data.settings, up = AN.upcoming, o2n = AN.stats.ovuToNext, pM = Math.max(1, Math.round(AN.stats.periodMean));
+    const logged = ((data.logs[A.fromDay(d)] || {}).flow || 0) >= 2;
+    const res = { d, phase: null, tag: "", kind: "" };
+    const inRange = up.find(u => d >= u.lo && d <= u.hi);
+    if (S.mode === "hormonal") {
+      res.phase = "steady";
+      if (logged || (c.inPeriod && d <= AN.last.start + pM - 1 && d >= TODAY)) { res.phase = "bleed"; res.tag = "Bleed"; res.kind = "period"; }
+      else if (inRange && d >= TODAY) { res.tag = inRange.start === d ? "Bleed expected" : "Bleed may start"; res.kind = "pred"; }
+      return res;
+    }
+    if (c.late && d >= TODAY) { res.phase = "autumn"; res.tag = d === TODAY ? "Period due" : ""; res.kind = d === TODAY ? "pred" : ""; return res; }
+    let ctx;
+    if (d < up[0].start || (c.inPeriod && d <= AN.last.start + pM - 1)) ctx = { start: AN.last.start, bleedEnd: c.inPeriod ? Math.max(c.bleedEnd, AN.last.start + pM - 1) : c.bleedEnd, ovu: c.ovu.day };
+    else { const j = d >= up[1].start ? 1 : 0; ctx = { start: up[j].start, bleedEnd: up[j].start + pM - 1, ovu: up[j + 1].start - o2n }; }
+    res.phase = A.phaseOf(d, ctx);
+    const confirmedPast = ctx.start === AN.last.start && c.ovu.confirmed && d > ctx.ovu;
+    if (logged || (res.phase === "winter" && ctx.start === AN.last.start && c.inPeriod)) { res.tag = "Period"; res.kind = "period"; }
+    else if (d === ctx.ovu && !confirmedPast) { res.tag = "Ovulation"; res.kind = "ovu"; }
+    else if (d >= ctx.ovu - 5 && d < ctx.ovu && !confirmedPast) { res.tag = "Fertile"; res.kind = "fert"; }
+    else if (inRange && d >= TODAY && ctx.start !== AN.last.start || (inRange && d >= TODAY && d >= up[0].lo)) { res.tag = inRange.start === d ? "Period expected" : "Period may start"; res.kind = "pred"; }
+    return res;
+  }
+  function outlookCard() {
+    if (!AN.current || !AN.upcoming.length || data.settings.mode === "paused") return "";
+    const tiles = Array.from({ length: 7 }, (_, i) => outlookDay(TODAY + i)).map((o, i) => {
+      const ph = o.phase || "spring";
+      return `<li class="out out--${o.kind || "none"}${i === 0 ? " is-now" : ""}" style="--ph:var(--c-${ph === "bleed" ? "winter" : ph === "steady" ? "spring" : ph})" aria-label="${esc(fLong(o.d) + (o.tag ? ": " + o.tag : "") + (o.phase && o.phase !== "steady" && o.phase !== "bleed" ? ", " + pName(o.phase) : ""))}">
+        <span class="out__dow">${i === 0 ? "Today" : fmt(o.d, { weekday: "short" })}</span><b class="out__n">${fmt(o.d, { day: "numeric" })}</b>
+        <span class="out__ico">${F.PHICON[o.phase] || ""}</span><span class="out__tag">${o.tag || "&nbsp;"}</span></li>`;
+    }).join("");
+    return `<section class="card card--flush"><div class="row row--pad"><h2 class="h3 ih">${F.ICON.clock}Next 7 days</h2><button class="link" data-tab="calendar" type="button">Calendar</button></div>
+      <ol class="outlook" aria-label="Seven day outlook">${tiles}</ol><p class="fine fine--pad">Estimates from your cycle history. Not birth control.</p></section>`;
+  }
+
   function seasonCard(c) {
     const P = C.PHASES[c.phase];
     if (!P.what) return `<section class="card"><h2 class="h3">${P.name}</h2><p>${P.line}</p></section>`;
@@ -258,12 +311,44 @@
         <p class="fine">For comparison: in a study of over 600,000 logged cycles the average was 29.3 days, and only 13% were exactly 28. Typical adult cycles run ${r.min} to ${r.max} days.</p></section>`;
     }
     h += flagsHTML();
+    h += wheelCard() + stripsCard();
     h += patternsCard() + symptomsCard();
     h += `<section class="card"><h2 class="h3">Take it with you</h2>
       <p>A one-page summary of your cycles to bring to an appointment, or your predictions as calendar events.</p>
       <div class="actions"><button class="btn btn--ghost" data-act="summary" type="button">Doctor summary</button>${AN.upcoming.length ? '<button class="btn btn--ghost" data-act="ics" type="button">Add predictions to calendar</button>' : ""}</div>
       <p class="fine">Calendar events can be seen by anyone who shares that calendar. Check before you add them.</p></section>`;
     return h;
+  }
+  function wheelCard() {
+    const c = AN.current; if (!c || data.settings.mode !== "natural") return "";
+    const st = AN.last.start, len = Math.max(c.predLen, c.day);
+    const fig = F.wheel({ len, bleedEnd: c.bleedEnd - st + 1, ovu: clamp(c.ovu.day - st + 1, c.bleedEnd - st + 4, len - 2), today: c.day, main: "Day " + c.day, sub: pName(c.phase),
+      label: `Cycle wheel. Day ${c.day} of about ${len}, ${pName(c.phase)}. Estimated fertile window days ${c.fertile.start - st + 1} to ${c.fertile.end - st + 1}.` });
+    return `<section class="card"><h2 class="h3 ih">${F.ICON.chart}This cycle at a glance</h2><div class="wheelbox">${fig}</div>
+      <ul class="wlegend"><li><i style="background:var(--c-winter)"></i>Winter</li><li><i style="background:var(--c-spring)"></i>Spring</li><li><i style="background:var(--c-summer)"></i>Summer</li><li><i style="background:var(--c-autumn)"></i>Autumn</li><li><i class="wl-f"></i>Fertile window</li><li><i class="wl-o"></i>Ovulation (est.)</li></ul>
+      <p class="fine">Drawn to scale for your own cycle length. The ringed dot is today.</p></section>`;
+  }
+  function stripsCard() {
+    const cs = AN.cycles.slice(-8); if (!cs.length) return "";
+    const natural = data.settings.mode === "natural", o2n = AN.stats.ovuToNext, cur = AN.current;
+    const max = Math.max(...cs.map(c => c.length), cur ? Math.max(cur.predLen, cur.day) : 0, 28);
+    const w = v => (100 * v / max).toFixed(2) + "%";
+    const seg = (ph, n) => n > 0 ? `<i style="width:${w(n)};background:var(--c-${ph})"></i>` : "";
+    const rows = cs.map(c => {
+      let bar, mk = "";
+      if (natural) {
+        const od = (c.ovu != null ? c.ovu : c.next - o2n) - c.start + 1, b = c.periodLen, od2 = Math.max(od, b + 3);
+        bar = seg("winter", b) + seg("spring", od2 - 2 - b) + seg("summer", 3) + seg("autumn", c.length - (od2 + 1));
+        mk = `<span class="strip__o${c.ovuConfirmed ? " is-conf" : ""}" style="left:${w(od2 - 0.5)}" title="${c.ovuConfirmed ? "Ovulation confirmed" : "Ovulation estimated"}"></span>`;
+      } else bar = seg("winter", c.periodLen) + `<i style="width:${w(c.length - c.periodLen)};background:var(--line)"></i>`;
+      return `<li class="strip"><span class="strip__d">${fShort(c.start)}</span><span class="strip__bar">${bar}${mk}</span><span class="strip__n">${c.length}</span></li>`;
+    });
+    if (cur && natural) {
+      const st = AN.last.start, b = cur.bleedEnd - st + 1, od = clamp(cur.ovu.day - st + 1, b + 3, cur.predLen - 2), len = Math.max(cur.predLen, cur.day);
+      rows.push(`<li class="strip strip--now"><span class="strip__d">${fShort(st)}</span><span class="strip__bar">${seg("winter", b)}${seg("spring", od - 2 - b)}${seg("summer", 3)}${seg("autumn", len - (od + 1))}<span class="strip__o${cur.ovu.confirmed ? " is-conf" : ""}" style="left:${w(od - 0.5)}"></span><span class="strip__t" style="left:${w(cur.day - 0.5)}"></span></span><span class="strip__n">now</span></li>`);
+    }
+    return `<section class="card"><h2 class="h3 ih">${F.ICON.chart}Your last ${cs.length} cycles</h2><ul class="strips" aria-label="Each row is one cycle; the number is its length in days">${rows.join("")}</ul>
+      <p class="fine">Each bar is one cycle, drawn to the same scale. ${natural ? "A solid dot is ovulation confirmed by your own temperature or LH test; a hollow dot is an estimate. The last row is the current cycle (predicted), and the tick is today." : "The coloured part is your bleeding."}</p></section>`;
   }
   function patternsCard() {
     const logged = Object.values(data.logs).filter(l => l.mood || l.energy || l.pain != null).length;
@@ -284,18 +369,58 @@
   }
 
   /* ---------------------------------------------------------------- learn */
+  const GUIDE_SUB = { temp: "Confirms ovulation after the fact", lh: "Predicts ovulation about a day ahead", mucus: "Your body's own fertility signal", products: "Tampons, cups, pads and toxic shock signs", pms: "PMS, PMDD and when to get help", bc: "What hormonal methods do to bleeding" };
+  const mucusScale = () => `<ol class="mscale">${C.MUCUS_INFO.map(m => `<li><span class="mscale__ico">${F.MUCUS_GLYPH[m[0]]}</span><span><b>${m[1]}</b><small>${m[2]}</small></span><span class="mscale__bar" role="img" aria-label="Fertility ${m[3]} of 5"><i style="width:${m[3] * 20}%"></i></span></li>`).join("")}</ol>`;
+  const figBox = (svg, cap) => `<figure class="figbox">${svg}<figcaption>${cap}</figcaption></figure>`;
+  function guideCard(g) {
+    const fig = g.fig === "bbt" ? figBox(F.bbt(), "Example temperature chart with made-up data. A sustained rise after ovulation confirms it happened.")
+      : g.fig === "lh" ? figBox(F.lhStrips(), "How an ovulation test typically looks as the LH surge arrives.") : g.fig === "mucus" ? mucusScale() : "";
+    return `<details class="card lsec fold fold--big" id="guide-${g.id}"><summary><span class="ph-ico ph-ico--g">${F.ICON[g.ico]}</span><span><b>${g.title}</b><small>${GUIDE_SUB[g.id] || ""}</small></span></summary>
+      <p>${g.intro}</p>${fig}<ol class="steps">${g.steps.map(t => `<li>${t}</li>`).join("")}</ol><ul class="notes">${g.notes.map(t => `<li>${t}</li>`).join("")}</ul></details>`;
+  }
   function pageLearn() {
-    const seasons = ["winter", "spring", "summer", "autumn"].map(k => { const P = C.PHASES[k]; return `<details class="card fold fold--big" style="--ph:var(--c-${k})"><summary><span class="dot dot--lg"></span><span><b>${P.name}</b><small>${P.sci}</small></span></summary>
-      <p class="muted">${P.days}</p>${P.what.map(t => `<p>${t}</p>`).join("")}<p class="hormones"><b>Hormones.</b> ${P.hormones}</p>
-      <h3 class="h4">Commonly reported</h3><p>${P.common}</p><h3 class="h4">What may help</h3><ul class="list">${P.help.map(t => `<li>${t}</li>`).join("")}</ul></details>`; }).join("");
+    const ih = (ico, t) => `<h2 class="h3 ih">${F.ICON[ico] || ""}${t}</h2>`;
+    const seasons = ["winter", "spring", "summer", "autumn"].map(k => { const P = C.PHASES[k];
+      return `<details class="card lsec fold fold--big" id="season-${k}" style="--ph:var(--c-${k})"><summary><span class="ph-ico">${F.PHICON[k]}</span><span><b>${P.name}</b><small>${P.sci}</small></span></summary>
+        <figure class="anat"><div class="anat__fig">${F.anatomy(k)}</div><figcaption>${C.ANATOMY[k]} <small>Simplified diagram.</small></figcaption></figure>
+        <p class="muted">${P.days}</p>${P.what.map(t => `<p>${t}</p>`).join("")}<p class="hormones"><b>Hormones.</b> ${P.hormones}</p>
+        <h3 class="h4">Commonly reported</h3><p>${P.common}</p><h3 class="h4">What may help</h3><ul class="list">${P.help.map(t => `<li>${t}</li>`).join("")}</ul></details>`; }).join("");
+    const jumps = [["sec-charts", "Pictures"], ["sec-seasons", "Seasons"], ["sec-howto", "How-to"], ["sec-safety", "Safety"], ["sec-life", "Life stages"], ["sec-myths", "Myths"], ["sec-glossary", "Glossary"]]
+      .map(j => `<button type="button" class="chip chip--btn" data-act="jump" data-to="${j[0]}">${j[1]}</button>`).join("");
+    const wheel = F.wheel({ len: 28, bleedEnd: 5, ovu: 15, today: null, main: "28", sub: "day example", label: "An example 28-day cycle wheel: bleeding on days 1 to 5, ovulation around day 15, and a fertile window from day 10 to 15." });
     return `<section class="card"><h1 class="h2">Learn</h1><p>A cycle is counted from the first day of one period to the day before the next. For adults it's usually <b>21 to 35 days</b>; for teenagers up to <b>45</b>. The four seasons are our way of picturing the four phases. The science underneath is the standard one, and every season shows its scientific name.</p></section>
-      ${seasons}
-      <section class="card"><h2 class="h3">The fertile window</h2><p>${C.FERTILE_FACT}</p><p class="fine">Almanac's fertile window is an estimate. It is not contraception.</p></section>
-      <section class="card"><h2 class="h3">Myths and facts</h2>${C.MYTHS.map(m => `<details class="fold"><summary>${m[0]}</summary><p>${m[1]}</p></details>`).join("")}</section>
-      <section class="card"><h2 class="h3">When to see a doctor</h2><ul class="list">${C.SEE_DOCTOR.map(t => `<li>${t}</li>`).join("")}</ul><h3 class="h4">Get urgent care for</h3><ul class="list">${C.URGENT.map(t => `<li>${t}</li>`).join("")}</ul></section>
-      <section class="card"><h2 class="h3">How Almanac works out its numbers</h2>${C.HOW.map(h => `<details class="fold"><summary>${h[0]}</summary><p>${h[1]}</p></details>`).join("")}</section>
-      <section class="card"><h2 class="h3">Sources</h2><ul class="list list--small">${C.SOURCES.map(t => `<li>${esc(t)}</li>`).join("")}</ul>
-        <p class="fine"><b>Almanac is an information tool, not medical advice.</b> It can't diagnose anything and it isn't a contraceptive. If something worries you, or your cycle changes, talk to a clinician.</p></section>`;
+      <section class="card card--tight"><label class="searchbox">${F.ICON.search}<span class="sr">Search Learn</span><input id="learn-q" type="search" placeholder="Search: ovulation, cramps, tampons…" autocomplete="off" enterkeyhint="search"></label>
+        <div class="jumps" role="group" aria-label="Jump to a section">${jumps}</div><p class="fine" id="learn-count" aria-live="polite"></p></section>
+      <h2 class="lhead" id="sec-charts">${F.ICON.chart}The cycle in pictures</h2>
+      <section class="card lsec">${ih("chart", "The cycle wheel")}<div class="wheelbox">${wheel}</div>
+        <ul class="wlegend"><li><i style="background:var(--c-winter)"></i>Winter · menstrual</li><li><i style="background:var(--c-spring)"></i>Spring · follicular</li><li><i style="background:var(--c-summer)"></i>Summer · ovulation</li><li><i style="background:var(--c-autumn)"></i>Autumn · luteal</li><li><i class="wl-f"></i>Fertile window</li></ul>
+        <p class="fine">An example 28-day cycle. Yours will differ. Ovulation sits about 14 days before your next period, not always on day 14.</p></section>
+      <section class="card lsec">${ih("chart", "Hormones across a cycle")}${F.hormones()}
+        <ul class="list"><li><b>Estrogen</b> climbs through spring, peaks just before ovulation, then has a smaller rise in autumn.</li><li><b>LH</b> spikes about a day before ovulation. This is what ovulation tests detect.</li><li><b>Progesterone</b> stays low until ovulation, peaks about a week later, then falls before your period.</li><li><b>FSH</b> is highest early in the cycle, with a smaller rise at mid-cycle.</li></ul>
+        <p class="fine">Schematic shapes from published reference ranges. They show the pattern, not anyone's actual levels.</p></section>
+      <h2 class="lhead" id="sec-seasons">${F.PHICON.spring}The four seasons</h2>${seasons}
+      <section class="card lsec">${ih("shield", "The fertile window")}<p>${C.FERTILE_FACT}</p><p class="fine">Almanac's fertile window is an estimate. It is not contraception.</p></section>
+      <h2 class="lhead" id="sec-howto">${F.ICON.thermo}How-to guides</h2>${C.GUIDES.filter(g => ["temp", "lh", "mucus"].includes(g.id)).map(guideCard).join("")}
+      <h2 class="lhead" id="sec-safety">${F.ICON.shield}Safety and wellbeing</h2>${C.GUIDES.filter(g => ["products", "pms", "bc"].includes(g.id)).map(guideCard).join("")}
+      <section class="card lsec" id="sec-life">${ih("life", "Life stages")}${C.LIFE.map(l => `<div class="item" data-item><h3 class="h4">${l[0]}</h3><p>${l[1]}</p></div>`).join("")}</section>
+      <section class="card lsec" id="sec-myths">${ih("alert", "Myths and facts")}${C.MYTHS.map(m => `<details class="fold"><summary>${m[0]}</summary><p>${m[1]}</p></details>`).join("")}</section>
+      <section class="card lsec">${ih("alert", "When to see a doctor")}<ul class="list">${C.SEE_DOCTOR.map(t => `<li>${t}</li>`).join("")}</ul><h3 class="h4">Get urgent care for</h3><ul class="list">${C.URGENT.map(t => `<li>${t}</li>`).join("")}</ul></section>
+      <section class="card lsec">${ih("book", "How Almanac works out its numbers")}${C.HOW.map(h => `<details class="fold"><summary>${h[0]}</summary><p>${h[1]}</p></details>`).join("")}</section>
+      <section class="card lsec" id="sec-glossary">${ih("glossary", "Glossary")}<dl class="gloss">${C.GLOSSARY.map(g => `<div data-item><dt>${g[0]}</dt><dd>${g[1]}</dd></div>`).join("")}</dl></section>
+      <section class="card lsec">${ih("book", "Sources")}<ul class="list list--small">${C.SOURCES.concat(C.MORE_SOURCES).map(t => `<li>${esc(t)}</li>`).join("")}</ul>
+        <p class="fine"><b>Almanac is an information tool, not medical advice.</b> It can't diagnose anything and it isn't a contraceptive. If something worries you, or your cycle changes, talk to a clinician.</p></section>
+      <p class="muted nomatch" id="learn-none" hidden>Nothing matches that. Try a simpler word, like "pain" or "ovulation".</p>`;
+  }
+  function filterLearn(raw) {
+    const q = raw.trim().toLowerCase(); let shown = 0;
+    $$("#page .lhead").forEach(h => (h.hidden = !!q));
+    $$("#page .lsec").forEach(sec => {
+      const hit = !q || sec.textContent.toLowerCase().includes(q); sec.hidden = !hit; if (!hit) return; shown++;
+      if (q && sec.tagName === "DETAILS") sec.open = true;
+      $$(".fold, [data-item]", sec).forEach(it => { const m = !q || it.textContent.toLowerCase().includes(q); it.hidden = !m; if (q && m && it.tagName === "DETAILS") it.open = true; });
+    });
+    $("#learn-none").hidden = !(q && shown === 0);
+    $("#learn-count").textContent = q ? (shown ? shown + " section" + (shown === 1 ? "" : "s") + " match" + (shown === 1 ? "es" : "") : "") : "";
   }
 
   /* ============================================================== SHEETS */
@@ -314,27 +439,27 @@
   const seg = (k, opts, name) => `<div class="seg" role="radiogroup" aria-label="${name}">${opts.map(o => `<button type="button" role="radio" class="seg__b" data-act="set" data-k="${k}" data-v="${o.v}" aria-checked="false">${o.html}</button>`).join("")}</div>`;
   function logHTML(iso) {
     const d = A.toDay(iso), natural = data.settings.mode === "natural", L = data.logs[iso] || {};
-    const flow = seg("flow", C.FLOW.map(f => ({ v: f[0], html: f[1] })), "Flow");
+    const flow = seg("flow", C.FLOW.map(f => ({ v: f[0], html: `${F.drops([0, 1, 1, 2, 3][+f[0]])}<span class="fl-l">${f[1]}</span>` })), "Flow");
     const mood = seg("mood", C.MOOD.map(f => ({ v: f[0], html: `<span class="em">${f[1]}</span><small>${f[2]}</small>` })), "Mood");
     const energy = seg("energy", C.ENERGY.map(f => ({ v: f[0], html: f[1] })), "Energy");
     const pain = seg("pain", C.PAIN.map(f => ({ v: f[0], html: f[1] })), "Pain");
-    const chip = (id, label, alert) => `<button type="button" class="chip chip--btn${alert ? " chip--alert" : ""}" data-act="sym" data-v="${id}" aria-pressed="false">${label}</button>`;
+    const chip = (id, label, alert, em) => `<button type="button" class="chip chip--btn${alert ? " chip--alert" : ""}" data-act="sym" data-v="${id}" aria-pressed="false">${em || ""} ${label}</button>`;
     const fert = natural ? `<details class="fold adv" ${L.lh || L.mucus || L.bbt != null ? "open" : ""}><summary>Fertility signs <small>optional, but they make predictions much sharper</small></summary>
-      <fieldset><legend>LH (ovulation) test</legend>${seg("lh", [{ v: "neg", html: "Negative" }, { v: "pos", html: "Positive" }], "LH test")}</fieldset>
-      <fieldset><legend>Cervical mucus</legend>${seg("mucus", C.MUCUS.map(f => ({ v: f[0], html: f[1] })), "Cervical mucus")}</fieldset>
-      <label class="field"><span>Morning temperature <small>(°${data.settings.unit}, before getting up)</small></span><input type="number" inputmode="decimal" step="0.01" id="in-bbt" placeholder="${data.settings.unit === "F" ? "97.70" : "36.50"}" value="${L.bbt != null ? cToUnit(L.bbt).toFixed(2) : ""}"></label></details>` : "";
+      <fieldset><legend>${F.ICON.strip}LH (ovulation) test</legend>${seg("lh", [{ v: "neg", html: "Negative" }, { v: "pos", html: "Positive" }], "LH test")}</fieldset>
+      <fieldset><legend>${F.ICON.mucus}Cervical mucus</legend>${seg("mucus", C.MUCUS.map(f => ({ v: f[0], html: f[1] })), "Cervical mucus")}</fieldset>
+      <label class="field"><span>${F.ICON.thermo}Morning temperature <small>(°${data.settings.unit}, before getting up)</small></span><input type="number" inputmode="decimal" step="0.01" id="in-bbt" placeholder="${data.settings.unit === "F" ? "97.70" : "36.50"}" value="${L.bbt != null ? cToUnit(L.bbt).toFixed(2) : ""}"></label></details>` : "";
     return `<header class="sheet__head sheet__head--day"><button class="icon" data-act="day-step" data-step="-1" type="button" aria-label="Previous day">${I.chev(-1)}</button>
       <div class="sheet__title"><h2 id="sh-t">${d === TODAY ? "Today" : fmt(d, { weekday: "long" })}</h2><p class="sheet__sub" id="sh-sub"></p></div>
       <button class="icon" data-act="day-step" data-step="1" type="button" aria-label="Next day" ${d >= TODAY ? "disabled" : ""}>${I.chev(1)}</button></header>
       <div class="sheet__body">
-        <fieldset><legend>Flow</legend>${flow}</fieldset>
-        <fieldset><legend>Mood</legend>${mood}</fieldset>
-        <fieldset><legend>Energy</legend>${energy}</fieldset>
-        <fieldset><legend>Pain</legend>${pain}</fieldset>
-        <fieldset><legend>Symptoms</legend><div class="chips">${C.SYMPTOMS.map(s => chip(s[0], s[1])).join("")}</div>
-          <div class="chips chips--alert">${C.ALERT_SYMPTOMS.map(s => chip(s[0], s[1], true)).join("")}</div></fieldset>
+        <fieldset><legend>${F.ICON.drop}Flow</legend>${flow}</fieldset>
+        <fieldset><legend>${F.ICON.smile}Mood</legend>${mood}</fieldset>
+        <fieldset><legend>${F.ICON.bolt}Energy</legend>${energy}</fieldset>
+        <fieldset><legend>${F.ICON.pain}Pain</legend>${pain}</fieldset>
+        <fieldset><legend>${F.ICON.plus}Symptoms</legend><div class="chips">${C.SYMPTOMS.map(s => chip(s[0], s[1], false, s[2])).join("")}</div>
+          <div class="chips chips--alert">${C.ALERT_SYMPTOMS.map(s => chip(s[0], s[1], true, s[2])).join("")}</div></fieldset>
         ${fert}
-        <label class="field"><span>Note</span><textarea id="in-note" rows="2" maxlength="500" placeholder="Anything worth remembering">${esc(L.note || "")}</textarea></label>
+        <label class="field"><span>${F.ICON.note}Note</span><textarea id="in-note" rows="2" maxlength="500" placeholder="Anything worth remembering">${esc(L.note || "")}</textarea></label>
         <button class="link link--danger" data-act="clear-day" type="button">Clear this day</button>
       </div><footer class="sheet__foot"><button class="btn" data-act="close" type="button">Done</button></footer>`;
   }
@@ -503,7 +628,7 @@
   const PHASE_ACCENT = { winter: "winter", spring: "spring", summer: "summer", autumn: "autumn", bleed: "winter", steady: "spring" };
   function render() {
     recompute();
-    document.body.dataset.tab = ui.tab;
+    document.body.dataset.view = ui.tab;
     document.body.dataset.phase = AN.current ? PHASE_ACCENT[AN.current.phase] || "spring" : "spring";
     $("#page").innerHTML = ({ today: pageToday, calendar: pageCalendar, insights: pageInsights, learn: pageLearn })[ui.tab]();
     $$(".dock__btn").forEach(b => b.setAttribute("aria-current", b.dataset.tab === ui.tab ? "page" : "false"));
@@ -513,7 +638,7 @@
 
   /* ================================================================= EVENTS */
   document.addEventListener("click", e => {
-    const t = e.target.closest("[data-act],[data-tab]"); if (!t) return;
+    const t = e.target.closest("[data-act],[data-tab]"); if (!t || t === document.body) return;   // body must never count as a button
     if (t.dataset.tab && !t.dataset.act) return go(t.dataset.tab);
     const act = t.dataset.act;
     switch (act) {
@@ -525,6 +650,9 @@
       case "set": { const k = t.dataset.k, v = t.dataset.v, L = data.logs[ui.day] || {}, num = ["flow", "mood", "energy", "pain"].includes(k) ? +v : v; setLog(ui.day, { [k]: L[k] === num ? undefined : num }); return syncLog(); }
       case "sym": { const L = data.logs[ui.day] || {}, s = new Set(L.sym || []); s.has(t.dataset.v) ? s.delete(t.dataset.v) : s.add(t.dataset.v); setLog(ui.day, { sym: [...s] }); return syncLog(); }
       case "clear-day": { delete data.logs[ui.day]; save(); recompute(); $$("#in-bbt,#in-note", sheet).forEach(x => (x.value = "")); return syncLog(); }
+      case "quick": { const L = data.logs[isoNow()] || {}, v = +t.dataset.v; setLog(isoNow(), { [t.dataset.k]: L[t.dataset.k] === v ? undefined : v }); return render(); }
+      case "quick-sym": { const L = data.logs[isoNow()] || {}, st = new Set(L.sym || []); st.has(t.dataset.v) ? st.delete(t.dataset.v) : st.add(t.dataset.v); setLog(isoNow(), { sym: [...st] }); return render(); }
+      case "jump": { const el = document.getElementById(t.dataset.to); if (el) { const d = $("#learn-q"); if (d && d.value) { d.value = ""; filterLearn(""); } el.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "start" }); } return; }
       case "start-period": return startPeriodToday();
       case "period-over": setLog(isoNow(), { flow: 0 }); toast("Marked: period over."); return render();
       case "pick-start": return openOnboarding() || (ui.ob.step = 1, openSheet("onboard", obHTML(), "sheet--full"));
@@ -557,6 +685,7 @@
     }
   });
   document.addEventListener("input", e => {
+    if (e.target.id === "learn-q") return filterLearn(e.target.value);
     if (e.target.id === "in-note") { clearTimeout(onInput.nt); onInput.nt = setTimeout(() => setLog(ui.day, { note: e.target.value.trim() }), 300); }
   });
 
