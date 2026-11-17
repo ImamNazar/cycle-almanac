@@ -2,9 +2,9 @@
    Strategy: serve from cache instantly, refresh the cache in the background,
    so an update you upload to GitHub arrives on the next visit.
    It only ever caches this site's own files. It never touches your logged data. */
-const CACHE = "almanac-v1";
+const CACHE = "almanac-v2";
 const FILES = ["./", "index.html", "manifest.webmanifest",
-  "assets/css/style.css", "assets/js/engine.js", "assets/js/content.js", "assets/js/scene.js", "assets/js/app.js",
+  "assets/css/style.css", "assets/js/engine.js", "assets/js/content.js", "assets/js/scene.js", "assets/js/figures.js", "assets/js/app.js",
   "assets/fonts/fraunces.woff2", "assets/fonts/fraunces-italic.woff2", "assets/fonts/figtree.woff2", "assets/fonts/figtree-italic.woff2",
   "assets/icons/favicon.svg", "assets/icons/icon-192.png", "assets/icons/icon-512.png", "assets/icons/apple-touch-icon.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())); });

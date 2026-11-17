@@ -13,6 +13,20 @@ follows your cycle **and the real time of day**.
 - **Works offline** and installs like an app on a phone.
 - Plain HTML, CSS and JavaScript. No build step, no installs.
 
+## What's inside
+
+- **Today**: a living landscape (sky follows the clock, season follows your phase, the two hills are
+  your hormones), your cycle ribbon, next-period range, fertile window, a **7-day outlook**, and
+  **one-tap logging** of mood and the symptoms people commonly report in your current season.
+- **Calendar**: periods, likely start window, fertile window and ovulation, all readable without relying on colour.
+- **Insights**: your rhythm, a **cycle wheel** for this cycle, **cycle strips** for every past cycle,
+  your own patterns by phase, gentle "worth mentioning to a clinician" notes, a printable
+  **doctor summary** and calendar export.
+- **Learn** (searchable, with jump links): **pictures** (cycle wheel, hormone chart, a uterus/ovary
+  diagram for each season), **how-to guides** (temperature, LH tests, cervical mucus), **safety**
+  (tampons, cups and toxic shock signs; PMS and PMDD; contraception and bleeding), **life stages**
+  (first periods to menopause), myths and facts, when to see a doctor, a glossary, and sources.
+
 ---
 
 ## Put it online (GitHub Pages)
@@ -37,9 +51,10 @@ follows your cycle **and the real time of day**.
 6. After a minute or two it's live at
    `https://<your-username>.github.io/cycle-almanac/`
 
-**Updating later:** drag the changed files into the repo again and commit. Because
-the app works offline, a returning visitor sees the new version on their *next*
-visit (one refresh after the update).
+**Updating later:** drag the changed files into the repo again and commit. Because the
+app works offline, a returning visitor sees the new version on their *next* visit, so
+open the site, then close and reopen it (or refresh twice). If an installed phone app
+still shows the old version, close it fully and reopen it.
 
 ---
 
@@ -100,6 +115,7 @@ sw.js                 offline support
 assets/js/engine.js   all the cycle logic (pure, tested)
 assets/js/content.js  all the words and facts
 assets/js/scene.js    the landscape
+assets/js/figures.js  every picture and icon (wheel, charts, diagrams)
 assets/js/app.js      the interface
 assets/css/style.css  the design
 assets/fonts/         Fraunces + Figtree (SIL Open Font License)
