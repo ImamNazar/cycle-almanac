@@ -38,6 +38,7 @@
   ];
   function sanitizeRituals(src) {
     const out = {};
+    if (src && JSON.stringify(src).length > 500000) return out;
     if (!src || typeof src !== "object" || Array.isArray(src)) return out;
     for (const [date, entries] of Object.entries(src)) {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !Array.isArray(entries) || entries.length > 30) continue;
@@ -68,6 +69,7 @@
       <button type="button" class="link" data-act="ritual-remove" data-ritual="${ritual.id}">Remove today's reflection</button></div></div>`);
   }
   function ritualRecord(id, result) {
+    if (storageReadError) { toast("Saved data could not be read. Restore a backup before saving."); return; }
     if (!RITUALS.some(r => r.id === id)) return;
     const day = isoNow(), entries = ((data.rituals || {})[day] || []).filter(e => e.id !== id);
     if (["tried", "better", "same", "not"].includes(result)) entries.push({ id, result });
@@ -647,7 +649,7 @@
   function importFile(file) {
     if (file.size > 5 * 1024 * 1024) { toast("Backup is too large (5 MB maximum)."); return; }
     const r = new FileReader();
-    r.onload = () => { try { const d = JSON.parse(r.result); if (!d || !d.logs || typeof d.logs !== "object" || Array.isArray(d.logs)) throw 0; const logs = sanitizeLogs(d.logs); const rituals = sanitizeRituals(d.rituals); if (!confirm(`Restore ${Object.keys(logs).length} logged days? This will replace ${Object.keys(data.logs).length} existing logged days and cannot be undone. Download a backup first if you want to keep them.`)) return; data.logs = logs; data.rituals = rituals; if (d.settings) { const f = fresh().settings, s = d.settings; data.settings = Object.assign(f, { mode: ["natural", "hormonal", "paused"].includes(s.mode) ? s.mode : "natural", age: s.age === "teen" ? "teen" : "adult", unit: s.unit === "F" ? "F" : "C", weekStart: s.weekStart === "sun" ? "sun" : "mon", defaultCycle: Number.isInteger(s.defaultCycle) ? s.defaultCycle : null, defaultPeriod: Number.isInteger(s.defaultPeriod) ? s.defaultPeriod : 5, onboarded: true }); } data.sample = false; storageReadError = false; save(); recompute(); toast("Restored " + Object.keys(logs).length + " logged days."); sheet.close(); } catch (e) { toast("That file doesn't look like an Almanac backup."); } };
+    r.onload = () => { try { const d = JSON.parse(r.result); if (!d || !d.logs || typeof d.logs !== "object" || Array.isArray(d.logs)) throw 0; const logs = sanitizeLogs(d.logs); const rituals = sanitizeRituals(d.rituals); if (!confirm(`Restore ${Object.keys(logs).length} logged days? This will replace ${Object.keys(data.logs).length} existing logged days and your current ritual reflections; it cannot be undone. Download a backup first if you want to keep them.`)) return; data.logs = logs; data.rituals = rituals; if (d.settings) { const f = fresh().settings, s = d.settings; data.settings = Object.assign(f, { mode: ["natural", "hormonal", "paused"].includes(s.mode) ? s.mode : "natural", age: s.age === "teen" ? "teen" : "adult", unit: s.unit === "F" ? "F" : "C", weekStart: s.weekStart === "sun" ? "sun" : "mon", defaultCycle: Number.isInteger(s.defaultCycle) ? s.defaultCycle : null, defaultPeriod: Number.isInteger(s.defaultPeriod) ? s.defaultPeriod : 5, onboarded: true }); } data.sample = false; storageReadError = false; save(); recompute(); toast("Restored " + Object.keys(logs).length + " logged days."); sheet.close(); } catch (e) { toast("That file doesn't look like an Almanac backup."); } };
     r.onerror = () => toast("Could not read that backup file.");
     r.readAsText(file);
   }
