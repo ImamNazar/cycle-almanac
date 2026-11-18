@@ -472,7 +472,7 @@
     const cd = cycleDayOf(A.toDay(iso)), sub = $("#sh-sub", sheet);
     if (sub) sub.textContent = fmt(A.toDay(iso), { day: "numeric", month: "long", year: "numeric" }) + (cd && cd < 120 ? " · cycle day " + cd : "");
   }
-  function openLog(iso) { clearTimeout(onInput.nt); ui.day = iso; openSheet("log", logHTML(iso)); syncLog(); }
+  function openLog(iso) { ui.day = iso; openSheet("log", logHTML(iso)); syncLog(); }
 
   /* ---- reading the landscape */
   function hillsSheet() {
@@ -650,7 +650,7 @@
       case "settings": return settingsSheet();
       case "hills": return hillsSheet();
       case "log": return openLog(t.dataset.day || isoNow());
-      case "day-step": { clearTimeout(onInput.nt); const d = clamp(A.toDay(ui.day) + (+t.dataset.step), 0, TODAY); if (d <= TODAY) { ui.day = A.fromDay(d); openSheet("log", logHTML(ui.day)); syncLog(); } return; }
+      case "day-step": { const d = clamp(A.toDay(ui.day) + (+t.dataset.step), 0, TODAY); if (d <= TODAY) { ui.day = A.fromDay(d); openSheet("log", logHTML(ui.day)); syncLog(); } return; }
       case "set": { const k = t.dataset.k, v = t.dataset.v, L = data.logs[ui.day] || {}, num = ["flow", "mood", "energy", "pain"].includes(k) ? +v : v; setLog(ui.day, { [k]: L[k] === num ? undefined : num }); return syncLog(); }
       case "sym": { const L = data.logs[ui.day] || {}, s = new Set(L.sym || []); s.has(t.dataset.v) ? s.delete(t.dataset.v) : s.add(t.dataset.v); setLog(ui.day, { sym: [...s] }); return syncLog(); }
       case "clear-day": { delete data.logs[ui.day]; save(); recompute(); $$("#in-bbt,#in-note", sheet).forEach(x => (x.value = "")); return syncLog(); }
@@ -690,7 +690,7 @@
   });
   document.addEventListener("input", e => {
     if (e.target.id === "learn-q") return filterLearn(e.target.value);
-    if (e.target.id === "in-note") { const day = ui.day, note = e.target.value.trim(); clearTimeout(onInput.nt); onInput.nt = setTimeout(() => setLog(day, { note }), 300); }
+    if (e.target.id === "in-note") { setLog(ui.day, { note: e.target.value.slice(0, 500) }); }
   });
 
   /* ---------------------------------------------------------------- boot */
