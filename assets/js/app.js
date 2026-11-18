@@ -10,24 +10,88 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const KEY = "almanac.v1";
-  const LOC = navigator.language || "en";
+  // Some Linux browsers expose legacy locale tags such as en-US@posix, which Intl rejects.
+  // Use a valid BCP 47 tag for date formatting without changing the user’s stored data.
+  const LOC = (() => { const raw = (navigator.language || "en").split("@")[0].replace(/_/g, "-"); try { return Intl.getCanonicalLocales(raw)[0] || "en"; } catch (e) { return "en"; } })();
   const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ------------------------------------------------------------- storage */
   const guessWeek = () => { try { return ["US", "CA", "MX", "BR", "JP", "IN", "PH", "IL", "SA", "ZA", "TW", "HK", "KR", "CO", "PE"].includes(new Intl.Locale(LOC).maximize().region) ? "sun" : "mon"; } catch (e) { return "mon"; } };
-  const fresh = () => ({ v: 1, settings: { mode: "natural", age: "adult", unit: "C", weekStart: guessWeek(), defaultCycle: null, defaultPeriod: 5, onboarded: false, lastBackup: null }, logs: {}, sample: false });
+  const fresh = () => ({ v: 1, settings: { mode: "natural", age: "adult", unit: "C", weekStart: guessWeek(), defaultCycle: null, defaultPeriod: 5, onboarded: false, lastBackup: null }, logs: {}, rituals: {}, sample: false });
   let storageReadError = false;
   function load() {
-    try { const raw = localStorage.getItem(KEY); if (raw) { const d = JSON.parse(raw), f = fresh(); if (!d || !d.logs || typeof d.logs !== "object" || Array.isArray(d.logs)) throw Error("Invalid saved data"); d.settings = Object.assign(f.settings, d.settings || {}); return d; } } catch (e) { storageReadError = true; }
+    try { const raw = localStorage.getItem(KEY); if (raw) { const d = JSON.parse(raw), f = fresh(); if (!d || !d.logs || typeof d.logs !== "object" || Array.isArray(d.logs)) throw Error("Invalid saved data"); d.settings = Object.assign(f.settings, d.settings || {}); d.rituals = sanitizeRituals(d.rituals); return d; } } catch (e) { storageReadError = true; }
     return fresh();
   }
-  let data = load(), saveT = 0;
+  let data, saveT = 0;
   function save() {
     if (storageReadError) { toast("Saved data could not be read. Restore a backup before saving."); return; }
     clearTimeout(saveT);
     saveT = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { toast("Couldn't save on this device. Private browsing can block saving."); } }, 120);
   }
 
+  /* --------------------------------------------------------- daily rituals */
+  const RITUALS = [
+    { id: "walk", icon: "🚶", title: "A comfortable walk", note: "Move at a pace that feels good." },
+    { id: "rest", icon: "🍵", title: "A quiet break", note: "Pause, breathe or make space to rest." },
+    { id: "meal", icon: "🥣", title: "A satisfying meal", note: "Enjoy something nourishing without food rules." },
+    { id: "journal", icon: "📓", title: "A quick reflection", note: "Notice what you need today." },
+    { id: "strength", icon: "🏋️", title: "Strength or movement", note: "Choose an intensity that suits your comfort." }
+  ];
+  function sanitizeRituals(src) {
+    const out = {};
+    if (src && JSON.stringify(src).length > 500000) return out;
+    if (!src || typeof src !== "object" || Array.isArray(src)) return out;
+    for (const [date, entries] of Object.entries(src)) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !Array.isArray(entries) || entries.length > 30) continue;
+      if (isNaN(A.toDay(date)) || A.fromDay(A.toDay(date)) !== date) continue;
+      const clean = entries.filter(e => e && RITUALS.some(r => r.id === e.id) && ["tried", "better", "same", "not"].includes(e.result))
+        .slice(0, RITUALS.length).map(e => ({ id: e.id, result: e.result }));
+      if (clean.length) out[date] = [...new Map(clean.map(e => [e.id, e])).values()];
+    }
+    return out;
+  }
+  function ritualCard() {
+    const done = (data.rituals || {})[isoNow()] || [];
+    return `<section class="card ritual-card"><p class="eyebrow">LITTLE THINGS</p><h2 class="h3">What might feel good today?</h2>
+      <p class="fine">Optional ideas, not phase rules. Try something and note how it felt.</p>
+      <div class="ritual-grid">${RITUALS.map(r => {
+        const entry = done.find(x => x.id === r.id);
+        return `<div class="ritual-item"><span class="ritual-icon" aria-hidden="true">${r.icon}</span><div class="ritual-copy"><b>${r.title}</b><span class="fine">${r.note}</span>
+          ${entry ? `<span class="fine">Your reflection: ${{tried:"Tried it",better:"Felt better",same:"About the same",not:"Not helpful"}[entry.result]}</span>` : ""}</div>
+          <button class="btn btn--ghost" data-act="ritual-pick" data-ritual="${r.id}" type="button">${entry ? "Update" : "Reflect"}</button></div>`;
+      }).join("")}</div></section>`;
+  }
+  function ritualReflection(id) {
+    const ritual = RITUALS.find(r => r.id === id);
+    if (!ritual) return;
+    const choices = [["tried", "I tried it"], ["better", "Felt better"], ["same", "About the same"], ["not", "Not helpful"]];
+    openSheet("ritual", frame("Your reflection", `<p class="eyebrow">LITTLE THINGS</p><h3 class="h3">${ritual.icon} ${ritual.title}</h3><p>How did it feel? This records an observation, not proof of cause and effect.</p>
+      <div class="ritual-actions">${choices.map(([value, label]) => `<button type="button" class="btn btn--ghost" data-act="ritual-save" data-ritual="${ritual.id}" data-result="${value}">${label}</button>`).join("")}
+      <button type="button" class="link" data-act="ritual-remove" data-ritual="${ritual.id}">Remove today's reflection</button></div>`));
+  }
+  function ritualRecord(id, result) {
+    if (storageReadError) { toast("Saved data could not be read. Restore a backup before saving."); return; }
+    if (!RITUALS.some(r => r.id === id)) return;
+    const day = isoNow(), entries = ((data.rituals || {})[day] || []).filter(e => e.id !== id);
+    if (["tried", "better", "same", "not"].includes(result)) entries.push({ id, result });
+    if (!data.rituals) data.rituals = {};
+    if (entries.length) data.rituals[day] = entries; else delete data.rituals[day];
+    save(); sheet.close(); render();
+  }
+  function ritualInsights() {
+    const entries = Object.values(data.rituals || {}).flat().filter(e => e.result !== "tried");
+    if (!entries.length) return `<section class="card"><h2 class="h3">Your little things</h2><p>Once you've reflected on activities, you'll see what you've noticed here. There are no streaks to maintain.</p></section>`;
+    const rows = RITUALS.map(r => {
+      const e = entries.filter(x => x.id === r.id);
+      if (!e.length) return "";
+      const better = e.filter(x => x.result === "better").length;
+      return `<li><b>${r.title}</b> — felt better on ${better} of ${e.length} reflected occasions.</li>`;
+    }).filter(Boolean);
+    return `<section class="card"><h2 class="h3">Your little things</h2><p class="fine">Your own observations, not medical conclusions.</p><ul class="list">${rows.join("")}</ul></section>`;
+  }
+
+  data = load();
   /* ---------------------------------------------------------------- time */
   let NOW = new Date(), TODAY = A.localDay(NOW), AN = null, PAT = null;
   const recompute = () => { AN = A.analyze(data, TODAY); PAT = A.patterns(data, AN); };
@@ -53,7 +117,7 @@
   };
 
   /* ------------------------------------------------------------ UI state */
-  const ui = { tab: "today", month: null, day: null, ob: null };
+  const ui = { tab: "today", month: null, day: null, ob: null, calSelected: null };
   const monthOf = d => { const iso = A.fromDay(d); return { y: +iso.slice(0, 4), m: +iso.slice(5, 7) - 1 }; };
   ui.month = monthOf(TODAY);
 
@@ -130,10 +194,10 @@
       <h1 class="status__h">Welcome to <span class="status__ph">Almanac</span></h1>
       <p class="status__line">Log the first day of your last period and the landscape above starts following your cycle.</p>
       <div class="actions"><button class="btn" data-act="start-period" type="button">My period started today</button><button class="btn btn--ghost" data-act="pick-start" type="button">It started earlier</button></div>
-      <p class="fine">Everything stays on this device. No account, no server.</p></section>` + todayLogCard() + learnTeaser();
+      <p class="fine">Everything stays on this device. No account, no server.</p></section>` + todayLogCard() + ritualCard() + learnTeaser();
     if (S.mode === "paused") return h + `<section class="card status"><p class="eyebrow">${greeting()}</p><h1 class="status__h">Predictions <span class="status__ph">paused</span></h1>
       <p class="status__line">Cycle estimates are off, which makes sense during pregnancy, postpartum or whenever your cycle isn't following its usual pattern. You can still log how you feel, and switch predictions back on in Settings.</p>
-      <div class="actions"><button class="btn" data-act="log" type="button">Log today</button></div></section>` + todayLogCard() + flagsHTML();
+      <div class="actions"><button class="btn" data-act="log" type="button">Log today</button></div></section>` + todayLogCard() + ritualCard() + flagsHTML();
 
     const P = C.PHASES[c.phase];
     const hormonal = S.mode === "hormonal";
@@ -145,7 +209,7 @@
       <ul class="facts">${nextFact(c)}${hormonal ? "" : fertileFact(c)}</ul>
       ${hormonal ? "" : `<p class="fine">Fertile-window dates are estimates and <b>not birth control</b>.</p>`}
       <div class="actions">${actionsFor(c)}</div></section>`;
-    h += outlookCard() + todayLogCard() + flagsHTML() + seasonCard(c);
+    h += todayLogCard() + ritualCard() + flagsHTML() + `<details class="card fold"><summary>Explore your next 7 days</summary>${outlookCard()}</details>` + seasonCard(c);
     return h;
   }
   function actionsFor(c) {
@@ -258,22 +322,27 @@
     const nm = m === 11 ? A.toDay(`${y + 1}-01-01`) : A.toDay(`${y}-${String(m + 2).padStart(2, "0")}-01`), dim = nm - first;
     const sun = data.settings.weekStart === "sun", off = sun ? (A.weekday(first) + 1) % 7 : A.weekday(first);
     const ref = A.toDay("2026-11-09") - (sun ? 1 : 0);
-    const dows = Array.from({ length: 7 }, (_, i) => `<span title="${fmt(ref + i, { weekday: "long" })}">${fmt(ref + i, { weekday: "narrow" })}</span>`).join("");
+    const dows = Array.from({ length: 7 }, (_, i) => `<span title="${fmt(ref + i, { weekday: "long" })}">${fmt(ref + i, { weekday: "short" })}</span>`).join("");
     let cells = "";
-    for (let i = 0; i < off; i++) cells += `<li class="day day--blank" aria-hidden="true"></li>`;
+    for (let i = 0; i < off; i++) cells += '<li class="day day--blank" aria-hidden="true"></li>';
     for (let n = 0; n < dim; n++) {
       const d = first + n, inf = dayInfo(d), label = fLong(d) + (inf.lab.length ? ", " + inf.lab.join(", ") : "");
-      const inner = `<span class="day__n">${n + 1}</span>`;
-      cells += d <= TODAY ? `<li class="day ${inf.cls.join(" ")}"><button type="button" data-act="log" data-day="${inf.iso}" aria-label="${esc(label)}">${inner}</button></li>`
-        : `<li class="day ${inf.cls.join(" ")}" aria-label="${esc(label)}"><span>${inner}</span></li>`;
+      const marker = inf.cls.includes("is-period") ? "period" : inf.cls.includes("is-spot") ? "spot" : inf.cls.some(c => c.split(" ").includes("is-pred")) ? "pred" : inf.cls.includes("is-ovu") ? "ovu" : inf.cls.includes("is-fert") ? "fert" : inf.cls.includes("has-log") ? "log" : "";
+      const inner = `<span class="day__n">${n + 1}</span><i class="cal-dot cal-dot--${marker}" aria-hidden="true"></i>`;
+      const selected = ui.calSelected === inf.iso;
+      cells += `<li class="day cal-day${d === TODAY ? " is-today" : ""}${selected ? " is-selected" : ""}"><button type="button" data-act="cal-select" data-day="${inf.iso}" aria-label="${esc(label)}" aria-pressed="${selected}">${inner}</button></li>`;
     }
-    const natural = data.settings.mode === "natural";
-    return sampleBanner() + `<section class="card"><div class="cal__head"><button class="icon" data-act="cal-step" data-step="-1" type="button" aria-label="Previous month">${I.chev(-1)}</button>
+    const selectedDay = ui.calSelected ? A.toDay(ui.calSelected) : null;
+    const selectedInfo = selectedDay != null ? dayInfo(selectedDay) : null;
+    const details = selectedInfo ? `<div class="cal-detail" aria-live="polite"><div><b>${fLong(selectedDay)}</b><p class="fine">${selectedInfo.lab.length ? esc(selectedInfo.lab.join(" · ")) : "No events recorded"}</p></div>${selectedDay <= TODAY ? `<button class="btn btn--ghost" data-act="log" data-day="${selectedInfo.iso}" type="button">Log this day</button>` : '<span class="fine">Future dates are estimates</span>'}</div>` : '<p class="fine cal-prompt">Choose a date to see its details.</p>';
+    return sampleBanner() + `<section class="card cal-clean"><div class="cal__head"><button class="icon" data-act="cal-step" data-step="-1" type="button" aria-label="Previous month">${I.chev(-1)}</button>
       <h1 class="cal__title">${fmt(first, { month: "long", year: "numeric" })}</h1>
       <button class="icon" data-act="cal-step" data-step="1" type="button" aria-label="Next month">${I.chev(1)}</button></div>
+      <p class="fine">A clearer view of your cycle. Select a day for the details.</p>
       <div class="cal__dow" aria-hidden="true">${dows}</div><ol class="cal">${cells}</ol>
-      <ul class="legend"><li><i class="lg lg--period"></i>Period</li><li><i class="lg lg--pred"></i>Likely start</li>${natural ? '<li><i class="lg lg--fert"></i>Fertile window (estimate)</li><li><i class="lg lg--ovu"></i>Ovulation</li>' : ""}<li><i class="lg lg--log"></i>Logged</li></ul>
-      <div class="row"><button class="link" data-act="cal-today" type="button">Jump to today</button><span class="fine">Tap a day to log it</span></div></section>`;
+      <ul class="legend"><li><i class="cal-dot cal-dot--period"></i>Logged period</li><li><i class="cal-dot cal-dot--pred"></i>Predicted period</li>${data.settings.mode === "natural" ? '<li><i class="cal-dot cal-dot--fert"></i>Fertility estimate</li><li><i class="cal-dot cal-dot--ovu"></i>Ovulation estimate</li>' : ""}<li><i class="cal-dot cal-dot--log"></i>Other log</li></ul>
+      ${details}<div class="row"><button class="link" data-act="cal-today" type="button">Jump to today</button></div>
+      <p class="fine">Estimates are uncertain and cannot be used as birth control.</p></section>`;
   }
 
   /* ------------------------------------------------------------- insights */
@@ -294,7 +363,7 @@
   }
   function pageInsights() {
     const st = AN.stats, S = data.settings;
-    let h = sampleBanner();
+    let h = sampleBanner() + ritualInsights();
     if (st.n < 1) {
       h += `<section class="card"><h1 class="h2">Your rhythm</h1><p>Almanac needs at least two logged periods to measure a cycle. Once you have them, you'll see your average, how much it varies, and a chart here.</p></section>`;
     } else {
@@ -582,7 +651,7 @@
   function importFile(file) {
     if (file.size > 5 * 1024 * 1024) { toast("Backup is too large (5 MB maximum)."); return; }
     const r = new FileReader();
-    r.onload = () => { try { const d = JSON.parse(r.result); if (!d || !d.logs || typeof d.logs !== "object" || Array.isArray(d.logs)) throw 0; const logs = sanitizeLogs(d.logs); if (!confirm(`Restore ${Object.keys(logs).length} logged days? This will replace ${Object.keys(data.logs).length} existing logged days and cannot be undone. Download a backup first if you want to keep them.`)) return; data.logs = logs; if (d.settings) { const f = fresh().settings, s = d.settings; data.settings = Object.assign(f, { mode: ["natural", "hormonal", "paused"].includes(s.mode) ? s.mode : "natural", age: s.age === "teen" ? "teen" : "adult", unit: s.unit === "F" ? "F" : "C", weekStart: s.weekStart === "sun" ? "sun" : "mon", defaultCycle: Number.isInteger(s.defaultCycle) ? s.defaultCycle : null, defaultPeriod: Number.isInteger(s.defaultPeriod) ? s.defaultPeriod : 5, onboarded: true }); } data.sample = false; storageReadError = false; save(); recompute(); toast("Restored " + Object.keys(logs).length + " logged days."); sheet.close(); } catch (e) { toast("That file doesn't look like an Almanac backup."); } };
+    r.onload = () => { try { const d = JSON.parse(r.result); if (!d || !d.logs || typeof d.logs !== "object" || Array.isArray(d.logs)) throw 0; const logs = sanitizeLogs(d.logs); const rituals = sanitizeRituals(d.rituals); if (!confirm(`Restore ${Object.keys(logs).length} logged days? This will replace ${Object.keys(data.logs).length} existing logged days and your current ritual reflections; it cannot be undone. Download a backup first if you want to keep them.`)) return; data.logs = logs; data.rituals = rituals; if (d.settings) { const f = fresh().settings, s = d.settings; data.settings = Object.assign(f, { mode: ["natural", "hormonal", "paused"].includes(s.mode) ? s.mode : "natural", age: s.age === "teen" ? "teen" : "adult", unit: s.unit === "F" ? "F" : "C", weekStart: s.weekStart === "sun" ? "sun" : "mon", defaultCycle: Number.isInteger(s.defaultCycle) ? s.defaultCycle : null, defaultPeriod: Number.isInteger(s.defaultPeriod) ? s.defaultPeriod : 5, onboarded: true }); } data.sample = false; storageReadError = false; save(); recompute(); toast("Restored " + Object.keys(logs).length + " logged days."); sheet.close(); } catch (e) { toast("That file doesn't look like an Almanac backup."); } };
     r.onerror = () => toast("Could not read that backup file.");
     r.readAsText(file);
   }
@@ -660,8 +729,12 @@
       case "start-period": return startPeriodToday();
       case "period-over": setLog(isoNow(), { flow: 0 }); toast("Marked: period over."); return render();
       case "pick-start": return openOnboarding() || (ui.ob.step = 1, openSheet("onboard", obHTML(), "sheet--full"));
-      case "cal-step": { let { y, m } = ui.month; m += +t.dataset.step; if (m < 0) { m = 11; y--; } if (m > 11) { m = 0; y++; } ui.month = { y, m }; return render(); }
-      case "cal-today": ui.month = monthOf(TODAY); return render();
+      case "ritual-pick": return ritualReflection(t.dataset.ritual);
+      case "ritual-save": return ritualRecord(t.dataset.ritual, t.dataset.result);
+      case "ritual-remove": return ritualRecord(t.dataset.ritual, null);
+      case "cal-select": ui.calSelected = t.dataset.day; return render();
+      case "cal-step": { let { y, m } = ui.month; m += +t.dataset.step; if (m < 0) { m = 11; y--; } if (m > 11) { m = 0; y++; } ui.month = { y, m }; ui.calSelected = null; return render(); }
+      case "cal-today": ui.month = monthOf(TODAY); ui.calSelected = isoNow(); return render();
       case "undo": if (toast.undo) { toast.undo(); } $("#toast").classList.remove("on"); return;
       case "summary": $("#print").innerHTML = printHTML(); return setTimeout(() => window.print(), 60);
       case "ics": return download("almanac-predictions.ics", "text/calendar", icsText());
