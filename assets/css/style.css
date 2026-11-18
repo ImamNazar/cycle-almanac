@@ -444,3 +444,30 @@ dialog[open]~#toast{z-index:200}
 .gloss dd{margin:2px 0 0;color:var(--muted);font-size:.93rem}
 .nomatch{text-align:center;padding:24px 10px}
 @media (max-width:380px){.anat{grid-template-columns:1fr}.anat .fig--anat{max-width:150px}.mscale li{grid-template-columns:38px 1fr}.mscale__bar{display:none}}
+
+
+/* Almanac 2.0: calmer calendar, single meaningful marker per date */
+.cal-clean .cal{gap:clamp(5px,1.3vw,12px);margin:18px 0 22px}
+.cal-clean .cal__dow{margin-top:20px}
+.cal-clean .cal-day{background:transparent!important;border:0!important;box-shadow:none!important}
+.cal-clean .cal-day button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:100%;min-height:clamp(48px,8vw,72px);border:1px solid var(--line);border-radius:14px;background:var(--surface,#fff);color:inherit;box-shadow:none!important;padding:6px 2px}
+.cal-clean .cal-day button::before,.cal-clean .cal-day button::after{display:none!important}
+.cal-clean .cal-day .day__n{position:static!important;background:transparent!important;color:inherit!important;border:0!important;box-shadow:none!important;font-size:clamp(13px,2vw,17px);line-height:1.2}
+.cal-clean .cal-day.is-today button{border-color:var(--c-spring);font-weight:700}
+.cal-clean .cal-day.is-selected button{outline:2px solid var(--c-spring);outline-offset:1px}
+.cal-clean .cal-day button:focus-visible{outline:3px solid var(--c-spring);outline-offset:2px}
+.cal-clean .day--blank{background:transparent!important;border:0!important}
+.cal-clean .cal-dot{display:block;flex:none;width:7px;height:7px;border-radius:50%;background:transparent;border:0}
+.cal-clean .cal-dot--period{background:#b96060}
+.cal-clean .cal-dot--spot{background:#c6a9a4}
+.cal-clean .cal-dot--pred{border:2px solid #b96060}
+.cal-clean .cal-dot--fert{background:#538d72}
+.cal-clean .cal-dot--ovu{background:#b68a3f}
+.cal-clean .cal-dot--log{background:#73818a}
+.cal-clean .legend{display:flex;flex-wrap:wrap;gap:10px 18px;margin:16px 0;padding:0;list-style:none}
+.cal-clean .legend li{display:flex;align-items:center;gap:7px}
+.cal-clean .legend .cal-dot{position:static!important}
+.cal-clean .cal-detail{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.cal-clean .cal-detail p{margin:5px 0 0}
+.cal-clean .cal-prompt{padding:15px 0;border-top:1px solid var(--line)}
+@media(max-width:420px){.cal-clean{padding:16px!important}.cal-clean .cal{gap:4px}.cal-clean .cal-day button{border-radius:10px;min-height:48px}.cal-clean .cal-detail{align-items:flex-start;flex-direction:column}}
