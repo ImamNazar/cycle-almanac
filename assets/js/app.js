@@ -16,12 +16,14 @@
   /* ------------------------------------------------------------- storage */
   const guessWeek = () => { try { return ["US", "CA", "MX", "BR", "JP", "IN", "PH", "IL", "SA", "ZA", "TW", "HK", "KR", "CO", "PE"].includes(new Intl.Locale(LOC).maximize().region) ? "sun" : "mon"; } catch (e) { return "mon"; } };
   const fresh = () => ({ v: 1, settings: { mode: "natural", age: "adult", unit: "C", weekStart: guessWeek(), defaultCycle: null, defaultPeriod: 5, onboarded: false, lastBackup: null }, logs: {}, sample: false });
+  let storageReadError = false;
   function load() {
-    try { const raw = localStorage.getItem(KEY); if (raw) { const d = JSON.parse(raw), f = fresh(); d.settings = Object.assign(f.settings, d.settings || {}); d.logs = d.logs && typeof d.logs === "object" ? d.logs : {}; return d; } } catch (e) { /* storage blocked or corrupt */ }
+    try { const raw = localStorage.getItem(KEY); if (raw) { const d = JSON.parse(raw), f = fresh(); if (!d || !d.logs || typeof d.logs !== "object" || Array.isArray(d.logs)) throw Error("Invalid saved data"); d.settings = Object.assign(f.settings, d.settings || {}); return d; } } catch (e) { storageReadError = true; }
     return fresh();
   }
   let data = load(), saveT = 0;
   function save() {
+    if (storageReadError) { toast("Saved data could not be read. Restore a backup before saving."); return; }
     clearTimeout(saveT);
     saveT = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { toast("Couldn't save on this device. Private browsing can block saving."); } }, 120);
   }
@@ -77,7 +79,7 @@
   function startPeriodToday() {
     const iso = isoNow(), before = data.logs[iso] ? JSON.parse(JSON.stringify(data.logs[iso])) : null;
     setLog(iso, { flow: (data.logs[iso] && data.logs[iso].flow >= 2) ? data.logs[iso].flow : 3 });
-    toast("Period started. Day 1 is today.", () => { if (before) data.logs[iso] = before; else delete data.logs[iso]; save(); render(); });
+    toast("Period started. Day 1 is today.", () => { if (before) data.logs[iso] = before; else delete data.logs[iso]; save(); recompute(); render(); });
     render();
   }
 
@@ -557,7 +559,7 @@
     obRead(); const o = ui.ob, S = data.settings;
     S.mode = o.mode; S.age = o.teen ? "teen" : "adult"; S.defaultPeriod = o.plen;
     const c = parseInt(o.clen, 10); S.defaultCycle = c >= 15 && c <= 60 ? c : null; S.onboarded = true;
-    if (o.date) { const st = A.toDay(o.date); const pat = [3, 4, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2]; for (let i = 0; i < o.plen; i++) if (st + i <= TODAY) data.logs[A.fromDay(st + i)] = { flow: pat[i] || 2 }; }
+    if (o.date) { const st = A.toDay(o.date); const pat = [3, 4, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2]; for (let i = 0; i < o.plen; i++) if (st + i <= TODAY) { const day = A.fromDay(st + i); if (!data.logs[day] || data.logs[day].flow == null) data.logs[day] = Object.assign({}, data.logs[day] || {}, { flow: pat[i] || 2 }); } }
     save(); try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { /* optional */ }
     sheet.close(); toast("All set. Welcome to Almanac.");
   }
@@ -568,7 +570,7 @@
   function sanitizeLogs(src) {
     const out = {}, iso = /^\d{4}-\d{2}-\d{2}$/, ok = (v, a, b) => Number.isInteger(v) && v >= a && v <= b, symIds = C.SYMPTOMS.concat(C.ALERT_SYMPTOMS).map(x => x[0]);
     for (const k of Object.keys(src || {})) {
-      if (!iso.test(k) || isNaN(A.toDay(k))) continue; const s = src[k] || {}, l = {};
+      if (!iso.test(k) || isNaN(A.toDay(k)) || A.fromDay(A.toDay(k)) !== k) continue; const s = src[k] || {}, l = {};
       if (ok(s.flow, 0, 4)) l.flow = s.flow; if (ok(s.mood, 1, 5)) l.mood = s.mood; if (ok(s.energy, 1, 5)) l.energy = s.energy; if (ok(s.pain, 0, 3)) l.pain = s.pain;
       if (Array.isArray(s.sym)) { const y = s.sym.filter(x => symIds.includes(x)); if (y.length) l.sym = y; }
       if (s.lh === "pos" || s.lh === "neg") l.lh = s.lh; if (C.MUCUS.some(m => m[0] === s.mucus)) l.mucus = s.mucus;
@@ -578,8 +580,10 @@
     return out;
   }
   function importFile(file) {
+    if (file.size > 5 * 1024 * 1024) { toast("Backup is too large (5 MB maximum)."); return; }
     const r = new FileReader();
-    r.onload = () => { try { const d = JSON.parse(r.result); if (!d || typeof d.logs !== "object") throw 0; const logs = sanitizeLogs(d.logs); data.logs = logs; if (d.settings) { const f = fresh().settings, s = d.settings; data.settings = Object.assign(f, { mode: ["natural", "hormonal", "paused"].includes(s.mode) ? s.mode : "natural", age: s.age === "teen" ? "teen" : "adult", unit: s.unit === "F" ? "F" : "C", weekStart: s.weekStart === "sun" ? "sun" : "mon", defaultCycle: Number.isInteger(s.defaultCycle) ? s.defaultCycle : null, defaultPeriod: Number.isInteger(s.defaultPeriod) ? s.defaultPeriod : 5, onboarded: true }); } data.sample = false; save(); recompute(); toast("Restored " + Object.keys(logs).length + " logged days."); sheet.close(); } catch (e) { toast("That file doesn't look like an Almanac backup."); } };
+    r.onload = () => { try { const d = JSON.parse(r.result); if (!d || !d.logs || typeof d.logs !== "object" || Array.isArray(d.logs)) throw 0; const logs = sanitizeLogs(d.logs); if (!confirm(`Restore ${Object.keys(logs).length} logged days? This will replace ${Object.keys(data.logs).length} existing logged days and cannot be undone. Download a backup first if you want to keep them.`)) return; data.logs = logs; if (d.settings) { const f = fresh().settings, s = d.settings; data.settings = Object.assign(f, { mode: ["natural", "hormonal", "paused"].includes(s.mode) ? s.mode : "natural", age: s.age === "teen" ? "teen" : "adult", unit: s.unit === "F" ? "F" : "C", weekStart: s.weekStart === "sun" ? "sun" : "mon", defaultCycle: Number.isInteger(s.defaultCycle) ? s.defaultCycle : null, defaultPeriod: Number.isInteger(s.defaultPeriod) ? s.defaultPeriod : 5, onboarded: true }); } data.sample = false; storageReadError = false; save(); recompute(); toast("Restored " + Object.keys(logs).length + " logged days."); sheet.close(); } catch (e) { toast("That file doesn't look like an Almanac backup."); } };
+    r.onerror = () => toast("Could not read that backup file.");
     r.readAsText(file);
   }
   function icsText() {
@@ -686,7 +690,7 @@
   });
   document.addEventListener("input", e => {
     if (e.target.id === "learn-q") return filterLearn(e.target.value);
-    if (e.target.id === "in-note") { clearTimeout(onInput.nt); onInput.nt = setTimeout(() => setLog(ui.day, { note: e.target.value.trim() }), 300); }
+    if (e.target.id === "in-note") { setLog(ui.day, { note: e.target.value.slice(0, 500) }); }
   });
 
   /* ---------------------------------------------------------------- boot */
@@ -701,6 +705,7 @@
   if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) navigator.serviceWorker.register("sw.js").catch(() => { });
 
   recompute(); render();
+  if (storageReadError) setTimeout(() => alert("Almanac could not read saved data. New entries will not overwrite it. Restore a valid backup to recover; avoid clearing site data."), 0);
   if (!data.settings.onboarded && !AN.hasData) openOnboarding();
 
   window.__almanac = { get data() { return data; }, set data(d) { data = d; }, render, get AN() { return AN; }, setToday(d) { TODAY = d; render(); }, openLog, settingsSheet };
