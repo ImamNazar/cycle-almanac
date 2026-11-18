@@ -64,9 +64,9 @@
     const ritual = RITUALS.find(r => r.id === id);
     if (!ritual) return;
     const choices = [["tried", "I tried it"], ["better", "Felt better"], ["same", "About the same"], ["not", "Not helpful"]];
-    openSheet("ritual", `<div class="sheet__body"><p class="eyebrow">YOUR REFLECTION</p><h2 class="h2">${ritual.icon} ${ritual.title}</h2><p>How did it feel? This records an observation, not proof of cause and effect.</p>
-      <div class="ritual-actions">${choices.map(([id, label]) => `<button type="button" class="btn btn--ghost" data-act="ritual-save" data-ritual="${ritual.id}" data-result="${id}">${label}</button>`).join("")}
-      <button type="button" class="link" data-act="ritual-remove" data-ritual="${ritual.id}">Remove today's reflection</button></div></div>`);
+    openSheet("ritual", frame("Your reflection", `<p class="eyebrow">LITTLE THINGS</p><h3 class="h3">${ritual.icon} ${ritual.title}</h3><p>How did it feel? This records an observation, not proof of cause and effect.</p>
+      <div class="ritual-actions">${choices.map(([value, label]) => `<button type="button" class="btn btn--ghost" data-act="ritual-save" data-ritual="${ritual.id}" data-result="${value}">${label}</button>`).join("")}
+      <button type="button" class="link" data-act="ritual-remove" data-ritual="${ritual.id}">Remove today's reflection</button></div>`));
   }
   function ritualRecord(id, result) {
     if (storageReadError) { toast("Saved data could not be read. Restore a backup before saving."); return; }
