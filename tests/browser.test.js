@@ -63,6 +63,29 @@ const { spawn } = require("node:child_process");
         await page.waitForFunction(() => !!window.__almanac);
         assert.equal(await page.evaluate(() => Object.values(window.__almanac.data.rituals || {}).flat().some(x => x.id === "walk" && x.result === "better")), true, "Backup restore persists");
       } else throw Error("Export button not found in settings");
+      // Confirm the service worker has cached the shell before testing an offline reload.
+      await page.evaluate(async () => {
+        const registration = await navigator.serviceWorker.ready;
+        await registration.update();
+        await navigator.serviceWorker.controller || await new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => reject(new Error("Service worker did not take control")), 10000);
+          navigator.serviceWorker.addEventListener("controllerchange", () => { clearTimeout(timeout); resolve(); }, { once: true });
+        });
+      });
+      await context.setOffline(true);
+      await page.reload({ waitUntil: "load" });
+      await page.waitForFunction(() => !!window.__almanac);
+      assert.equal(await page.evaluate(() => Object.values(window.__almanac.data.rituals || {}).flat().some(x => x.id === "walk" && x.result === "better")), true, "Offline reload preserves saved reflection");
+      await page.locator('[data-tab="calendar"]').first().click();
+      assert.equal(await page.locator('[data-act="cal-select"]').count() > 0, true, "Calendar works offline");
+      await context.setOffline(false);
+      // Essential navigation controls must expose an accessible name.
+      const unnamedTabs = await page.locator('[data-tab]').evaluateAll(els => els.filter(el => {
+        const style = getComputedStyle(el);
+        if (style.display === "none" || style.visibility === "hidden") return false;
+        return !(el.getAttribute("aria-label") || el.getAttribute("title") || el.textContent || "").trim();
+      }).map(el => el.outerHTML.slice(0, 200)));
+      assert.deepEqual(unnamedTabs, [], "Navigation tabs have accessible names");
       assert.deepEqual(errors, [], "No uncaught browser errors");
       await context.close();
       console.log("PASS viewport", viewport.width);
