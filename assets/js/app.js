@@ -10,7 +10,9 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const KEY = "almanac.v1";
-  const LOC = navigator.language || "en";
+  // Some Linux browsers expose legacy locale tags such as en-US@posix, which Intl rejects.
+  // Use a valid BCP 47 tag for date formatting without changing the user’s stored data.
+  const LOC = (() => { const raw = (navigator.language || "en").split("@")[0].replace(/_/g, "-"); try { return Intl.getCanonicalLocales(raw)[0] || "en"; } catch (e) { return "en"; } })();
   const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ------------------------------------------------------------- storage */
