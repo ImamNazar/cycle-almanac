@@ -1,5 +1,6 @@
 /* Browser smoke tests. Run: npm install --no-save playwright && npx playwright install chromium && node tests/browser.test.js */
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 
@@ -46,9 +47,21 @@ const { spawn } = require("node:child_process");
       const exportButton = page.locator('[data-act="export"]');
       if (await exportButton.count()) {
         const [download] = await Promise.all([page.waitForEvent("download"), exportButton.click()]);
-        const fs = require("node:fs");
         const backup = JSON.parse(fs.readFileSync(await download.path(), "utf8"));
         assert.ok(Object.values(backup.rituals || {}).flat().some(x => x.id === "walk"), "Backup includes Rituals");
+        // Restore the downloaded file after removing the reflection.
+        await page.locator('[data-act="close"]').first().click();
+        await page.locator('[data-tab="today"]').first().click();
+        await page.locator('[data-act="ritual-pick"][data-ritual="walk"]').click();
+        await page.locator('[data-act="ritual-remove"][data-ritual="walk"]').click();
+        assert.equal(await page.evaluate(() => Object.values(window.__almanac.data.rituals || {}).flat().some(x => x.id === "walk")), false, "Ritual removal works");
+        await page.locator('[data-act="settings"]').first().click();
+        page.once("dialog", dialog => dialog.accept());
+        await page.locator('#in-file').setInputFiles({ name: "almanac-backup.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify(backup)) });
+        await page.waitForFunction(() => Object.values(window.__almanac.data.rituals || {}).flat().some(x => x.id === "walk" && x.result === "better"));
+        await page.reload();
+        await page.waitForFunction(() => !!window.__almanac);
+        assert.equal(await page.evaluate(() => Object.values(window.__almanac.data.rituals || {}).flat().some(x => x.id === "walk" && x.result === "better")), true, "Backup restore persists");
       } else throw Error("Export button not found in settings");
       assert.deepEqual(errors, [], "No uncaught browser errors");
       await context.close();
