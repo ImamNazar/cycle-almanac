@@ -40,7 +40,7 @@
     const out = {};
     if (!src || typeof src !== "object" || Array.isArray(src)) return out;
     for (const [date, entries] of Object.entries(src)) {
-      if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(date) || !Array.isArray(entries) || entries.length > 30) continue;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !Array.isArray(entries) || entries.length > 30) continue;
       if (isNaN(A.toDay(date)) || A.fromDay(A.toDay(date)) !== date) continue;
       const clean = entries.filter(e => e && RITUALS.some(r => r.id === e.id) && ["tried", "better", "same", "not"].includes(e.result))
         .slice(0, RITUALS.length).map(e => ({ id: e.id, result: e.result }));
