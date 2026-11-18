@@ -21,7 +21,7 @@
     try { const raw = localStorage.getItem(KEY); if (raw) { const d = JSON.parse(raw), f = fresh(); if (!d || !d.logs || typeof d.logs !== "object" || Array.isArray(d.logs)) throw Error("Invalid saved data"); d.settings = Object.assign(f.settings, d.settings || {}); d.rituals = sanitizeRituals(d.rituals); return d; } } catch (e) { storageReadError = true; }
     return fresh();
   }
-  let data = load(), saveT = 0;
+  let data, saveT = 0;
   function save() {
     if (storageReadError) { toast("Saved data could not be read. Restore a backup before saving."); return; }
     clearTimeout(saveT);
@@ -87,6 +87,7 @@
     return `<section class="card"><h2 class="h3">Your little things</h2><p class="fine">Your own observations, not medical conclusions.</p><ul class="list">${rows.join("")}</ul></section>`;
   }
 
+  data = load();
   /* ---------------------------------------------------------------- time */
   let NOW = new Date(), TODAY = A.localDay(NOW), AN = null, PAT = null;
   const recompute = () => { AN = A.analyze(data, TODAY); PAT = A.patterns(data, AN); };
