@@ -49,7 +49,7 @@
   const t80 = df => (df < 1 ? T80[1] : df <= 10 ? T80[df] : df <= 15 ? 1.341 : df <= 30 ? 1.310 : 1.282);
 
   /* How long will the NEXT cycle be?
-     With 3+ logged cycles we give a real 80% prediction interval:
+     With 3+ logged cycles we estimate an 80% prediction interval under a simple statistical model:
        mean ± t · s · √(1 + 1/n)      (the √(1+1/n) accounts for not knowing the true mean)
      With fewer we say so, and use a deliberately wide band.                    */
   function predictLength(lengths, usual) {
@@ -58,7 +58,7 @@
     const n = use.length;
     if (n >= 3) {
       const s = sd(use);
-      return { mean: mean(use), half: clamp(Math.round(t80(n - 1) * s * Math.sqrt(1 + 1 / n)), 2, 14), n, sd: s, basis: "personal" };
+      return { mean: mean(use), half: Math.max(2, Math.ceil(t80(n - 1) * s * Math.sqrt(1 + 1 / n))), n, sd: s, basis: "personal" };
     }
     if (n >= 1) return { mean: mean(use), half: 5, n, sd: n > 1 ? sd(use) : null, basis: "early" };
     return { mean: usual || 28, half: 6, n: 0, sd: null, basis: "default" };
@@ -182,7 +182,7 @@
     const day = today - last.start + 1;
 
     for (let k = 1; k <= 3; k++) {
-      const half = clamp(Math.round(pr.half * Math.sqrt(k)), 2, 21);
+      const half = Math.max(2, Math.ceil(pr.half * Math.sqrt(k)));
       const start = last.start + Math.round(k * pr.mean);
       out.upcoming.push({ k, start, lo: start - half, hi: start + half, half });
     }
