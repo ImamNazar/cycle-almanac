@@ -53,7 +53,7 @@
   };
 
   /* ------------------------------------------------------------ UI state */
-  const ui = { tab: "today", month: null, day: null, ob: null };
+  const ui = { tab: "today", month: null, day: null, ob: null, calSelected: null };
   const monthOf = d => { const iso = A.fromDay(d); return { y: +iso.slice(0, 4), m: +iso.slice(5, 7) - 1 }; };
   ui.month = monthOf(TODAY);
 
@@ -145,7 +145,7 @@
       <ul class="facts">${nextFact(c)}${hormonal ? "" : fertileFact(c)}</ul>
       ${hormonal ? "" : `<p class="fine">Fertile-window dates are estimates and <b>not birth control</b>.</p>`}
       <div class="actions">${actionsFor(c)}</div></section>`;
-    h += outlookCard() + todayLogCard() + flagsHTML() + seasonCard(c);
+    h += todayLogCard() + flagsHTML() + `<details class="card fold"><summary>Explore your next 7 days</summary>${outlookCard()}</details>` + seasonCard(c);
     return h;
   }
   function actionsFor(c) {
@@ -258,22 +258,27 @@
     const nm = m === 11 ? A.toDay(`${y + 1}-01-01`) : A.toDay(`${y}-${String(m + 2).padStart(2, "0")}-01`), dim = nm - first;
     const sun = data.settings.weekStart === "sun", off = sun ? (A.weekday(first) + 1) % 7 : A.weekday(first);
     const ref = A.toDay("2026-11-09") - (sun ? 1 : 0);
-    const dows = Array.from({ length: 7 }, (_, i) => `<span title="${fmt(ref + i, { weekday: "long" })}">${fmt(ref + i, { weekday: "narrow" })}</span>`).join("");
+    const dows = Array.from({ length: 7 }, (_, i) => `<span title="${fmt(ref + i, { weekday: "long" })}">${fmt(ref + i, { weekday: "short" })}</span>`).join("");
     let cells = "";
-    for (let i = 0; i < off; i++) cells += `<li class="day day--blank" aria-hidden="true"></li>`;
+    for (let i = 0; i < off; i++) cells += '<li class="day day--blank" aria-hidden="true"></li>';
     for (let n = 0; n < dim; n++) {
       const d = first + n, inf = dayInfo(d), label = fLong(d) + (inf.lab.length ? ", " + inf.lab.join(", ") : "");
-      const inner = `<span class="day__n">${n + 1}</span>`;
-      cells += d <= TODAY ? `<li class="day ${inf.cls.join(" ")}"><button type="button" data-act="log" data-day="${inf.iso}" aria-label="${esc(label)}">${inner}</button></li>`
-        : `<li class="day ${inf.cls.join(" ")}" aria-label="${esc(label)}"><span>${inner}</span></li>`;
+      const marker = inf.cls.includes("is-period") ? "period" : inf.cls.includes("is-spot") ? "spot" : inf.cls.includes("is-pred") ? "pred" : inf.cls.includes("is-ovu") ? "ovu" : inf.cls.includes("is-fert") ? "fert" : inf.cls.includes("has-log") ? "log" : "";
+      const inner = `<span class="day__n">${n + 1}</span><i class="cal-dot cal-dot--${marker}" aria-hidden="true"></i>`;
+      const selected = ui.calSelected === inf.iso;
+      cells += `<li class="day cal-day${d === TODAY ? " is-today" : ""}${selected ? " is-selected" : ""}"><button type="button" data-act="cal-select" data-day="${inf.iso}" aria-label="${esc(label)}" aria-pressed="${selected}">${inner}</button></li>`;
     }
-    const natural = data.settings.mode === "natural";
-    return sampleBanner() + `<section class="card"><div class="cal__head"><button class="icon" data-act="cal-step" data-step="-1" type="button" aria-label="Previous month">${I.chev(-1)}</button>
+    const selectedDay = ui.calSelected ? A.toDay(ui.calSelected) : null;
+    const selectedInfo = selectedDay != null ? dayInfo(selectedDay) : null;
+    const details = selectedInfo ? `<div class="cal-detail" aria-live="polite"><div><b>${fLong(selectedDay)}</b><p class="fine">${selectedInfo.lab.length ? esc(selectedInfo.lab.join(" · ")) : "No events recorded"}</p></div>${selectedDay <= TODAY ? `<button class="btn btn--ghost" data-act="log" data-day="${selectedInfo.iso}" type="button">Log this day</button>` : '<span class="fine">Future dates are estimates</span>'}</div>` : '<p class="fine cal-prompt">Choose a date to see its details.</p>';
+    return sampleBanner() + `<section class="card cal-clean"><div class="cal__head"><button class="icon" data-act="cal-step" data-step="-1" type="button" aria-label="Previous month">${I.chev(-1)}</button>
       <h1 class="cal__title">${fmt(first, { month: "long", year: "numeric" })}</h1>
       <button class="icon" data-act="cal-step" data-step="1" type="button" aria-label="Next month">${I.chev(1)}</button></div>
+      <p class="fine">A clearer view of your cycle. Select a day for the details.</p>
       <div class="cal__dow" aria-hidden="true">${dows}</div><ol class="cal">${cells}</ol>
-      <ul class="legend"><li><i class="lg lg--period"></i>Period</li><li><i class="lg lg--pred"></i>Likely start</li>${natural ? '<li><i class="lg lg--fert"></i>Fertile window (estimate)</li><li><i class="lg lg--ovu"></i>Ovulation</li>' : ""}<li><i class="lg lg--log"></i>Logged</li></ul>
-      <div class="row"><button class="link" data-act="cal-today" type="button">Jump to today</button><span class="fine">Tap a day to log it</span></div></section>`;
+      <ul class="legend"><li><i class="cal-dot cal-dot--period"></i>Logged period</li><li><i class="cal-dot cal-dot--pred"></i>Predicted period</li>${data.settings.mode === "natural" ? '<li><i class="cal-dot cal-dot--fert"></i>Fertility estimate</li><li><i class="cal-dot cal-dot--ovu"></i>Ovulation estimate</li>' : ""}<li><i class="cal-dot cal-dot--log"></i>Other log</li></ul>
+      ${details}<div class="row"><button class="link" data-act="cal-today" type="button">Jump to today</button></div>
+      <p class="fine">Estimates are uncertain and cannot be used as birth control.</p></section>`;
   }
 
   /* ------------------------------------------------------------- insights */
@@ -660,8 +665,9 @@
       case "start-period": return startPeriodToday();
       case "period-over": setLog(isoNow(), { flow: 0 }); toast("Marked: period over."); return render();
       case "pick-start": return openOnboarding() || (ui.ob.step = 1, openSheet("onboard", obHTML(), "sheet--full"));
-      case "cal-step": { let { y, m } = ui.month; m += +t.dataset.step; if (m < 0) { m = 11; y--; } if (m > 11) { m = 0; y++; } ui.month = { y, m }; return render(); }
-      case "cal-today": ui.month = monthOf(TODAY); return render();
+      case "cal-select": ui.calSelected = t.dataset.day; return render();
+      case "cal-step": { let { y, m } = ui.month; m += +t.dataset.step; if (m < 0) { m = 11; y--; } if (m > 11) { m = 0; y++; } ui.month = { y, m }; ui.calSelected = null; return render(); }
+      case "cal-today": ui.month = monthOf(TODAY); ui.calSelected = isoNow(); return render();
       case "undo": if (toast.undo) { toast.undo(); } $("#toast").classList.remove("on"); return;
       case "summary": $("#print").innerHTML = printHTML(); return setTimeout(() => window.print(), 60);
       case "ics": return download("almanac-predictions.ics", "text/calendar", icsText());
