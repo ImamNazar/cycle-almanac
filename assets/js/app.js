@@ -16,12 +16,14 @@
   /* ------------------------------------------------------------- storage */
   const guessWeek = () => { try { return ["US", "CA", "MX", "BR", "JP", "IN", "PH", "IL", "SA", "ZA", "TW", "HK", "KR", "CO", "PE"].includes(new Intl.Locale(LOC).maximize().region) ? "sun" : "mon"; } catch (e) { return "mon"; } };
   const fresh = () => ({ v: 1, settings: { mode: "natural", age: "adult", unit: "C", weekStart: guessWeek(), defaultCycle: null, defaultPeriod: 5, onboarded: false, lastBackup: null }, logs: {}, sample: false });
+  let storageReadError = false;
   function load() {
-    try { const raw = localStorage.getItem(KEY); if (raw) { const d = JSON.parse(raw), f = fresh(); d.settings = Object.assign(f.settings, d.settings || {}); d.logs = d.logs && typeof d.logs === "object" ? d.logs : {}; return d; } } catch (e) { /* storage blocked or corrupt */ }
+    try { const raw = localStorage.getItem(KEY); if (raw) { const d = JSON.parse(raw), f = fresh(); if (!d || !d.logs || typeof d.logs !== "object" || Array.isArray(d.logs)) throw Error("Invalid saved data"); d.settings = Object.assign(f.settings, d.settings || {}); return d; } } catch (e) { storageReadError = true; }
     return fresh();
   }
   let data = load(), saveT = 0;
   function save() {
+    if (storageReadError) { toast("Saved data could not be read. Restore a backup before saving."); return; }
     clearTimeout(saveT);
     saveT = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { toast("Couldn't save on this device. Private browsing can block saving."); } }, 120);
   }
@@ -578,8 +580,10 @@
     return out;
   }
   function importFile(file) {
+    if (file.size > 5 * 1024 * 1024) { toast("Backup is too large (5 MB maximum)."); return; }
     const r = new FileReader();
-    r.onload = () => { try { const d = JSON.parse(r.result); if (!d || !d.logs || typeof d.logs !== "object" || Array.isArray(d.logs)) throw 0; const logs = sanitizeLogs(d.logs); if (!confirm(`Restore ${Object.keys(logs).length} logged days? This will replace ${Object.keys(data.logs).length} existing logged days and cannot be undone. Download a backup first if you want to keep them.`)) return; data.logs = logs; if (d.settings) { const f = fresh().settings, s = d.settings; data.settings = Object.assign(f, { mode: ["natural", "hormonal", "paused"].includes(s.mode) ? s.mode : "natural", age: s.age === "teen" ? "teen" : "adult", unit: s.unit === "F" ? "F" : "C", weekStart: s.weekStart === "sun" ? "sun" : "mon", defaultCycle: Number.isInteger(s.defaultCycle) ? s.defaultCycle : null, defaultPeriod: Number.isInteger(s.defaultPeriod) ? s.defaultPeriod : 5, onboarded: true }); } data.sample = false; save(); recompute(); toast("Restored " + Object.keys(logs).length + " logged days."); sheet.close(); } catch (e) { toast("That file doesn't look like an Almanac backup."); } };
+    r.onload = () => { try { const d = JSON.parse(r.result); if (!d || !d.logs || typeof d.logs !== "object" || Array.isArray(d.logs)) throw 0; const logs = sanitizeLogs(d.logs); if (!confirm(`Restore ${Object.keys(logs).length} logged days? This will replace ${Object.keys(data.logs).length} existing logged days and cannot be undone. Download a backup first if you want to keep them.`)) return; data.logs = logs; if (d.settings) { const f = fresh().settings, s = d.settings; data.settings = Object.assign(f, { mode: ["natural", "hormonal", "paused"].includes(s.mode) ? s.mode : "natural", age: s.age === "teen" ? "teen" : "adult", unit: s.unit === "F" ? "F" : "C", weekStart: s.weekStart === "sun" ? "sun" : "mon", defaultCycle: Number.isInteger(s.defaultCycle) ? s.defaultCycle : null, defaultPeriod: Number.isInteger(s.defaultPeriod) ? s.defaultPeriod : 5, onboarded: true }); } data.sample = false; storageReadError = false; save(); recompute(); toast("Restored " + Object.keys(logs).length + " logged days."); sheet.close(); } catch (e) { toast("That file doesn't look like an Almanac backup."); } };
+    r.onerror = () => toast("Could not read that backup file.");
     r.readAsText(file);
   }
   function icsText() {
@@ -701,6 +705,7 @@
   if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) navigator.serviceWorker.register("sw.js").catch(() => { });
 
   recompute(); render();
+  if (storageReadError) setTimeout(() => alert("Almanac could not read saved data. New entries will not overwrite it. Restore a valid backup to recover; avoid clearing site data."), 0);
   if (!data.settings.onboarded && !AN.hasData) openOnboarding();
 
   window.__almanac = { get data() { return data; }, set data(d) { data = d; }, render, get AN() { return AN; }, setToday(d) { TODAY = d; render(); }, openLog, settingsSheet };
