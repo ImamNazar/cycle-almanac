@@ -30,7 +30,7 @@ const { spawn } = require("node:child_process");
       await page.waitForTimeout(300);
       assert.equal(await page.evaluate(() => Object.values(window.__almanac.data.rituals || {}).flat().some(x => x.id === "walk" && x.result === "better")), true, "Ritual reflection recorded");
       await page.reload();
-      await page.waitForFunction(() => !!window.__almanac);
+      await page.waitForFunction(() => !!window.__almanac, { timeout: 10000 }).catch(async error => { throw new Error(`App did not initialise after reload: ${error.message}; page errors: ${JSON.stringify(errors)}; page: ${page.url()}; scripts: ${await page.locator("script[src]").evaluateAll(els => els.map(e => e.src))}`); });
       assert.equal(await page.evaluate(() => Object.values(window.__almanac.data.rituals || {}).flat().some(x => x.id === "walk" && x.result === "better")), true, "Ritual reflection persisted");
       await page.locator('[data-tab="insights"]').first().click();
       assert.equal(await page.getByText(/felt better on 1 of 1 reflected occasions/i).count() > 0, true, "Insight reflects log");
