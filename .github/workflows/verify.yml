@@ -1,7 +1,7 @@
 name: Verify Cycle Almanac
 on:
   push:
-    branches: [main, fix/data-integrity-audit-20261118]
+    branches: [main, fix/data-integrity-audit-20261118, design/almanac-2-prototype]
   pull_request:
     branches: [main]
 jobs:
