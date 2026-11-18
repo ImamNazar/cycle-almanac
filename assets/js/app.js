@@ -325,7 +325,7 @@
     for (let i = 0; i < off; i++) cells += '<li class="day day--blank" aria-hidden="true"></li>';
     for (let n = 0; n < dim; n++) {
       const d = first + n, inf = dayInfo(d), label = fLong(d) + (inf.lab.length ? ", " + inf.lab.join(", ") : "");
-      const marker = inf.cls.includes("is-period") ? "period" : inf.cls.includes("is-spot") ? "spot" : inf.cls.includes("is-pred") ? "pred" : inf.cls.includes("is-ovu") ? "ovu" : inf.cls.includes("is-fert") ? "fert" : inf.cls.includes("has-log") ? "log" : "";
+      const marker = inf.cls.includes("is-period") ? "period" : inf.cls.includes("is-spot") ? "spot" : inf.cls.some(c => c.split(" ").includes("is-pred")) ? "pred" : inf.cls.includes("is-ovu") ? "ovu" : inf.cls.includes("is-fert") ? "fert" : inf.cls.includes("has-log") ? "log" : "";
       const inner = `<span class="day__n">${n + 1}</span><i class="cal-dot cal-dot--${marker}" aria-hidden="true"></i>`;
       const selected = ui.calSelected === inf.iso;
       cells += `<li class="day cal-day${d === TODAY ? " is-today" : ""}${selected ? " is-selected" : ""}"><button type="button" data-act="cal-select" data-day="${inf.iso}" aria-label="${esc(label)}" aria-pressed="${selected}">${inner}</button></li>`;
