@@ -77,7 +77,7 @@
   function startPeriodToday() {
     const iso = isoNow(), before = data.logs[iso] ? JSON.parse(JSON.stringify(data.logs[iso])) : null;
     setLog(iso, { flow: (data.logs[iso] && data.logs[iso].flow >= 2) ? data.logs[iso].flow : 3 });
-    toast("Period started. Day 1 is today.", () => { if (before) data.logs[iso] = before; else delete data.logs[iso]; save(); render(); });
+    toast("Period started. Day 1 is today.", () => { if (before) data.logs[iso] = before; else delete data.logs[iso]; save(); recompute(); render(); });
     render();
   }
 
@@ -470,7 +470,7 @@
     const cd = cycleDayOf(A.toDay(iso)), sub = $("#sh-sub", sheet);
     if (sub) sub.textContent = fmt(A.toDay(iso), { day: "numeric", month: "long", year: "numeric" }) + (cd && cd < 120 ? " · cycle day " + cd : "");
   }
-  function openLog(iso) { ui.day = iso; openSheet("log", logHTML(iso)); syncLog(); }
+  function openLog(iso) { clearTimeout(onInput.nt); ui.day = iso; openSheet("log", logHTML(iso)); syncLog(); }
 
   /* ---- reading the landscape */
   function hillsSheet() {
@@ -557,7 +557,7 @@
     obRead(); const o = ui.ob, S = data.settings;
     S.mode = o.mode; S.age = o.teen ? "teen" : "adult"; S.defaultPeriod = o.plen;
     const c = parseInt(o.clen, 10); S.defaultCycle = c >= 15 && c <= 60 ? c : null; S.onboarded = true;
-    if (o.date) { const st = A.toDay(o.date); const pat = [3, 4, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2]; for (let i = 0; i < o.plen; i++) if (st + i <= TODAY) data.logs[A.fromDay(st + i)] = { flow: pat[i] || 2 }; }
+    if (o.date) { const st = A.toDay(o.date); const pat = [3, 4, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2]; for (let i = 0; i < o.plen; i++) if (st + i <= TODAY) { const day = A.fromDay(st + i); if (!data.logs[day] || data.logs[day].flow == null) data.logs[day] = Object.assign({}, data.logs[day] || {}, { flow: pat[i] || 2 }); } }
     save(); try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { /* optional */ }
     sheet.close(); toast("All set. Welcome to Almanac.");
   }
@@ -568,7 +568,7 @@
   function sanitizeLogs(src) {
     const out = {}, iso = /^\d{4}-\d{2}-\d{2}$/, ok = (v, a, b) => Number.isInteger(v) && v >= a && v <= b, symIds = C.SYMPTOMS.concat(C.ALERT_SYMPTOMS).map(x => x[0]);
     for (const k of Object.keys(src || {})) {
-      if (!iso.test(k) || isNaN(A.toDay(k))) continue; const s = src[k] || {}, l = {};
+      if (!iso.test(k) || isNaN(A.toDay(k)) || A.fromDay(A.toDay(k)) !== k) continue; const s = src[k] || {}, l = {};
       if (ok(s.flow, 0, 4)) l.flow = s.flow; if (ok(s.mood, 1, 5)) l.mood = s.mood; if (ok(s.energy, 1, 5)) l.energy = s.energy; if (ok(s.pain, 0, 3)) l.pain = s.pain;
       if (Array.isArray(s.sym)) { const y = s.sym.filter(x => symIds.includes(x)); if (y.length) l.sym = y; }
       if (s.lh === "pos" || s.lh === "neg") l.lh = s.lh; if (C.MUCUS.some(m => m[0] === s.mucus)) l.mucus = s.mucus;
@@ -579,7 +579,7 @@
   }
   function importFile(file) {
     const r = new FileReader();
-    r.onload = () => { try { const d = JSON.parse(r.result); if (!d || typeof d.logs !== "object") throw 0; const logs = sanitizeLogs(d.logs); data.logs = logs; if (d.settings) { const f = fresh().settings, s = d.settings; data.settings = Object.assign(f, { mode: ["natural", "hormonal", "paused"].includes(s.mode) ? s.mode : "natural", age: s.age === "teen" ? "teen" : "adult", unit: s.unit === "F" ? "F" : "C", weekStart: s.weekStart === "sun" ? "sun" : "mon", defaultCycle: Number.isInteger(s.defaultCycle) ? s.defaultCycle : null, defaultPeriod: Number.isInteger(s.defaultPeriod) ? s.defaultPeriod : 5, onboarded: true }); } data.sample = false; save(); recompute(); toast("Restored " + Object.keys(logs).length + " logged days."); sheet.close(); } catch (e) { toast("That file doesn't look like an Almanac backup."); } };
+    r.onload = () => { try { const d = JSON.parse(r.result); if (!d || !d.logs || typeof d.logs !== "object" || Array.isArray(d.logs)) throw 0; const logs = sanitizeLogs(d.logs); if (!confirm(`Restore ${Object.keys(logs).length} logged days? This will replace ${Object.keys(data.logs).length} existing logged days and cannot be undone. Download a backup first if you want to keep them.`)) return; data.logs = logs; if (d.settings) { const f = fresh().settings, s = d.settings; data.settings = Object.assign(f, { mode: ["natural", "hormonal", "paused"].includes(s.mode) ? s.mode : "natural", age: s.age === "teen" ? "teen" : "adult", unit: s.unit === "F" ? "F" : "C", weekStart: s.weekStart === "sun" ? "sun" : "mon", defaultCycle: Number.isInteger(s.defaultCycle) ? s.defaultCycle : null, defaultPeriod: Number.isInteger(s.defaultPeriod) ? s.defaultPeriod : 5, onboarded: true }); } data.sample = false; save(); recompute(); toast("Restored " + Object.keys(logs).length + " logged days."); sheet.close(); } catch (e) { toast("That file doesn't look like an Almanac backup."); } };
     r.readAsText(file);
   }
   function icsText() {
@@ -646,7 +646,7 @@
       case "settings": return settingsSheet();
       case "hills": return hillsSheet();
       case "log": return openLog(t.dataset.day || isoNow());
-      case "day-step": { const d = clamp(A.toDay(ui.day) + (+t.dataset.step), 0, TODAY); if (d <= TODAY) { ui.day = A.fromDay(d); openSheet("log", logHTML(ui.day)); syncLog(); } return; }
+      case "day-step": { clearTimeout(onInput.nt); const d = clamp(A.toDay(ui.day) + (+t.dataset.step), 0, TODAY); if (d <= TODAY) { ui.day = A.fromDay(d); openSheet("log", logHTML(ui.day)); syncLog(); } return; }
       case "set": { const k = t.dataset.k, v = t.dataset.v, L = data.logs[ui.day] || {}, num = ["flow", "mood", "energy", "pain"].includes(k) ? +v : v; setLog(ui.day, { [k]: L[k] === num ? undefined : num }); return syncLog(); }
       case "sym": { const L = data.logs[ui.day] || {}, s = new Set(L.sym || []); s.has(t.dataset.v) ? s.delete(t.dataset.v) : s.add(t.dataset.v); setLog(ui.day, { sym: [...s] }); return syncLog(); }
       case "clear-day": { delete data.logs[ui.day]; save(); recompute(); $$("#in-bbt,#in-note", sheet).forEach(x => (x.value = "")); return syncLog(); }
@@ -686,7 +686,7 @@
   });
   document.addEventListener("input", e => {
     if (e.target.id === "learn-q") return filterLearn(e.target.value);
-    if (e.target.id === "in-note") { clearTimeout(onInput.nt); onInput.nt = setTimeout(() => setLog(ui.day, { note: e.target.value.trim() }), 300); }
+    if (e.target.id === "in-note") { const day = ui.day, note = e.target.value.trim(); clearTimeout(onInput.nt); onInput.nt = setTimeout(() => setLog(day, { note }), 300); }
   });
 
   /* ---------------------------------------------------------------- boot */
