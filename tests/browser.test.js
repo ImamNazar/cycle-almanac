@@ -59,6 +59,8 @@ const { spawn } = require("node:child_process");
         page.once("dialog", dialog => dialog.accept());
         await page.locator('#in-file').setInputFiles({ name: "almanac-backup.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify(backup)) });
         await page.waitForFunction(() => Object.values(window.__almanac.data.rituals || {}).flat().some(x => x.id === "walk" && x.result === "better"));
+        // Writes are debounced; wait for durable storage before testing a reload.
+        await page.waitForFunction(() => { try { return Object.values(JSON.parse(localStorage.getItem("almanac.v1") || "{}").rituals || {}).flat().some(x => x.id === "walk" && x.result === "better"); } catch { return false; } });
         await page.reload();
         await page.waitForFunction(() => !!window.__almanac);
         assert.equal(await page.evaluate(() => Object.values(window.__almanac.data.rituals || {}).flat().some(x => x.id === "walk" && x.result === "better")), true, "Backup restore persists");
