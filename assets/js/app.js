@@ -15,10 +15,10 @@
 
   /* ------------------------------------------------------------- storage */
   const guessWeek = () => { try { return ["US", "CA", "MX", "BR", "JP", "IN", "PH", "IL", "SA", "ZA", "TW", "HK", "KR", "CO", "PE"].includes(new Intl.Locale(LOC).maximize().region) ? "sun" : "mon"; } catch (e) { return "mon"; } };
-  const fresh = () => ({ v: 1, settings: { mode: "natural", age: "adult", unit: "C", weekStart: guessWeek(), defaultCycle: null, defaultPeriod: 5, onboarded: false, lastBackup: null }, logs: {}, sample: false });
+  const fresh = () => ({ v: 1, settings: { mode: "natural", age: "adult", unit: "C", weekStart: guessWeek(), defaultCycle: null, defaultPeriod: 5, onboarded: false, lastBackup: null }, logs: {}, rituals: {}, sample: false });
   let storageReadError = false;
   function load() {
-    try { const raw = localStorage.getItem(KEY); if (raw) { const d = JSON.parse(raw), f = fresh(); if (!d || !d.logs || typeof d.logs !== "object" || Array.isArray(d.logs)) throw Error("Invalid saved data"); d.settings = Object.assign(f.settings, d.settings || {}); return d; } } catch (e) { storageReadError = true; }
+    try { const raw = localStorage.getItem(KEY); if (raw) { const d = JSON.parse(raw), f = fresh(); if (!d || !d.logs || typeof d.logs !== "object" || Array.isArray(d.logs)) throw Error("Invalid saved data"); d.settings = Object.assign(f.settings, d.settings || {}); d.rituals = sanitizeRituals(d.rituals); return d; } } catch (e) { storageReadError = true; }
     return fresh();
   }
   let data = load(), saveT = 0;
@@ -26,6 +26,65 @@
     if (storageReadError) { toast("Saved data could not be read. Restore a backup before saving."); return; }
     clearTimeout(saveT);
     saveT = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { toast("Couldn't save on this device. Private browsing can block saving."); } }, 120);
+  }
+
+  /* --------------------------------------------------------- daily rituals */
+  const RITUALS = [
+    { id: "walk", icon: "🚶", title: "A comfortable walk", note: "Move at a pace that feels good." },
+    { id: "rest", icon: "🍵", title: "A quiet break", note: "Pause, breathe or make space to rest." },
+    { id: "meal", icon: "🥣", title: "A satisfying meal", note: "Enjoy something nourishing without food rules." },
+    { id: "journal", icon: "📓", title: "A quick reflection", note: "Notice what you need today." },
+    { id: "strength", icon: "🏋️", title: "Strength or movement", note: "Choose an intensity that suits your comfort." }
+  ];
+  function sanitizeRituals(src) {
+    const out = {};
+    if (!src || typeof src !== "object" || Array.isArray(src)) return out;
+    for (const [date, entries] of Object.entries(src)) {
+      if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(date) || !Array.isArray(entries) || entries.length > 30) continue;
+      if (isNaN(A.toDay(date)) || A.fromDay(A.toDay(date)) !== date) continue;
+      const clean = entries.filter(e => e && RITUALS.some(r => r.id === e.id) && ["tried", "better", "same", "not"].includes(e.result))
+        .slice(0, RITUALS.length).map(e => ({ id: e.id, result: e.result }));
+      if (clean.length) out[date] = [...new Map(clean.map(e => [e.id, e])).values()];
+    }
+    return out;
+  }
+  function ritualCard() {
+    const done = (data.rituals || {})[isoNow()] || [];
+    return `<section class="card ritual-card"><p class="eyebrow">LITTLE THINGS</p><h2 class="h3">What might feel good today?</h2>
+      <p class="fine">Optional ideas, not phase rules. Try something and note how it felt.</p>
+      <div class="ritual-grid">${RITUALS.map(r => {
+        const entry = done.find(x => x.id === r.id);
+        return `<div class="ritual-item"><span class="ritual-icon" aria-hidden="true">${r.icon}</span><div class="ritual-copy"><b>${r.title}</b><span class="fine">${r.note}</span>
+          ${entry ? `<span class="fine">Your reflection: ${{tried:"Tried it",better:"Felt better",same:"About the same",not:"Not helpful"}[entry.result]}</span>` : ""}</div>
+          <button class="btn btn--ghost" data-act="ritual-pick" data-ritual="${r.id}" type="button">${entry ? "Update" : "Reflect"}</button></div>`;
+      }).join("")}</div></section>`;
+  }
+  function ritualReflection(id) {
+    const ritual = RITUALS.find(r => r.id === id);
+    if (!ritual) return;
+    const choices = [["tried", "I tried it"], ["better", "Felt better"], ["same", "About the same"], ["not", "Not helpful"]];
+    openSheet("ritual", `<div class="sheet__body"><p class="eyebrow">YOUR REFLECTION</p><h2 class="h2">${ritual.icon} ${ritual.title}</h2><p>How did it feel? This records an observation, not proof of cause and effect.</p>
+      <div class="ritual-actions">${choices.map(([id, label]) => `<button type="button" class="btn btn--ghost" data-act="ritual-save" data-ritual="${ritual.id}" data-result="${id}">${label}</button>`).join("")}
+      <button type="button" class="link" data-act="ritual-remove" data-ritual="${ritual.id}">Remove today's reflection</button></div></div>`);
+  }
+  function ritualRecord(id, result) {
+    if (!RITUALS.some(r => r.id === id)) return;
+    const day = isoNow(), entries = ((data.rituals || {})[day] || []).filter(e => e.id !== id);
+    if (["tried", "better", "same", "not"].includes(result)) entries.push({ id, result });
+    if (!data.rituals) data.rituals = {};
+    if (entries.length) data.rituals[day] = entries; else delete data.rituals[day];
+    save(); sheet.close(); render();
+  }
+  function ritualInsights() {
+    const entries = Object.values(data.rituals || {}).flat().filter(e => e.result !== "tried");
+    if (!entries.length) return `<section class="card"><h2 class="h3">Your little things</h2><p>Once you've reflected on activities, you'll see what you've noticed here. There are no streaks to maintain.</p></section>`;
+    const rows = RITUALS.map(r => {
+      const e = entries.filter(x => x.id === r.id);
+      if (!e.length) return "";
+      const better = e.filter(x => x.result === "better").length;
+      return `<li><b>${r.title}</b> — felt better on ${better} of ${e.length} reflected occasions.</li>`;
+    }).filter(Boolean);
+    return `<section class="card"><h2 class="h3">Your little things</h2><p class="fine">Your own observations, not medical conclusions.</p><ul class="list">${rows.join("")}</ul></section>`;
   }
 
   /* ---------------------------------------------------------------- time */
@@ -130,10 +189,10 @@
       <h1 class="status__h">Welcome to <span class="status__ph">Almanac</span></h1>
       <p class="status__line">Log the first day of your last period and the landscape above starts following your cycle.</p>
       <div class="actions"><button class="btn" data-act="start-period" type="button">My period started today</button><button class="btn btn--ghost" data-act="pick-start" type="button">It started earlier</button></div>
-      <p class="fine">Everything stays on this device. No account, no server.</p></section>` + todayLogCard() + learnTeaser();
+      <p class="fine">Everything stays on this device. No account, no server.</p></section>` + todayLogCard() + ritualCard() + learnTeaser();
     if (S.mode === "paused") return h + `<section class="card status"><p class="eyebrow">${greeting()}</p><h1 class="status__h">Predictions <span class="status__ph">paused</span></h1>
       <p class="status__line">Cycle estimates are off, which makes sense during pregnancy, postpartum or whenever your cycle isn't following its usual pattern. You can still log how you feel, and switch predictions back on in Settings.</p>
-      <div class="actions"><button class="btn" data-act="log" type="button">Log today</button></div></section>` + todayLogCard() + flagsHTML();
+      <div class="actions"><button class="btn" data-act="log" type="button">Log today</button></div></section>` + todayLogCard() + ritualCard() + flagsHTML();
 
     const P = C.PHASES[c.phase];
     const hormonal = S.mode === "hormonal";
@@ -145,7 +204,7 @@
       <ul class="facts">${nextFact(c)}${hormonal ? "" : fertileFact(c)}</ul>
       ${hormonal ? "" : `<p class="fine">Fertile-window dates are estimates and <b>not birth control</b>.</p>`}
       <div class="actions">${actionsFor(c)}</div></section>`;
-    h += todayLogCard() + flagsHTML() + `<details class="card fold"><summary>Explore your next 7 days</summary>${outlookCard()}</details>` + seasonCard(c);
+    h += todayLogCard() + ritualCard() + flagsHTML() + `<details class="card fold"><summary>Explore your next 7 days</summary>${outlookCard()}</details>` + seasonCard(c);
     return h;
   }
   function actionsFor(c) {
@@ -299,7 +358,7 @@
   }
   function pageInsights() {
     const st = AN.stats, S = data.settings;
-    let h = sampleBanner();
+    let h = sampleBanner() + ritualInsights();
     if (st.n < 1) {
       h += `<section class="card"><h1 class="h2">Your rhythm</h1><p>Almanac needs at least two logged periods to measure a cycle. Once you have them, you'll see your average, how much it varies, and a chart here.</p></section>`;
     } else {
@@ -587,7 +646,7 @@
   function importFile(file) {
     if (file.size > 5 * 1024 * 1024) { toast("Backup is too large (5 MB maximum)."); return; }
     const r = new FileReader();
-    r.onload = () => { try { const d = JSON.parse(r.result); if (!d || !d.logs || typeof d.logs !== "object" || Array.isArray(d.logs)) throw 0; const logs = sanitizeLogs(d.logs); if (!confirm(`Restore ${Object.keys(logs).length} logged days? This will replace ${Object.keys(data.logs).length} existing logged days and cannot be undone. Download a backup first if you want to keep them.`)) return; data.logs = logs; if (d.settings) { const f = fresh().settings, s = d.settings; data.settings = Object.assign(f, { mode: ["natural", "hormonal", "paused"].includes(s.mode) ? s.mode : "natural", age: s.age === "teen" ? "teen" : "adult", unit: s.unit === "F" ? "F" : "C", weekStart: s.weekStart === "sun" ? "sun" : "mon", defaultCycle: Number.isInteger(s.defaultCycle) ? s.defaultCycle : null, defaultPeriod: Number.isInteger(s.defaultPeriod) ? s.defaultPeriod : 5, onboarded: true }); } data.sample = false; storageReadError = false; save(); recompute(); toast("Restored " + Object.keys(logs).length + " logged days."); sheet.close(); } catch (e) { toast("That file doesn't look like an Almanac backup."); } };
+    r.onload = () => { try { const d = JSON.parse(r.result); if (!d || !d.logs || typeof d.logs !== "object" || Array.isArray(d.logs)) throw 0; const logs = sanitizeLogs(d.logs); const rituals = sanitizeRituals(d.rituals); if (!confirm(`Restore ${Object.keys(logs).length} logged days? This will replace ${Object.keys(data.logs).length} existing logged days and cannot be undone. Download a backup first if you want to keep them.`)) return; data.logs = logs; data.rituals = rituals; if (d.settings) { const f = fresh().settings, s = d.settings; data.settings = Object.assign(f, { mode: ["natural", "hormonal", "paused"].includes(s.mode) ? s.mode : "natural", age: s.age === "teen" ? "teen" : "adult", unit: s.unit === "F" ? "F" : "C", weekStart: s.weekStart === "sun" ? "sun" : "mon", defaultCycle: Number.isInteger(s.defaultCycle) ? s.defaultCycle : null, defaultPeriod: Number.isInteger(s.defaultPeriod) ? s.defaultPeriod : 5, onboarded: true }); } data.sample = false; storageReadError = false; save(); recompute(); toast("Restored " + Object.keys(logs).length + " logged days."); sheet.close(); } catch (e) { toast("That file doesn't look like an Almanac backup."); } };
     r.onerror = () => toast("Could not read that backup file.");
     r.readAsText(file);
   }
@@ -665,6 +724,9 @@
       case "start-period": return startPeriodToday();
       case "period-over": setLog(isoNow(), { flow: 0 }); toast("Marked: period over."); return render();
       case "pick-start": return openOnboarding() || (ui.ob.step = 1, openSheet("onboard", obHTML(), "sheet--full"));
+      case "ritual-pick": return ritualReflection(t.dataset.ritual);
+      case "ritual-save": return ritualRecord(t.dataset.ritual, t.dataset.result);
+      case "ritual-remove": return ritualRecord(t.dataset.ritual, null);
       case "cal-select": ui.calSelected = t.dataset.day; return render();
       case "cal-step": { let { y, m } = ui.month; m += +t.dataset.step; if (m < 0) { m = 11; y--; } if (m > 11) { m = 0; y++; } ui.month = { y, m }; ui.calSelected = null; return render(); }
       case "cal-today": ui.month = monthOf(TODAY); ui.calSelected = isoNow(); return render();
