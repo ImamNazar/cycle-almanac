@@ -65,6 +65,15 @@ const { spawn } = require("node:child_process");
       await page.locator('[data-act="constellation-now"]').click();
       assert.equal(await page.locator('.orbit-journal__day').last().getAttribute('data-day'), currentLastDay, "Back to today restores current window");
       assert.equal(await page.locator('[data-act="constellation-step"][data-step="-1"]').isDisabled(), true, "Cannot navigate into future");
+      assert.equal(await page.locator('.v5-timeline-preview').count(), 1, "Day-in-focus preview is visible");
+      const firstTimelineDay = await page.locator('.orbit-journal__day').first().getAttribute('data-day');
+      await page.locator('.orbit-journal__day').first().click();
+      assert.equal(await page.locator('.orbit-journal__day').first().getAttribute('aria-pressed'), 'true', "Selecting a timeline day marks it active");
+      assert.equal(await page.locator('.v5-timeline-preview [data-act="log"]').getAttribute('data-day'), firstTimelineDay, "Preview journal action targets selected day");
+      await page.locator('.v5-timeline-preview [data-act="log"]').click();
+      assert.equal(await page.locator('#sheet[open]').count(), 1, "Preview opens selected day journal");
+      await page.locator('#sheet [data-act="close"]').click();
+
 
       assert.equal(await page.locator(".ritual-card").count(), 1, "Rituals visible on Today");
       await page.locator('[data-act="ritual-pick"][data-ritual="walk"]').click();
