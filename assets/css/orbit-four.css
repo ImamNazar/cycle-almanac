@@ -139,3 +139,22 @@ button:active{transform:scale(.97)}
 .orbit-journal__day{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .orbit-journal__sky:focus-within .orbit-journal__connections{filter:drop-shadow(0 0 5px rgba(194,173,255,.8))}
 @media(prefers-contrast:more){.orbit-journal__day{border:2px solid white}.orbit-journal__footer,.orbit-caption__foot{color:white}.orbit-journal__connections{filter:none}}
+
+/* Compact-screen and landscape resilience */
+@media(max-height:650px) and (max-width:999px){
+ body[data-view="today"] .hero{min-height:360px;max-height:55svh}
+ body[data-view="today"] .orbit-art__planet{width:min(48%,210px)}
+ body[data-view="today"] .orbit-caption{bottom:15px}
+ body[data-view="today"] .orbit-caption strong{font-size:30px}
+}
+@media(max-width:350px){
+ .orbit-journal__day{width:29px;height:29px;font-size:10px}
+ .orbit-journal__footer{gap:8px}
+ .orbit-caption__foot{font-size:11px}
+}
+@media(forced-colors:active){
+ .orbit-journal__day{border:2px solid ButtonText;background:ButtonFace;color:ButtonText}
+ .orbit-journal__day.is-today{outline:2px solid Highlight}
+ .orbit-journal__core{border:2px solid CanvasText;background:Canvas;color:CanvasText}
+ .orbit-art__planet{border:2px solid CanvasText}
+}
