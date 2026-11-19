@@ -141,3 +141,5 @@ body .side::before{content:"";position:absolute;top:0;right:4%;width:1px;height:
 .v5-timeline-dates button[aria-pressed="true"]{border-color:#c9b1ff;background:rgba(173,146,239,.23)}
 .v5-timeline-dates button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 @media(max-width:390px){.v5-timeline-dates{gap:3px}.v5-timeline-dates button{min-height:48px}}
+
+.v5-observation__summary{margin:9px 0 18px;font-size:12px;line-height:1.5;opacity:.85}
