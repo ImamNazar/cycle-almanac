@@ -34,3 +34,27 @@ Transform Almanac from a calendar-first cycle tracker into a private, navigable 
 - Animations pause with reduced-motion and don't block input.
 - Observed vs estimated vs missing data is always explicit.
 - No merge/deployment without explicit approval.
+
+## Release candidate checklist (2026-11-19)
+
+**Automated verification:** GitHub Actions run #132 passed on commit `5943a73`. This is a development candidate, **not** a release approval.
+
+### Implemented and automatically covered
+- [x] One-tap check-ins and durable local storage status, including write-failure warnings.
+- [x] Living Timeline, accessible date selection and Day in Focus.
+- [x] Pattern Observatory with explicit missing days and coverage counts.
+- [x] 320px / 390px / desktop browser coverage, reduced-motion checks and keyboard dock navigation.
+- [x] Corrupt-storage protection, browser offline smoke tests and existing cycle-engine tests.
+- [x] Review of overconfident fertility and temperature-related copy in Today, Calendar, visualizations and Learn.
+
+### Manual release gates (not yet verified)
+- [ ] Test actual iPhone Safari and Android Chrome with touch, screen reader and zoomed text.
+- [ ] Confirm real-device contrast, focus order, virtual-keyboard behavior and 200% text resizing.
+- [ ] Exercise offline reload, install-to-home-screen and reconnect on real devices.
+- [ ] Import an actual *test* backup into a fresh browser profile; verify round-trip and recovery without risking personal data.
+- [ ] Review remaining health copy and engine assumptions with qualified clinical expertise before describing the tracker as medically validated.
+- [ ] Confirm performance on a lower-end phone and visually inspect animation smoothness.
+- [ ] Obtain explicit approval for merge and deployment.
+
+### Launch boundaries
+The development branch and draft PR are **not** the live site. Do not merge, publish, or represent these manual gates as passed until independently verified.
