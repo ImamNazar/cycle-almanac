@@ -256,6 +256,7 @@
         <div class="orbit-journal__core" aria-hidden="true"><span>${span}</span><small>DAYS</small></div>
         ${entries}
       </div>
+      <div class="v5-timeline-dates" role="group" aria-label="Choose a day from this timeline">${days.map(d => { const iso = A.fromDay(d), L = data.logs[iso] || {}, hasEntry = Object.values(L).some(v => v != null && v !== "" && (!Array.isArray(v) || v.length)); return `<button type="button" data-act="constellation-preview" data-day="${iso}" aria-pressed="${previewDay === iso}" aria-label="${esc(fmt(d, { weekday: "long", month: "short", day: "numeric" }))}${hasEntry ? ", entry logged" : ", no entry"}"><span>${fmt(d, { weekday: "short" })}</span><strong>${fmt(d, { day: "numeric" })}</strong><i aria-hidden="true">${hasEntry ? "●" : "○"}</i></button>`; }).join("")}</div>
       ${preview}
       <div class="orbit-journal__footer"><span><b>${logged}</b> of ${span} days logged</span><span><i class="orbit-journal__key"></i> Period logged <i class="orbit-journal__key orbit-journal__key--other"></i> Other entry</span></div>
       <p class="fine">This is your recorded history, not a prediction. Missing days are perfectly fine.</p>
