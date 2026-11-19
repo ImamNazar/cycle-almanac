@@ -131,3 +131,13 @@ body .side::before{content:"";position:absolute;top:0;right:4%;width:1px;height:
 .orbit-journal__day{z-index:4;touch-action:manipulation}
 .orbit-journal__day:hover,.orbit-journal__day:focus-visible{z-index:5}
 @media(max-width:540px){.orbit-journal__sky{width:min(100%,310px);height:310px;margin:12px auto 22px}.orbit-journal__day{min-width:32px;min-height:32px}.orbit-journal__sky--dense .orbit-journal__day{min-width:26px;min-height:26px}}
+
+/* A conventional, dependable date picker accompanies the exploratory sky. */
+.v5-timeline-dates{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin:14px 0 18px}
+.v5-timeline-dates button{display:flex;align-items:center;flex-direction:column;justify-content:center;gap:3px;min-width:0;min-height:54px;padding:6px 2px;border:1px solid rgba(197,184,238,.25);border-radius:12px;background:rgba(143,131,192,.08);color:var(--ink);cursor:pointer;font:inherit}
+.v5-timeline-dates button span{font-size:10px;opacity:.75}
+.v5-timeline-dates button strong{font-size:14px;font-variant-numeric:tabular-nums}
+.v5-timeline-dates button i{font-size:8px;font-style:normal;opacity:.8}
+.v5-timeline-dates button[aria-pressed="true"]{border-color:#c9b1ff;background:rgba(173,146,239,.23)}
+.v5-timeline-dates button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+@media(max-width:390px){.v5-timeline-dates{gap:3px}.v5-timeline-dates button{min-height:48px}}
