@@ -29,6 +29,12 @@
     storageStatus = next;
     const indicator = document.querySelector(".v5-checkin__save");
     if (indicator) { indicator.textContent = storageStatus === "saving" ? "Saving changes on this device…" : storageStatus === "saved" ? "Saved on this device" : "Not saved — check your browser storage"; indicator.dataset.status = storageStatus; }
+    const journalHint = document.querySelector(".v5-portal__action--primary small");
+    if (journalHint) {
+      const today = data && data.logs && data.logs[isoNow()] || {};
+      const recorded = Object.values(today).some(v => v != null && v !== "" && (!Array.isArray(v) || v.length));
+      journalHint.textContent = storageStatus === "error" ? "Storage unavailable — protect your entries with a backup" : storageStatus === "saving" ? "Saving your latest changes…" : recorded ? "Your entry is saved on this device" : "Mood, energy, symptoms and notes";
+    }
   }
   function save() {
     if (storageReadError) { updateStorageStatus("error"); toast("Saved data could not be read. Restore a backup before saving."); return; }
