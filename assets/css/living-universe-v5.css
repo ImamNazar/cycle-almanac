@@ -1,0 +1,22 @@
+/* ALMANAC 5.0 — Daily Studio portal.
+   Editorial restraint around vivid interaction; native controls remain accessible. */
+.v5-portal{position:relative;isolation:isolate;overflow:hidden;margin:0 0 18px;padding:clamp(22px,5vw,38px);border:1px solid rgba(206,196,255,.3);border-radius:28px;background:radial-gradient(circle at 91% 4%,rgba(183,113,251,.29),transparent 38%),radial-gradient(circle at 8% 100%,rgba(89,205,215,.13),transparent 43%),#111631;box-shadow:0 18px 45px rgba(8,8,29,.18);color:#f9f7ff}
+.v5-portal::before{content:"";position:absolute;right:-70px;top:-120px;width:260px;height:260px;border:1px solid rgba(229,208,255,.24);border-radius:50%;box-shadow:0 0 0 40px rgba(205,167,255,.035),0 0 0 82px rgba(205,167,255,.025);z-index:-1;pointer-events:none}
+.v5-portal__eyebrow{font-size:10px!important;font-weight:800;letter-spacing:.2em;color:#cbb8ff!important;margin:0 0 12px!important}
+.v5-portal__intro h2{font-family:var(--font-d,serif);font-size:clamp(30px,5vw,52px);line-height:1.04;letter-spacing:-.045em;font-weight:500;color:white;margin:0 0 12px}
+.v5-portal__intro>p:last-child{color:#d7d1ee;margin:0 0 24px;max-width:35ch}
+.v5-portal__actions{display:grid;grid-template-columns:1fr;gap:10px}
+.v5-portal__action{appearance:none;display:flex;align-items:center;gap:13px;width:100%;min-height:74px;text-align:left;padding:13px 16px;border:1px solid rgba(204,204,245,.23);border-radius:18px;background:rgba(255,255,255,.055);color:white;cursor:pointer;transition:transform .22s ease,background .22s ease,border-color .22s ease}
+.v5-portal__action--primary{background:linear-gradient(105deg,rgba(170,119,234,.3),rgba(109,182,219,.14));border-color:rgba(231,208,255,.46)}
+.v5-portal__action:hover{transform:translateY(-2px);background:rgba(255,255,255,.12);border-color:rgba(238,225,255,.6)}
+.v5-portal__action:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.v5-portal__symbol{flex:0 0 40px;width:40px;height:40px;display:grid;place-items:center;border-radius:14px;background:rgba(229,210,255,.13);font-size:23px;color:#e9d6ff}
+.v5-portal__action>span:nth-child(2){flex:1;min-width:0}
+.v5-portal__action strong,.v5-portal__action small{display:block}
+.v5-portal__action strong{font-size:14px;line-height:1.35}
+.v5-portal__action small{font-size:11px;color:#d4d0e6;margin-top:4px;line-height:1.4}
+.v5-portal__arrow{font-size:20px;color:#e5d7ff}
+.v5-portal__privacy{font-size:10px;line-height:1.5;letter-spacing:.015em;color:#c5bfdc;margin:18px 0 0}
+@media(min-width:720px){.v5-portal__actions{grid-template-columns:repeat(3,minmax(0,1fr))}.v5-portal__action{min-height:128px;flex-direction:column;align-items:flex-start}.v5-portal__action>span:nth-child(2){flex:0}.v5-portal__arrow{position:absolute;align-self:flex-end}}
+@media(prefers-reduced-motion:reduce){.v5-portal__action{transition:none}.v5-portal__action:hover{transform:none}}
+@media(forced-colors:active){.v5-portal{border:1px solid CanvasText}.v5-portal__action{border:1px solid ButtonText;color:ButtonText}.v5-portal__action:focus-visible{outline:3px solid Highlight}}
