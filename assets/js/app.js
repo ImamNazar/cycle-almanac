@@ -206,6 +206,39 @@
   }
 
   /* ============================================================== PAGES */
+  /* ORBIT: a navigable constellation of the last 14 days.
+     Only observed entries are marked as logged; no inferred health states. */
+  function orbitJournal() {
+    const days = Array.from({ length: 14 }, (_, i) => TODAY - 13 + i);
+    const entries = days.map((d, i) => {
+      const iso = A.fromDay(d), L = data.logs[iso] || {};
+      const hasLog = Object.keys(L).some(k => L[k] != null && L[k] !== "" && (!Array.isArray(L[k]) || L[k].length));
+      const period = Number(L.flow) >= 2;
+      const angle = (i / 14) * Math.PI * 2 - Math.PI / 2;
+      const radius = 34 + (i % 3) * 3.8;
+      const x = 50 + Math.cos(angle) * radius;
+      const y = 50 + Math.sin(angle) * radius;
+      const label = fmt(d, { weekday: "long", month: "short", day: "numeric" }) + (period ? ", period logged" : hasLog ? ", entry logged" : ", no entry");
+      return `<button type="button" class="orbit-journal__day${period ? " is-period" : hasLog ? " is-logged" : ""}${d === TODAY ? " is-today" : ""}" style="--x:${x.toFixed(2)}%;--y:${y.toFixed(2)}%" data-act="log" data-day="${iso}" aria-label="${esc(label)}" title="${esc(label)}"><span>${fmt(d, { day: "numeric" })}</span></button>`;
+    }).join("");
+    const logged = days.filter(d => {
+      const L = data.logs[A.fromDay(d)] || {};
+      return Object.values(L).some(v => v != null && v !== "" && (!Array.isArray(v) || v.length));
+    }).length;
+    return `<section class="card orbit-journal" aria-labelledby="orbit-journal-title">
+      <p class="eyebrow">YOUR PERSONAL CONSTELLATION</p>
+      <h2 class="h2" id="orbit-journal-title">Every day is a little world.</h2>
+      <p class="fine">Explore the last two weeks. Each point opens that day's private journal; brighter points have entries you've logged.</p>
+      <div class="orbit-journal__sky" role="group" aria-label="Open a daily entry from the last fourteen days">
+        <div class="orbit-journal__track orbit-journal__track--a" aria-hidden="true"></div>
+        <div class="orbit-journal__track orbit-journal__track--b" aria-hidden="true"></div>
+        <div class="orbit-journal__core" aria-hidden="true"><span>14</span><small>DAYS</small></div>
+        ${entries}
+      </div>
+      <div class="orbit-journal__footer"><span><b>${logged}</b> of 14 days logged</span><span><i class="orbit-journal__key"></i> Period logged <i class="orbit-journal__key orbit-journal__key--other"></i> Other entry</span></div>
+      <p class="fine">This is your recorded history, not a prediction. Missing days are perfectly fine.</p>
+    </section>`;
+  }
   function pageToday() {
     const S = data.settings, c = AN.current;
     let h = sampleBanner();
@@ -213,10 +246,10 @@
       <h1 class="status__h">Welcome to <span class="status__ph">Almanac</span></h1>
       <p class="status__line">Log the first day of your last period and the landscape above starts following your cycle.</p>
       <div class="actions"><button class="btn" data-act="start-period" type="button">My period started today</button><button class="btn btn--ghost" data-act="pick-start" type="button">It started earlier</button></div>
-      <p class="fine">Everything stays on this device. No account, no server.</p></section>` + todayLogCard() + ritualCard() + learnTeaser();
+      <p class="fine">Everything stays on this device. No account, no server.</p></section>` + orbitJournal() + todayLogCard() + ritualCard() + learnTeaser();
     if (S.mode === "paused") return h + `<section class="card status"><p class="eyebrow">${greeting()}</p><h1 class="status__h">Predictions <span class="status__ph">paused</span></h1>
       <p class="status__line">Cycle estimates are off, which makes sense during pregnancy, postpartum or whenever your cycle isn't following its usual pattern. You can still log how you feel, and switch predictions back on in Settings.</p>
-      <div class="actions"><button class="btn" data-act="log" type="button">Log today</button></div></section>` + todayLogCard() + ritualCard() + flagsHTML();
+      <div class="actions"><button class="btn" data-act="log" type="button">Log today</button></div></section>` + orbitJournal() + todayLogCard() + ritualCard() + flagsHTML();
 
     const P = C.PHASES[c.phase];
     const hormonal = S.mode === "hormonal";
@@ -228,7 +261,7 @@
       <ul class="facts">${nextFact(c)}${hormonal ? "" : fertileFact(c)}</ul>
       ${hormonal ? "" : `<p class="fine">Fertile-window dates are estimates and <b>not birth control</b>.</p>`}
       <div class="actions">${actionsFor(c)}</div></section>`;
-    h += todayLogCard() + ritualCard() + flagsHTML() + `<details class="card fold"><summary>Explore your next 7 days</summary>${outlookCard()}</details>` + seasonCard(c);
+    h += orbitJournal() + todayLogCard() + ritualCard() + flagsHTML() + `<details class="card fold"><summary>Explore your next 7 days</summary>${outlookCard()}</details>` + seasonCard(c);
     return h;
   }
   function actionsFor(c) {
