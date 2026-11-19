@@ -25,6 +25,11 @@ const { spawn } = require("node:child_process");
       await page.locator('[data-act="ob-sample"]').click();
       await page.waitForTimeout(200);
       assert.equal(await page.locator('.v5-checkin__row').count(), 4, "Daily Studio offers mood, energy, pain and flow");
+      assert.equal(await page.locator('.v5-portal').evaluate(el => getComputedStyle(el).backgroundImage !== 'none'), true, "Cosmic atmosphere remains visible without motion");
+      if (viewport.width < 720) {
+        assert.equal(await page.locator('.v5-portal').evaluate(el => getComputedStyle(el, '::after').animationName), 'none', "Mobile disables decorative planet animation");
+      }
+
       assert.equal(await page.locator('.dock__btn[aria-current="page"]').count(), 1, "Exactly one navigation tab is current");
       assert.equal(await page.locator('.dock__btn[data-tab="today"]').getAttribute('aria-current'), 'page', "Today navigation is announced as current");
       assert.equal(await page.locator('.dock__btn').first().evaluate(el => getComputedStyle(el).touchAction), 'manipulation', "Dock supports reliable touch activation");
