@@ -224,7 +224,7 @@
     else if (f.status === "in") { t = "You're in your likely fertile window"; s = `Ovulation is ${src} around ${fShort(o.day)}. The window runs ${fRange(f.start, f.end)}.`; }
     else if (f.status === "before") { t = "Likely fertile window: " + fRange(f.start, f.end); s = `Opens ${rel(f.start)}. Ovulation ${src}.`; }
     else { t = "Your likely fertile window has passed"; s = `Ovulation was ${src} around ${fShort(o.day)}.`; }
-    if (c.imprecise && !o.confirmed) s += " Your cycles vary a lot, so a calendar can't pinpoint this. LH tests, mucus or temperature are far more precise.";
+    if (c.imprecise && !o.confirmed) s += " Your cycles vary a lot, so a calendar can't pinpoint this. LH tests, mucus and temperature provide additional clues, but cannot guarantee timing.";
     return fact(I.sun, t, s);
   }
 
@@ -431,10 +431,10 @@
       if (S.mode === "natural" && c) for (const o of c.ovulations) {
         if (d >= o.day - 5 && d <= o.day) { cls.push("is-fert"); lab.push("estimated fertile window"); }
         else if (!o.confirmed && ((d >= o.lo - 5 && d < o.day - 5) || (d > o.day && d <= o.hi))) { cls.push("is-fert-lo"); lab.push("possible fertile window"); }
-        if (d === o.day) { cls.push("is-ovu"); lab.push(o.confirmed ? "ovulation, confirmed by temperature" : o.source === "lh" ? "ovulation expected from LH test" : "estimated ovulation"); }
+        if (d === o.day) { cls.push("is-ovu"); lab.push(o.confirmed ? "ovulation suggested by temperature" : o.source === "lh" ? "ovulation expected from LH test" : "estimated ovulation"); }
       }
     }
-    if (S.mode === "natural") for (const cy of AN.cycles) if (cy.ovuConfirmed && cy.ovu === d && !cls.includes("is-ovu")) { cls.push("is-ovu"); lab.push("ovulation, confirmed by temperature"); }
+    if (S.mode === "natural") for (const cy of AN.cycles) if (cy.ovuConfirmed && cy.ovu === d && !cls.includes("is-ovu")) { cls.push("is-ovu"); lab.push("ovulation suggested by temperature"); }
     if (d === TODAY) { cls.push("is-today"); lab.unshift("today"); }
     if (L.mood || L.energy || L.pain != null || (L.sym && L.sym.length) || L.note || L.bbt != null || L.lh || L.mucus) cls.push("has-log");
     return { iso, cls, lab };
@@ -573,7 +573,7 @@
       if (natural) {
         const od = (c.ovu != null ? c.ovu : c.next - o2n) - c.start + 1, b = c.periodLen, od2 = Math.max(od, b + 3);
         bar = seg("winter", b) + seg("spring", od2 - 2 - b) + seg("summer", 3) + seg("autumn", c.length - (od2 + 1));
-        mk = `<span class="strip__o${c.ovuConfirmed ? " is-conf" : ""}" style="left:${w(od2 - 0.5)}" title="${c.ovuConfirmed ? "Ovulation confirmed" : "Ovulation estimated"}"></span>`;
+        mk = `<span class="strip__o${c.ovuConfirmed ? " is-conf" : ""}" style="left:${w(od2 - 0.5)}" title="${c.ovuConfirmed ? "Ovulation suggested by temperature" : "Ovulation estimated"}"></span>`;
       } else bar = seg("winter", c.periodLen) + `<i style="width:${w(c.length - c.periodLen)};background:var(--line)"></i>`;
       return `<li class="strip"><span class="strip__d">${fShort(c.start)}</span><span class="strip__bar">${bar}${mk}</span><span class="strip__n">${c.length}</span></li>`;
     });
@@ -582,7 +582,7 @@
       rows.push(`<li class="strip strip--now"><span class="strip__d">${fShort(st)}</span><span class="strip__bar">${seg("winter", b)}${seg("spring", od - 2 - b)}${seg("summer", 3)}${seg("autumn", len - (od + 1))}<span class="strip__o${cur.ovu.confirmed ? " is-conf" : ""}" style="left:${w(od - 0.5)}"></span><span class="strip__t" style="left:${w(cur.day - 0.5)}"></span></span><span class="strip__n">now</span></li>`);
     }
     return `<section class="card"><h2 class="h3 ih">${F.ICON.chart}Your last ${cs.length} cycles</h2><ul class="strips" aria-label="Each row is one cycle; the number is its length in days">${rows.join("")}</ul>
-      <p class="fine">Each bar is one cycle, drawn to the same scale. ${natural ? "A solid dot is ovulation confirmed by your own temperature or LH test; a hollow dot is an estimate. The last row is the current cycle (predicted), and the tick is today." : "The coloured part is your bleeding."}</p></section>`;
+      <p class="fine">Each bar is one cycle, drawn to the same scale. ${natural ? "A solid dot is ovulation suggested by temperature or LH observations; a hollow dot is an estimate. The last row is the current cycle (predicted), and the tick is today." : "The coloured part is your bleeding."}</p></section>`;
   }
   function patternsCard() {
     const logged = Object.values(data.logs).filter(l => l.mood || l.energy || l.pain != null).length;
@@ -603,11 +603,11 @@
   }
 
   /* ---------------------------------------------------------------- learn */
-  const GUIDE_SUB = { temp: "Confirms ovulation after the fact", lh: "Predicts ovulation about a day ahead", mucus: "Your body's own fertility signal", products: "Tampons, cups, pads and toxic shock signs", pms: "PMS, PMDD and when to get help", bc: "What hormonal methods do to bleeding" };
+  const GUIDE_SUB = { temp: "Can suggest ovulation occurred", lh: "Predicts ovulation about a day ahead", mucus: "Your body's own fertility signal", products: "Tampons, cups, pads and toxic shock signs", pms: "PMS, PMDD and when to get help", bc: "What hormonal methods do to bleeding" };
   const mucusScale = () => `<ol class="mscale">${C.MUCUS_INFO.map(m => `<li><span class="mscale__ico">${F.MUCUS_GLYPH[m[0]]}</span><span><b>${m[1]}</b><small>${m[2]}</small></span><span class="mscale__bar" role="img" aria-label="Fertility ${m[3]} of 5"><i style="width:${m[3] * 20}%"></i></span></li>`).join("")}</ol>`;
   const figBox = (svg, cap) => `<figure class="figbox">${svg}<figcaption>${cap}</figcaption></figure>`;
   function guideCard(g) {
-    const fig = g.fig === "bbt" ? figBox(F.bbt(), "Example temperature chart with made-up data. A sustained rise after ovulation confirms it happened.")
+    const fig = g.fig === "bbt" ? figBox(F.bbt(), "Example temperature chart with made-up data. A sustained rise may suggest ovulation occurred.")
       : g.fig === "lh" ? figBox(F.lhStrips(), "How an ovulation test typically looks as the LH surge arrives.") : g.fig === "mucus" ? mucusScale() : "";
     return `<details class="card lsec fold fold--big" id="guide-${g.id}"><summary><span class="ph-ico ph-ico--g">${F.ICON[g.ico]}</span><span><b>${g.title}</b><small>${GUIDE_SUB[g.id] || ""}</small></span></summary>
       <p>${g.intro}</p>${fig}<ol class="steps">${g.steps.map(t => `<li>${t}</li>`).join("")}</ol><ul class="notes">${g.notes.map(t => `<li>${t}</li>`).join("")}</ul></details>`;
