@@ -252,10 +252,17 @@
   function dailyPortal() {
     const today = data.logs[isoNow()] || {};
     const recorded = Object.values(today).some(v => v != null && v !== "" && (!Array.isArray(v) || v.length));
+    const quickChoices = (key, label, options) => `<div class="v5-checkin__row"><span class="v5-checkin__label">${label}</span><div class="v5-checkin__choices" role="group" aria-label="Log today's ${label.toLowerCase()}">${options.map(o => {
+      const value = String(o[0]), selected = String(today[key]) === value;
+      const title = key === "mood" ? String(o[2] || o[1]) : String(o[1]);
+      return `<button type="button" class="v5-checkin__choice${selected ? " is-selected" : ""}" data-act="quick" data-k="${key}" data-v="${esc(value)}" aria-pressed="${selected}" title="${esc(title)}"><span>${esc(title)}</span></button>`;
+    }).join("")}</div></div>`;
+    const quickPanel = `<div class="v5-checkin" aria-label="Quick daily check-in"><div class="v5-checkin__heading"><strong>One-tap check-in</strong><span>Saved privately on this device</span></div>${quickChoices("mood", "Mood", C.MOOD)}${quickChoices("energy", "Energy", C.ENERGY)}<p class="v5-checkin__hint">Tap again to remove a choice. For symptoms, flow or notes, open your journal.</p></div>`;
     return `<section class="v5-portal" aria-labelledby="v5-portal-title">
       <div class="v5-portal__intro"><p class="v5-portal__eyebrow">YOUR DAILY STUDIO <span aria-hidden="true">✦</span></p>
       <h2 id="v5-portal-title">How's your world today?</h2>
       <p>One moment is enough. You can always add more later.</p></div>
+      ${quickPanel}
       <div class="v5-portal__actions">
         <button class="v5-portal__action v5-portal__action--primary" type="button" data-act="log"><span class="v5-portal__symbol" aria-hidden="true">✳</span><span><strong>${recorded ? "Continue today's journal" : "Check in with yourself"}</strong><small>${recorded ? "Your entry is saved on this device" : "Mood, energy, symptoms and notes"}</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
         <button class="v5-portal__action" type="button" data-tab="calendar"><span class="v5-portal__symbol" aria-hidden="true">◌</span><span><strong>Travel through time</strong><small>Explore recorded days and estimates</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
