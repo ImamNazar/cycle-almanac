@@ -57,6 +57,15 @@ const { spawn } = require("node:child_process");
       assert.equal(await page.locator('[data-act="constellation-range"][data-days="28"]').getAttribute('aria-pressed'), 'true', "28-day control selected");
       await page.locator('[data-act="constellation-range"][data-days="14"]').click();
       assert.equal(await page.locator('.orbit-journal__day').count(), 14, "14-day constellation restored");
+      const currentLastDay = await page.locator('.orbit-journal__day').last().getAttribute('data-day');
+      await page.locator('[data-act="constellation-step"][data-step="1"]').click();
+      const earlierLastDay = await page.locator('.orbit-journal__day').last().getAttribute('data-day');
+      assert.notEqual(earlierLastDay, currentLastDay, "Earlier navigates to different recorded dates");
+      assert.equal(await page.locator('[data-act="constellation-step"][data-step="-1"]').isEnabled(), true, "Later available after going back");
+      await page.locator('[data-act="constellation-now"]').click();
+      assert.equal(await page.locator('.orbit-journal__day').last().getAttribute('data-day'), currentLastDay, "Back to today restores current window");
+      assert.equal(await page.locator('[data-act="constellation-step"][data-step="-1"]').isDisabled(), true, "Cannot navigate into future");
+
       assert.equal(await page.locator(".ritual-card").count(), 1, "Rituals visible on Today");
       await page.locator('[data-act="ritual-pick"][data-ritual="walk"]').click();
       await page.locator('[data-act="ritual-save"][data-result="better"]').click();
