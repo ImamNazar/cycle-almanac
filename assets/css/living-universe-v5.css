@@ -235,3 +235,24 @@ body .side::before{content:"";position:absolute;top:0;right:4%;width:1px;height:
   .v5-timeline-dates button span{font-size:9px}
   .v5-range button{padding-inline:8px}
 }
+
+/* Phase 3 — navigation that remains legible and reachable on small screens. */
+.dock{isolation:isolate}
+.dock__btn{position:relative;touch-action:manipulation;transition:background-color .2s ease,color .2s ease,transform .2s ease}
+.dock__btn[aria-current="page"]{font-weight:800}
+.dock__btn[aria-current="page"]::after{content:"";position:absolute;inset:auto 20% 3px;height:3px;border-radius:99px;background:currentColor;opacity:.75;pointer-events:none}
+.dock__btn:focus-visible{outline:3px solid var(--v5-focus,#e5caff);outline-offset:-3px}
+@media(hover:hover) and (pointer:fine){.dock__btn:hover{transform:translateY(-2px)}}
+@media(max-width:720px){
+  .dock{padding-bottom:env(safe-area-inset-bottom,0px)}
+  .dock__btn{min-width:0;min-height:54px}
+  .dock__btn span{white-space:nowrap}
+  .dock__btn[aria-current="page"]::after{bottom:4px}
+  #page{scroll-margin-top:12px}
+}
+@media(max-width:360px){
+  .dock__btn{padding-inline:3px}
+  .dock__btn span{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){.dock__btn{transition:none!important}.dock__btn:hover{transform:none!important}}
+@media(forced-colors:active){.dock__btn[aria-current="page"]{outline:2px solid Highlight;outline-offset:-2px}.dock__btn[aria-current="page"]::after{background:Highlight}}
