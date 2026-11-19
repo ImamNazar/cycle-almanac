@@ -126,6 +126,8 @@
   }
 
   data = load();
+  // Storage errors are only known after load() has actually read the device.
+  if (storageReadError) storageStatus = "error";
   /* ---------------------------------------------------------------- time */
   let NOW = new Date(), TODAY = A.localDay(NOW), AN = null, PAT = null;
   const recompute = () => { AN = A.analyze(data, TODAY); PAT = A.patterns(data, AN); };
