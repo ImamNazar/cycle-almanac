@@ -14,7 +14,7 @@ const { spawn } = require("node:child_process");
       if (i === 39) throw Error("Local test server did not start");
     }
     browser = await chromium.launch({ headless: true, args: ["--no-sandbox"] });
-    for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 900 }]) {
+    for (const viewport of [{ width: 320, height: 700 }, { width: 390, height: 844 }, { width: 1280, height: 900 }]) {
       const context = await browser.newContext({ viewport, acceptDownloads: true, reducedMotion: "reduce" });
       const page = await context.newPage();
       const errors = [];
@@ -25,6 +25,14 @@ const { spawn } = require("node:child_process");
       await page.locator('[data-act="ob-sample"]').click();
       await page.waitForTimeout(200);
       assert.equal(await page.locator('.v5-checkin__row').count(), 4, "Daily Studio offers mood, energy, pain and flow");
+      if (viewport.width <= 390) {
+        const geometry = await page.locator('.v5-portal, .v5-checkin, .dock').evaluateAll(els => els.map(el => {
+          const r = el.getBoundingClientRect();
+          return { className: el.className, left: r.left, right: r.right, width: innerWidth };
+        }));
+        assert.equal(geometry.every(g => g.left >= -2 && g.right <= g.width + 2), true, "Primary mobile surfaces fit within the viewport: " + JSON.stringify(geometry));
+      }
+
       assert.equal(await page.locator('.v5-portal').evaluate(el => getComputedStyle(el).backgroundImage !== 'none'), true, "Cosmic atmosphere remains visible without motion");
       if (viewport.width < 720) {
         assert.equal(await page.locator('.v5-portal').evaluate(el => getComputedStyle(el, '::after').animationName), 'none', "Mobile disables decorative planet animation");
