@@ -203,6 +203,20 @@ const { spawn } = require("node:child_process");
       }).map(el => el.outerHTML.slice(0, 200)));
       assert.deepEqual(unnamedTabs, [], "Navigation tabs have accessible names");
       assert.deepEqual(errors, [], "No uncaught browser errors");
+      // Corrupt saved data must not be silently overwritten or called saved.
+      const corruptContext = await browser.newContext({ viewport, reducedMotion: "reduce" });
+      const corruptPage = await corruptContext.newPage();
+      await corruptPage.addInitScript(() => {
+        try { localStorage.setItem("almanac.v1", "{broken-json"); } catch {}
+      });
+      await corruptPage.goto("http://127.0.0.1:8765/", { waitUntil: "load" });
+      await corruptPage.waitForFunction(() => !!window.__almanac);
+      assert.equal(await corruptPage.evaluate(() => localStorage.getItem("almanac.v1")), "{broken-json", "Unreadable original data remains intact");
+      // Onboarding may precede Daily Studio, so inspect its state after opting for sample data.
+      await corruptPage.locator('[data-act="ob-sample"]').click();
+      assert.equal(await corruptPage.locator(".v5-checkin__save").getAttribute("data-status"), "error", "Unreadable storage is never shown as saved");
+      await corruptContext.close();
+
       await context.close();
       console.log("PASS viewport", viewport.width);
     }
