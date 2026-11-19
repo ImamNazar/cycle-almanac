@@ -57,6 +57,18 @@ const { spawn } = require("node:child_process");
       assert.equal(await page.locator('.v5-checkin__choice[data-k="mood"]').first().getAttribute('aria-pressed'), 'false', "Tapping again removes quick choice");
       assert.equal(await page.locator('.v5-checkin').count(), 1, "Only one quick check-in panel");
       assert.equal(await page.locator('.v5-checkin__choice[data-k="mood"][data-v="4"]').count(), 1, "Mood option is unique");
+      // A blocked storage write must never be reported as successfully saved.
+      await page.evaluate(() => {
+        window.__originalSetItem = Storage.prototype.setItem;
+        Storage.prototype.setItem = function () { throw new DOMException("Storage blocked", "QuotaExceededError"); };
+      });
+      await page.locator('.v5-checkin__choice[data-k="energy"]').first().click();
+      await page.waitForFunction(() => document.querySelector('.v5-checkin__save')?.dataset.status === 'error');
+      assert.match(await page.locator('.v5-checkin__save').innerText(), /Not saved/, "Failed storage is explicitly reported");
+      await page.evaluate(() => { Storage.prototype.setItem = window.__originalSetItem; });
+      await page.locator('.v5-checkin__choice[data-k="energy"]').first().click();
+      await page.waitForFunction(() => document.querySelector('.v5-checkin__save')?.dataset.status === 'saved');
+      assert.match(await page.locator('.v5-checkin__save').innerText(), /Saved on this device/, "Saving recovers after storage becomes available");
       // Almanac 5: the Daily Studio must open the existing private journal.
       assert.equal(await page.locator(".v5-portal").count(), 1, "Daily Studio visible");
       assert.equal(await page.locator(".v5-portal").evaluate(el => getComputedStyle(el, "::after").animationName), "none", "Decorative orb respects reduced motion");
@@ -181,19 +193,6 @@ const { spawn } = require("node:child_process");
         return !(el.getAttribute("aria-label") || el.getAttribute("title") || el.textContent || "").trim();
       }).map(el => el.outerHTML.slice(0, 200)));
       assert.deepEqual(unnamedTabs, [], "Navigation tabs have accessible names");
-      // A blocked storage write must never be reported as successfully saved.
-      await page.locator('[data-tab="today"]').first().click();
-      await page.evaluate(() => {
-        window.__originalSetItem = Storage.prototype.setItem;
-        Storage.prototype.setItem = function () { throw new DOMException("Storage blocked", "QuotaExceededError"); };
-      });
-      await page.locator('.v5-checkin__choice[data-k="energy"]').first().click();
-      await page.waitForFunction(() => document.querySelector('.v5-checkin__save')?.dataset.status === 'error');
-      assert.match(await page.locator('.v5-checkin__save').innerText(), /Not saved/, "Failed storage is explicitly reported");
-      await page.evaluate(() => { Storage.prototype.setItem = window.__originalSetItem; });
-      await page.locator('.v5-checkin__choice[data-k="energy"]').first().click();
-      await page.waitForFunction(() => document.querySelector('.v5-checkin__save')?.dataset.status === 'saved');
-      assert.match(await page.locator('.v5-checkin__save').innerText(), /Saved on this device/, "Saving recovers after storage becomes available");
       assert.deepEqual(errors, [], "No uncaught browser errors");
       await context.close();
       console.log("PASS viewport", viewport.width);
