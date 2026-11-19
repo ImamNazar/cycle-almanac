@@ -161,3 +161,56 @@ body .side::before{content:"";position:absolute;top:0;right:4%;width:1px;height:
 .v5-checkin__save{margin:8px 0 16px;font-size:12px;line-height:1.5;opacity:.82}
 .v5-checkin__row{scroll-margin-top:80px}
 .v5-checkin__choice:focus-visible{outline:3px solid #cbb4ff;outline-offset:2px}
+
+/* PHASE 3 — an intentional visual and motion system across all four views.
+   Motion is decorative only; navigation and logging remain ordinary controls. */
+:root{--v5-focus:#e5caff;--v5-surface-edge:rgba(206,188,245,.26);--v5-soft-glow:0 18px 56px rgba(7,9,30,.19)}
+#page{min-width:0}
+#page>.card{position:relative;isolation:isolate;transition:border-color .3s ease,box-shadow .3s ease}
+#page>.card:hover{border-color:var(--v5-surface-edge);box-shadow:var(--v5-soft-glow)}
+#page .card h1,#page .card h2,#page .card h3{text-wrap:balance}
+#page .card p{overflow-wrap:break-word}
+.v5-portal{box-shadow:0 25px 75px rgba(6,8,28,.3),inset 0 1px rgba(255,255,255,.12)}
+.v5-portal__intro{position:relative;z-index:1}
+.v5-portal__intro h2{text-wrap:balance}
+.v5-portal__action{position:relative;overflow:hidden;transform:translateZ(0)}
+.v5-portal__action::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 15%,rgba(255,255,255,.12) 49%,transparent 80%);transform:translateX(-140%);transition:transform .7s ease;pointer-events:none}
+@media(hover:hover) and (pointer:fine){.v5-portal__action:hover::after{transform:translateX(140%)}}
+.v5-checkin__row{padding-block:13px;border-top:1px solid rgba(227,210,255,.1)}
+.v5-checkin__row:first-of-type{border-top:0}
+.v5-checkin__choices{min-width:0}
+.v5-checkin__choice{touch-action:manipulation}
+.v5-checkin__choice[aria-pressed="true"]{box-shadow:0 0 0 1px rgba(242,220,255,.28),0 0 24px rgba(173,139,239,.17)}
+.v5-checkin__save[data-status="saving"]{color:#f7d8ad}
+.v5-checkin__save[data-status="saved"]{color:#b4f2e0}
+.v5-checkin__save[data-status="error"]{color:#ffb4bd;font-weight:700}
+.v5-timeline-dates button,.v5-observation__nav button,.v5-timeline-nav button,.v5-timeline-preview button{touch-action:manipulation;transition:background-color .18s ease,border-color .18s ease,transform .18s ease}
+@media(hover:hover) and (pointer:fine){
+  .v5-timeline-dates button:hover,.v5-observation__nav button:hover:not(:disabled),.v5-timeline-nav button:hover:not(:disabled),.v5-timeline-preview button:hover{transform:translateY(-2px);border-color:rgba(199,171,251,.7)}
+}
+.v5-timeline-dates button[aria-pressed="true"]{box-shadow:inset 0 0 0 1px rgba(208,178,255,.3),0 0 18px rgba(163,133,224,.13)}
+.v5-observation__cell.is-observed{transition:filter .2s ease,box-shadow .2s ease}
+@media(hover:hover) and (pointer:fine){.v5-observation__cell.is-observed:hover{filter:brightness(1.2);box-shadow:0 0 14px rgba(171,129,241,.35)}}
+@media(max-width:720px){
+  .v5-portal{padding:clamp(19px,5vw,28px);border-radius:23px}
+  .v5-portal__actions{gap:9px}
+  .v5-portal__action{min-height:68px}
+  .v5-checkin__row{padding-block:12px}
+  .v5-observation__row-head{align-items:flex-start}
+}
+@media(max-width:390px){
+  .v5-portal__intro h2{font-size:clamp(29px,8.5vw,38px)}
+  .v5-portal__action{padding:12px;gap:10px}
+  .v5-portal__symbol{flex-basis:36px;width:36px;height:36px}
+  .v5-timeline-preview{padding:14px}
+}
+@media(prefers-reduced-motion:reduce){
+  #page>.card,#page>.v5-portal{animation:none!important}
+  #page>.card,.v5-portal__action,.v5-portal__action::after,.v5-checkin__choice,.v5-timeline-dates button,.v5-observation__nav button,.v5-timeline-nav button,.v5-timeline-preview button,.v5-observation__cell{transition:none!important}
+  .v5-portal__action::after{display:none}
+  .v5-portal__action:hover,.v5-timeline-dates button:hover,.v5-observation__nav button:hover,.v5-timeline-nav button:hover,.v5-timeline-preview button:hover{transform:none!important}
+}
+@media(forced-colors:active){
+  .v5-checkin__save[data-status="saving"],.v5-checkin__save[data-status="saved"],.v5-checkin__save[data-status="error"]{color:CanvasText}
+  .v5-checkin__choice[aria-pressed="true"],.v5-timeline-dates button[aria-pressed="true"]{outline:2px solid Highlight;outline-offset:1px}
+}
