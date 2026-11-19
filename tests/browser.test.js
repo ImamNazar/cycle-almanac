@@ -217,6 +217,17 @@ const { spawn } = require("node:child_process");
       assert.equal(await page.evaluate(() => Object.values(window.__almanac.data.rituals || {}).flat().some(x => x.id === "walk" && x.result === "better")), true, "Offline reload preserves saved reflection");
       await page.locator('[data-tab="calendar"]').first().click();
       assert.equal(await page.locator('[data-act="cal-select"]').count() > 0, true, "Calendar works offline");
+      // Offline mode must support new observations, not merely reading cached history.
+      await page.locator('.dock__btn[data-tab="today"]').click();
+      const offlineMood = page.locator('.v5-checkin__choice[data-k="mood"][data-v="4"]');
+      const offlineWasSelected = await offlineMood.getAttribute('aria-pressed') === 'true';
+      await offlineMood.click();
+      await page.waitForFunction(() => document.querySelector('.v5-checkin__save')?.dataset.status === 'saved');
+      const offlineExpected = !offlineWasSelected;
+      await page.reload({ waitUntil: "load" });
+      await page.waitForFunction(() => !!window.__almanac);
+      assert.equal(await page.locator('.v5-checkin__choice[data-k="mood"][data-v="4"]').getAttribute('aria-pressed'), String(offlineExpected), "Offline observation survives offline reload");
+
       await context.setOffline(false);
       // Essential navigation controls must expose an accessible name.
       const unnamedTabs = await page.locator('[data-tab]').evaluateAll(els => els.filter(el => {
