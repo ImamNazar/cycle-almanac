@@ -79,3 +79,36 @@ button:active{transform:scale(.97)}
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/* Orbit installation — multi-layer orbital illustration, responsive to pointer movement. */
+.hero::before,.hero::after{content:none!important;display:none!important}
+.hero{--orbit-x:0;--orbit-y:0;min-height:450px}
+.orbit-art{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;transform:translate3d(calc(var(--orbit-x)*-9px),calc(var(--orbit-y)*-7px),0);transition:transform .4s ease-out}
+.orbit-art__halo{position:absolute;left:51%;top:49%;width:min(95%,570px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(177,112,255,.26),rgba(68,120,235,.12) 35%,transparent 70%);filter:blur(9px)}
+.orbit-art__planet{position:absolute;left:51%;top:49%;width:min(55%,310px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 27% 20%,rgba(255,249,255,.96),rgba(248,181,237,.9) 10%,rgba(173,125,253,.94) 31%,rgba(82,65,191,.96) 56%,rgba(18,29,95,.97) 78%);box-shadow:inset -25px -28px 48px rgba(6,9,49,.7),inset 12px 11px 25px rgba(255,255,255,.25),0 0 65px rgba(164,109,255,.35),0 0 140px rgba(50,175,208,.16);animation:orb-breathe 9s ease-in-out infinite}
+.orbit-art__ring{position:absolute;left:51%;top:49%;width:min(80%,460px);aspect-ratio:1;border:1px solid rgba(211,193,255,.4);border-radius:50%;transform:translate(-50%,-50%) rotate(-27deg) scaleY(.49);box-shadow:0 0 16px rgba(175,141,255,.15);animation:ring-turn 28s linear infinite}
+.orbit-art__ring--two{width:min(95%,570px);transform:translate(-50%,-50%) rotate(39deg) scaleY(.62);border-color:rgba(140,228,240,.25);animation-duration:42s;animation-direction:reverse}
+.orbit-art__moon{position:absolute;display:block;width:15px;height:15px;border-radius:50%;background:#e6d4ff;box-shadow:0 0 24px 8px rgba(205,164,255,.4)}
+.orbit-art__moon--one{top:29%;left:19%}.orbit-art__moon--two{top:72%;right:16%;width:9px;height:9px;background:#9ee9f1}
+.orbit-art__spark{position:absolute;font-size:25px;color:#f7dfff;text-shadow:0 0 25px #d3a4ff;animation:star-pulse 5s ease-in-out infinite}
+.orbit-art__spark--one{left:18%;top:56%}.orbit-art__spark--two{right:16%;top:21%;animation-delay:-2s}
+.orbit-caption{position:absolute;z-index:3;bottom:24px;left:26px;right:26px;display:flex;flex-direction:column;align-items:flex-start;gap:8px;pointer-events:none;text-shadow:0 3px 22px #090b27}
+.orbit-caption__kicker{font-size:10px;letter-spacing:.2em;font-weight:850;color:#d8c4ff}
+.orbit-caption strong{font-family:var(--font-d);font-weight:450;font-size:clamp(32px,6vw,56px);line-height:.98;letter-spacing:-.06em;color:#fff}
+.orbit-caption__foot{font-size:12px;color:#e0d8fa}
+@keyframes ring-turn{from{rotate:0deg}to{rotate:360deg}}
+@keyframes star-pulse{0%,100%{opacity:.35;scale:.85}50%{opacity:1;scale:1.2}}
+@media(min-width:1000px){
+ .hero{min-height:100dvh}
+ .orbit-art__planet{width:min(56%,410px)}
+ .orbit-art__ring{width:min(85%,590px)}
+ .orbit-art__ring--two{width:min(96%,690px)}
+ .orbit-caption{bottom:8%;left:8%}
+ .orbit-caption strong{font-size:clamp(52px,5.5vw,88px)}
+}
+@media(max-width:999px){
+ body:not([data-view="today"]) .hero{min-height:0}
+ body:not([data-view="today"]) .orbit-art,body:not([data-view="today"]) .orbit-caption{display:none}
+}
+@media(max-width:420px){.orbit-caption{left:20px;bottom:20px}.orbit-caption strong{font-size:34px}.orbit-art__planet{width:58%}}
+@media(prefers-reduced-motion:reduce){.orbit-art,.orbit-art *{animation:none!important;transition:none!important;transform-origin:center}}
