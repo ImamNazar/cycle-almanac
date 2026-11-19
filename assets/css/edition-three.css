@@ -69,3 +69,20 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
  .dock__btn[aria-current="page"]{background:#E4EBDC;color:#142522}
 }
 @media(prefers-reduced-motion:reduce){.hero__scene{filter:saturate(.73)}}
+
+/* Responsive tactile interaction language */
+@media(hover:hover) and (pointer:fine){
+ .card{transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+ .card:hover{border-color:color-mix(in srgb,var(--accent) 35%,var(--line));box-shadow:0 12px 32px -28px var(--ink)}
+ .dock__btn,.round,.btn,.ritual-card .ritual-icon{transition:transform .2s ease,background-color .2s ease,color .2s ease}
+ .dock__btn:hover,.round:hover{transform:translateY(-2px)}
+ .btn:hover{transform:translateY(-1px)}
+ .ritual-card .ritual-item:hover .ritual-icon{transform:rotate(-5deg) scale(1.05)}
+ .cal-clean .cal-day button{transition:background-color .18s ease,transform .18s ease,border-color .18s ease}
+ .cal-clean .cal-day button:hover{background:var(--accent-soft);transform:translateY(-2px)}
+}
+button:active{transform:scale(.97)}
+button:focus-visible,.dock__btn:focus-visible,.cal-clean .cal-day button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
