@@ -33,7 +33,16 @@
   function save() {
     if (storageReadError) { updateStorageStatus("error"); toast("Saved data could not be read. Restore a backup before saving."); return; }
     clearTimeout(saveT);
-    saveT = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { toast("Couldn't save on this device. Private browsing can block saving."); } }, 120);
+    updateStorageStatus("saving");
+    saveT = setTimeout(() => {
+      try {
+        localStorage.setItem(KEY, JSON.stringify(data));
+        updateStorageStatus("saved");
+      } catch (e) {
+        updateStorageStatus("error");
+        toast("Couldn't save on this device. Private browsing can block saving.");
+      }
+    }, 120);
   }
 
   /* --------------------------------------------------------- daily rituals */
