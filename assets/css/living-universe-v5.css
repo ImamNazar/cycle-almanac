@@ -103,3 +103,12 @@ body .side::before{content:"";position:absolute;top:0;right:4%;width:1px;height:
 @media(max-width:390px){.v5-checkin{padding:12px}.v5-checkin__choices{gap:4px}.v5-checkin__choice{min-height:61px;padding:7px 1px}.v5-checkin__choice small{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.v5-checkin__choice{transition:none}.v5-checkin__choice:hover{transform:none}}
 @media(forced-colors:active){.v5-checkin__choice[aria-pressed="true"]{border:2px solid Highlight}}
+
+/* Living Timeline: accessible time travel without gesture-only navigation. */
+.v5-timeline-nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px;margin:18px 0 12px}
+.v5-timeline-nav span{flex:1;text-align:center;font-size:12px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.v5-timeline-nav button{border:1px solid rgba(211,202,255,.26);border-radius:999px;background:rgba(203,184,255,.09);color:var(--ink);padding:9px 12px;font:inherit;font-size:12px;cursor:pointer;min-height:38px}
+.v5-timeline-nav button:hover:not(:disabled){background:rgba(203,184,255,.2)}
+.v5-timeline-nav button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.v5-timeline-nav button:disabled{opacity:.38;cursor:not-allowed}
+@media(max-width:540px){.v5-timeline-nav span{order:-1;flex:0 0 100%}.v5-timeline-nav button{flex:1}}
