@@ -213,14 +213,14 @@
     const n = c.next, b = c.basis;
     if (c.inPeriod) return fact(I.drop, "Period in progress", `Day ${c.day} of your period`);
     if (c.late) return fact(I.clock, "Later than your usual range", `Cycles run late for lots of reasons: stress, illness, travel, changes in routine. If there's any chance you could be pregnant, a test is most reliable from the first day of a missed period.`);
-    const confidence = b.basis === "personal" ? `Usually inside this range about 8 times in 10, based on your last ${b.n} cycles.` : b.basis === "early" ? `A rough guess from ${b.n} cycle${b.n > 1 ? "s" : ""}. Log 2 or 3 more and it'll sharpen.` : `A rough starting guess (${c.predLen} days). It sharpens as you log cycles.`;
+    const confidence = b.basis === "personal" ? `Estimated from your last ${b.n} cycles; individual cycles can fall outside this range.` : b.basis === "early" ? `A rough guess from ${b.n} cycle${b.n > 1 ? "s" : ""}. Log 2 or 3 more and it'll sharpen.` : `A rough starting guess (${c.predLen} days). It sharpens as you log cycles.`;
     return fact(I.drop, `Next period: ${fLong(n.start)} <small>(${rel(n.start)})</small>`, `Likely ${fRange(n.lo, n.hi)}. ${confidence}`);
   }
   function fertileFact(c) {
     const f = c.fertile, o = c.ovu;
-    const src = o.source === "temp" ? "confirmed by your temperature" : o.source === "lh" ? "expected from your LH test" : "estimated from the calendar";
+    const src = o.source === "temp" ? "suggested by your temperature pattern" : o.source === "lh" ? "suggested by your LH test" : "estimated from the calendar";
     let t, s;
-    if (o.confirmed && f.status === "after") { t = "Ovulation likely happened around " + fShort(o.day); s = "Confirmed by your temperature, so the fertile window has closed for this cycle."; }
+    if (o.confirmed && f.status === "after") { t = "Ovulation likely happened around " + fShort(o.day); s = "Temperature patterns suggest ovulation may have occurred; they cannot guarantee when fertility ended."; }
     else if (f.status === "in") { t = "You're in your likely fertile window"; s = `Ovulation is ${src} around ${fShort(o.day)}. The window runs ${fRange(f.start, f.end)}.`; }
     else if (f.status === "before") { t = "Likely fertile window: " + fRange(f.start, f.end); s = `Opens ${rel(f.start)}. Ovulation ${src}.`; }
     else { t = "Your likely fertile window has passed"; s = `Ovulation was ${src} around ${fShort(o.day)}.`; }
@@ -329,7 +329,7 @@
       <p class="status__sci">${P.sci}</p><p class="status__line">${P.line}</p>
       ${hormonal ? "" : ribbon(c)}
       <ul class="facts">${nextFact(c)}${hormonal ? "" : fertileFact(c)}</ul>
-      ${hormonal ? "" : `<p class="fine">Fertile-window dates are estimates and <b>not birth control</b>.</p>`}
+      ${hormonal ? "" : `<p class="fine">Fertile-window and ovulation dates are estimates, even with temperature or LH observations. <b>Do not use these dates as birth control or proof that pregnancy is impossible.</b></p>`}
       <div class="actions">${actionsFor(c)}</div></section>`;
     h += orbitJournal() + todayLogCard() + ritualCard() + flagsHTML() + `<details class="card fold"><summary>Explore your next 7 days</summary>${outlookCard()}</details>` + seasonCard(c);
     return h;
