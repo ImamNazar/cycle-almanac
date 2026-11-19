@@ -68,6 +68,16 @@ const { spawn } = require("node:child_process");
       assert.equal(await page.locator('.v5-portal__action').first().evaluate(el => getComputedStyle(el).transitionDuration), '0s', "Phase 3 interactions respect reduced motion");
       assert.equal(await page.locator('.v5-portal__action').first().evaluate(el => getComputedStyle(el, '::after').display), 'none', "Decorative shimmer is disabled under reduced motion");
       assert.equal(await page.locator('.v5-checkin__choice').first().evaluate(el => getComputedStyle(el).touchAction), 'manipulation', "Daily check-in is touch optimized");
+      if (viewport.width <= 390) {
+        const smallTargets = await page.locator('.v5-checkin__choice, .dock__btn, .v5-timeline-dates button').evaluateAll(els => els.filter(el => {
+          const style = getComputedStyle(el);
+          if (style.display === 'none' || style.visibility === 'hidden') return false;
+          const rect = el.getBoundingClientRect();
+          return rect.width < 24 || rect.height < 24;
+        }).map(el => ({ selector: el.className, label: el.getAttribute('aria-label') || el.textContent?.trim().slice(0, 40), width: Math.round(el.getBoundingClientRect().width), height: Math.round(el.getBoundingClientRect().height) })));
+        assert.deepEqual(smallTargets, [], "Primary mobile controls meet 24px minimum target dimensions");
+      }
+
 
       const noPain = page.locator('.v5-checkin__choice[data-k="pain"][data-v="0"]');
       if (await noPain.getAttribute('aria-pressed') === 'true') await noPain.click();
