@@ -272,7 +272,7 @@
       const title = key === "mood" ? String(o[2] || o[1]) : String(o[1]);
       return `<button type="button" class="v5-checkin__choice${selected ? " is-selected" : ""}" data-act="quick" data-k="${key}" data-v="${esc(value)}" aria-pressed="${selected}" title="${esc(title)}"><span>${esc(title)}</span></button>`;
     }).join("")}</div></div>`;
-    const quickPanel = `<div class="v5-checkin" aria-label="Quick daily check-in"><div class="v5-checkin__heading"><strong>One-tap check-in</strong><span>Saved privately on this device</span></div>${quickChoices("mood", "Mood", C.MOOD)}${quickChoices("energy", "Energy", C.ENERGY)}<p class="v5-checkin__hint">Tap again to remove a choice. For symptoms, flow or notes, open your journal.</p></div>`;
+    const quickPanel = `<div class="v5-checkin" aria-label="Quick daily check-in"><div class="v5-checkin__heading"><strong>One-tap check-in</strong><span>Saved privately on this device</span></div><p class="v5-checkin__save" role="status" aria-live="polite">${recorded ? "Today has recorded observations · Changes save automatically" : "Nothing recorded today yet · Changes save automatically"}</p>${quickChoices("mood", "Mood", C.MOOD)}${quickChoices("energy", "Energy", C.ENERGY)}${quickChoices("pain", "Pain", C.PAIN)}${quickChoices("flow", "Flow", C.FLOW)}<p class="v5-checkin__hint">Tap again to remove a choice. None is a real observation, different from leaving a field blank. For symptoms or notes, open your journal.</p></div>`;
     return `<section class="v5-portal" aria-labelledby="v5-portal-title">
       <div class="v5-portal__intro"><p class="v5-portal__eyebrow">YOUR DAILY STUDIO <span aria-hidden="true">✦</span></p>
       <h2 id="v5-portal-title">How's your world today?</h2>
