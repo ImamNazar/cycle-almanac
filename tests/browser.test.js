@@ -40,6 +40,16 @@ const { spawn } = require("node:child_process");
 
       assert.equal(await page.locator('.dock__btn[aria-current="page"]').count(), 1, "Exactly one navigation tab is current");
       assert.equal(await page.locator('.dock__btn[data-tab="today"]').getAttribute('aria-current'), 'page', "Today navigation is announced as current");
+      // Keyboard users must be able to reach and activate primary navigation.
+      await page.locator('.dock__btn[data-tab="calendar"]').focus();
+      assert.equal(await page.locator('.dock__btn[data-tab="calendar"]').evaluate(el => document.activeElement === el), true, "Calendar dock control accepts keyboard focus");
+      await page.keyboard.press("Enter");
+      assert.equal(await page.locator('.dock__btn[data-tab="calendar"]').getAttribute('aria-current'), 'page', "Enter activates the calendar");
+      assert.equal(await page.locator('#page').evaluate(el => document.activeElement === el), true, "Navigation moves focus to main content");
+      await page.locator('.dock__btn[data-tab="today"]').focus();
+      await page.keyboard.press("Enter");
+      assert.equal(await page.locator('.dock__btn[data-tab="today"]').getAttribute('aria-current'), 'page', "Keyboard can return to Today");
+
       assert.equal(await page.locator('.dock__btn').first().evaluate(el => getComputedStyle(el).touchAction), 'manipulation', "Dock supports reliable touch activation");
 
       assert.equal(await page.locator('.v5-portal__action').first().evaluate(el => getComputedStyle(el).transitionDuration), '0s', "Phase 3 interactions respect reduced motion");
