@@ -54,8 +54,8 @@
       hormones: "LH surges. Estrogen peaks, then dips. Progesterone starts to rise.",
       common: "Some people notice a brief one-sided twinge low in the belly (mittelschmerz), more clear cervical mucus, or light spotting. Many notice nothing at all.",
       help: [
-        "LH test strips detect the surge, which makes them a good way to predict ovulation. A sustained temperature rise only confirms it afterwards.",
-        "The calendar can't pinpoint ovulation. Mucus, LH tests and temperature are far more precise than a date on a calendar."
+        "LH test strips detect the surge, which makes them a good way to predict ovulation. A sustained temperature rise can suggest ovulation occurred afterwards, but does not prove the exact day.",
+        "The calendar can't pinpoint ovulation. Mucus, LH tests and temperature provide additional clues, but none guarantees the exact day."
       ]
     },
     autumn: {
@@ -65,7 +65,7 @@
       what: [
         "After the egg is released, the empty follicle becomes the corpus luteum. It makes progesterone, which peaks about a week after ovulation, plus some estrogen.",
         "If the egg isn't fertilized, the corpus luteum breaks down about two weeks after ovulation. Hormones fall, the lining sheds, and that is day 1 of your next cycle.",
-        "Progesterone raises your resting body temperature by roughly 0.2–0.5 °C, which is how temperature tracking confirms that ovulation happened."
+        "Progesterone raises your resting body temperature by roughly 0.2–0.5 °C, which is why temperature tracking can suggest that ovulation occurred."
       ],
       hormones: "Progesterone peaks about a week after ovulation, then falls if there's no pregnancy. Estrogen has a smaller second rise.",
       common: "Premenstrual symptoms are common: breast tenderness, bloating, tiredness, cravings, irritability or low mood, and disturbed sleep in the days before bleeding. As many as 3 in 4 people notice some. Around 3–8% have PMDD, a severe form that is treatable.",
@@ -129,7 +129,7 @@
     ["Day 1", "Your cycle starts on the first day of real bleeding (light flow or more). Spotting alone doesn't start a new cycle. Bleeding days up to two days apart count as one period."],
     ["Your next period", "With 3 or more logged cycles, Almanac averages your last six and builds an 80% prediction range from how much your cycles vary. In simulation, that range contained the real next period about 8 times in 10. With fewer than 3 cycles it says so and shows a wider, rougher range."],
     ["Ovulation", "By default, about 14 days before your next period is predicted to start. The average luteal phase is 12–14 days depending on the study, so 14 is the midpoint. When you log an LH test or temperatures, the estimate switches to your real evidence, and Almanac learns your personal luteal length."],
-    ["Temperature", "A sustained rise confirms ovulation after the fact, using the \"3 over 6\" rule: three days in a row higher than the previous six, the third at least 0.2 °C above them."],
+    ["Temperature", "A sustained rise can suggest ovulation occurred, using the \"3 over 6\" rule: three days in a row higher than the previous six, the third at least 0.2 °C above them."],
     ["Fertile window", "The 5 days before ovulation plus ovulation day. When your cycles vary a lot, the window gets a lighter extension to show the uncertainty, and the app tells you that a calendar can't pinpoint it."],
     ["The hills", "The two hills on the Today screen are schematic estrogen (front) and progesterone (back) curves, stretched to your cycle. They show typical shapes, not your measured levels."],
     ["Outlook and wheel", "The 7-day outlook, the cycle wheel and the cycle strips all use the same estimates as the calendar, so they always agree with each other. The wheel is drawn to scale for your own cycle length."],
@@ -162,8 +162,8 @@
   };
 
   const MUCUS_INFO = [
-    ["dry", "Dry", "Little or nothing noticeable. Low fertility.", 1],
-    ["sticky", "Sticky", "Tacky, crumbly or paste-like. Low fertility.", 2],
+    ["dry", "Dry", "Little or nothing noticeable. May be less fertile; not a reliable way to exclude pregnancy.", 1],
+    ["sticky", "Sticky", "Tacky, crumbly or paste-like. May be less fertile; not a reliable way to exclude pregnancy.", 2],
     ["creamy", "Creamy", "Like lotion, white or cloudy. Fertility is rising.", 3],
     ["watery", "Watery", "Wet, clear and thin. High fertility.", 4],
     ["eggwhite", "Egg-white", "Clear, slippery and stretchy. Peak fertility, and ovulation is close.", 5]
