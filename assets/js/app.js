@@ -488,6 +488,7 @@
       <p class="fine">Your last 28 days of mood, energy and pain entries. Brighter tiles mean higher recorded scores, not better health. A pain score of zero is a recorded observation, not a missing entry. Empty outlines mean nothing was recorded.</p>
       <div class="v5-observation__rows">${panels}</div>
       <div class="v5-observation__dates"><span>${esc(fShort(TODAY - 27))}</span><span>${esc(fShort(TODAY))}</span></div>
+      <div class="v5-observation__actions"><button class="btn btn--ghost" type="button" data-act="observatory-timeline">Explore these days in the Living Timeline</button></div>
       <p class="fine">These are observations only, not a diagnosis or prediction. Tap a date in Calendar to add or correct a record.</p>
       <button class="btn btn--ghost" type="button" data-tab="calendar">Open calendar</button>
     </section>`;
@@ -853,6 +854,7 @@
       case "constellation-range": ui.constellationDays = +t.dataset.days === 28 ? 28 : 14; return render();
       case "constellation-step": ui.constellationOffset = Math.max(0, (ui.constellationOffset || 0) + (+t.dataset.step) * ui.constellationDays); return render();
       case "constellation-now": ui.constellationOffset = 0; ui.constellationPreview = null; return render();
+      case "observatory-timeline": { ui.tab = "today"; ui.constellationDays = 28; ui.constellationOffset = 0; ui.constellationPreview = null; render(); const el = document.querySelector(".orbit-journal"); if (el) el.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "start" }); return; }
       case "constellation-preview": ui.constellationPreview = t.dataset.day; return render();
       case "day-step": { const d = clamp(A.toDay(ui.day) + (+t.dataset.step), 0, TODAY); if (d <= TODAY) { ui.day = A.fromDay(d); openSheet("log", logHTML(ui.day)); syncLog(); } return; }
       case "set": { const k = t.dataset.k, v = t.dataset.v, L = data.logs[ui.day] || {}, num = ["flow", "mood", "energy", "pain"].includes(k) ? +v : v; setLog(ui.day, { [k]: L[k] === num ? undefined : num }); return syncLog(); }
