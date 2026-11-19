@@ -112,3 +112,15 @@ body .side::before{content:"";position:absolute;top:0;right:4%;width:1px;height:
 .v5-timeline-nav button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 .v5-timeline-nav button:disabled{opacity:.38;cursor:not-allowed}
 @media(max-width:540px){.v5-timeline-nav span{order:-1;flex:0 0 100%}.v5-timeline-nav button{flex:1}}
+
+/* Day-in-focus: observations only, never inferred health conclusions. */
+.v5-timeline-preview{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:15px 0;padding:17px 19px;border:1px solid rgba(204,187,250,.27);border-radius:20px;background:linear-gradient(110deg,rgba(157,130,221,.13),rgba(111,189,197,.07))}
+.v5-timeline-preview>div{min-width:0}
+.v5-timeline-preview .eyebrow{margin:0 0 5px}
+.v5-timeline-preview h3{margin:0 0 6px;font-family:var(--font-d,serif);font-size:clamp(20px,3vw,27px);font-weight:500;line-height:1.15}
+.v5-timeline-preview .fine{margin:0;line-height:1.6;overflow-wrap:anywhere}
+.v5-timeline-preview button{flex:none;min-height:42px;padding:10px 16px;border:1px solid rgba(222,206,255,.45);border-radius:999px;background:rgba(194,164,245,.18);color:var(--ink);font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.v5-timeline-preview button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.orbit-journal__day[aria-pressed="true"]{outline:2px solid #f4d9ff;outline-offset:4px}
+@media(max-width:560px){.v5-timeline-preview{align-items:stretch;flex-direction:column}.v5-timeline-preview button{align-self:flex-start}}
+@media(forced-colors:active){.orbit-journal__day[aria-pressed="true"]{outline-color:Highlight}}
