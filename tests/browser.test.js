@@ -25,10 +25,13 @@ const { spawn } = require("node:child_process");
       await page.locator('[data-act="ob-sample"]').click();
       await page.waitForTimeout(200);
       assert.equal(await page.locator('.v5-checkin__row').count(), 4, "Daily Studio offers mood, energy, pain and flow");
-      await page.locator('.v5-checkin__choice[data-k="pain"][data-v="0"]').click();
-      assert.equal(await page.locator('.v5-checkin__choice[data-k="pain"][data-v="0"]').getAttribute('aria-pressed'), 'true', "No pain is explicitly recorded");
-      await page.locator('.v5-checkin__choice[data-k="pain"][data-v="0"]').click();
-      assert.equal(await page.locator('.v5-checkin__choice[data-k="pain"][data-v="0"]').getAttribute('aria-pressed'), 'false', "Tapping again removes a quick observation");
+      const noPain = page.locator('.v5-checkin__choice[data-k="pain"][data-v="0"]');
+      if (await noPain.getAttribute('aria-pressed') === 'true') await noPain.click();
+      assert.equal(await noPain.getAttribute('aria-pressed'), 'false', "Pain can be left unrecorded");
+      await noPain.click();
+      assert.equal(await noPain.getAttribute('aria-pressed'), 'true', "No pain is explicitly recorded");
+      await noPain.click();
+      assert.equal(await noPain.getAttribute('aria-pressed'), 'false', "Tapping again removes a quick observation");
       // One-tap check-in must persist and allow removal by tapping again.
       await page.locator('.v5-checkin__choice[data-k="mood"]').first().click();
       assert.equal(await page.locator('.v5-checkin__choice[data-k="mood"]').first().getAttribute('aria-pressed'), 'true', "Mood quick choice selected");
