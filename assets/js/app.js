@@ -438,9 +438,38 @@
       <rect x="${pl}" y="${y(r.max).toFixed(1)}" width="${W - pl - pr}" height="${(y(r.min) - y(r.max)).toFixed(1)}" class="band"/>
       <text x="${pl - 4}" y="${(y(r.max) + 3).toFixed(1)}" text-anchor="end" class="axis">${r.max}</text><text x="${pl - 4}" y="${(y(r.min) + 3).toFixed(1)}" text-anchor="end" class="axis">${r.min}</text>${bars}</svg>`;
   }
+  /* An observation-only chart. No smoothing, inferred values or predictions. */
+  function observationObservatory() {
+    const dims = [["mood", "Mood", 5], ["energy", "Energy", 5], ["pain", "Pain", 3]];
+    const days = Array.from({ length: 28 }, (_, i) => TODAY - 27 + i);
+    const panels = dims.map(([key, label, max]) => {
+      const points = days.map(d => {
+        const raw = (data.logs[A.fromDay(d)] || {})[key];
+        const value = raw == null || raw === "" ? null : Number(raw);
+        return { d, value: Number.isFinite(value) && value >= 1 && value <= max ? value : null };
+      });
+      const n = points.filter(p => p.value !== null).length;
+      const cells = points.map(p => {
+        const date = fmt(p.d, { day: "numeric", month: "short" });
+        const present = p.value !== null;
+        const title = present ? `${date}: ${label.toLowerCase()} ${p.value} of ${max}` : `${date}: not recorded`;
+        return `<span class="v5-observation__cell${present ? " is-observed" : ""}" style="--level:${present ? p.value / max : 0}" role="img" aria-label="${esc(title)}" title="${esc(title)}"></span>`;
+      }).join("");
+      return `<div class="v5-observation__row"><div class="v5-observation__row-head"><strong>${label}</strong><small>${n} of 28 days recorded</small></div><div class="v5-observation__grid">${cells}</div></div>`;
+    }).join("");
+    return `<section class="v5-observation card" aria-labelledby="v5-observation-title">
+      <p class="eyebrow">THE OBSERVATORY · ACTUAL ENTRIES</p>
+      <h2 class="h2" id="v5-observation-title">A month in little moments.</h2>
+      <p class="fine">Your last 28 days of mood, energy and pain entries. Brighter tiles mean higher recorded scores, not better health. Empty outlines mean nothing was recorded.</p>
+      <div class="v5-observation__rows">${panels}</div>
+      <div class="v5-observation__dates"><span>${esc(fShort(TODAY - 27))}</span><span>${esc(fShort(TODAY))}</span></div>
+      <p class="fine">These are observations only, not a diagnosis or prediction. Tap a date in Calendar to add or correct a record.</p>
+      <button class="btn btn--ghost" type="button" data-tab="calendar">Open calendar</button>
+    </section>`;
+  }
   function pageInsights() {
     const st = AN.stats, S = data.settings;
-    let h = sampleBanner() + ritualInsights();
+    let h = sampleBanner() + observationObservatory() + ritualInsights();
     if (st.n < 1) {
       h += `<section class="card"><h1 class="h2">Your rhythm</h1><p>Almanac needs at least two logged periods to measure a cycle. Once you have them, you'll see your average, how much it varies, and a chart here.</p></section>`;
     } else {
