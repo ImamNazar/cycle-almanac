@@ -235,7 +235,8 @@
       <h2 class="h2" id="orbit-journal-title">Every day is a little world.</h2>
       <p class="fine">Explore the last two weeks. Each point opens that day's private journal; brighter points have entries you've logged.</p>
       <div class="orbit-journal__sky" role="group" aria-label="Open a daily entry from the last fourteen days">
-        <svg class="orbit-journal__connections" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><polyline points="${constellationPath}" fill="none" stroke="rgba(181,173,255,.55)" stroke-width=".32" stroke-dasharray="1 1.2" stroke-linejoin="round" /></svg>\n        <div class="orbit-journal__track orbit-journal__track--a" aria-hidden="true"></div>
+        <svg class="orbit-journal__connections" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><polyline points="${constellationPath}" fill="none" stroke="rgba(181,173,255,.55)" stroke-width=".32" stroke-dasharray="1 1.2" stroke-linejoin="round" /></svg>
+        <div class="orbit-journal__track orbit-journal__track--a" aria-hidden="true"></div>
         <div class="orbit-journal__track orbit-journal__track--b" aria-hidden="true"></div>
         <div class="orbit-journal__core" aria-hidden="true"><span>14</span><small>DAYS</small></div>
         ${entries}
