@@ -256,3 +256,26 @@ body .side::before{content:"";position:absolute;top:0;right:4%;width:1px;height:
 }
 @media(prefers-reduced-motion:reduce){.dock__btn{transition:none!important}.dock__btn:hover{transform:none!important}}
 @media(forced-colors:active){.dock__btn[aria-current="page"]{outline:2px solid Highlight;outline-offset:-2px}.dock__btn[aria-current="page"]::after{background:Highlight}}
+
+/* Phase 3 — cinematic atmosphere with a strict performance budget.
+   Static gradients remain the baseline; only fine-pointer devices get glints. */
+.v5-portal{background-color:#11132c;background-image:radial-gradient(ellipse at 78% 4%,rgba(199,124,233,.32),transparent 43%),radial-gradient(ellipse at 8% 88%,rgba(99,219,212,.16),transparent 45%),linear-gradient(145deg,#16172e,#11132c 75%)}
+.v5-portal__eyebrow{display:inline-flex;align-items:center;gap:9px}
+.v5-portal__eyebrow::before{content:"";display:inline-block;width:7px;height:7px;flex:none;border-radius:50%;background:#a9e8df;box-shadow:0 0 12px rgba(169,232,223,.55)}
+.v5-portal__intro h2{letter-spacing:-.05em;line-height:1.06}
+.v5-checkin{backdrop-filter:none}
+.v5-observation__cell{contain:paint}
+@media(hover:none),(pointer:coarse){
+  .v5-portal__action::after{display:none}
+  .v5-portal__action:hover,.v5-checkin__choice:hover,.v5-observation__cell.is-observed:hover{transform:none}
+  .v5-observation__cell.is-observed:hover{box-shadow:none}
+}
+@media(max-width:720px){
+  .v5-portal::after{animation:none}
+  #page>.card{animation-duration:.25s;animation-delay:0s}
+}
+@media(prefers-reduced-motion:reduce){
+  .v5-portal__eyebrow::before{box-shadow:none}
+  .v5-portal::after{animation:none!important}
+}
+@media(forced-colors:active){.v5-portal__eyebrow::before{background:CanvasText;box-shadow:none}}
