@@ -26,6 +26,8 @@ const { spawn } = require("node:child_process");
       await page.waitForTimeout(200);
       // Almanac 5: the Daily Studio must open the existing private journal.
       assert.equal(await page.locator(".v5-portal").count(), 1, "Daily Studio visible");
+      assert.equal(await page.locator(".v5-portal").evaluate(el => getComputedStyle(el, "::after").animationName), "none", "Decorative orb respects reduced motion");
+      assert.equal(await page.locator(".v5-portal").evaluate(el => getComputedStyle(el).animationName), "none", "Entrance effects respect reduced motion");
       await page.locator('.v5-portal [data-act="log"]').click();
       assert.equal(await page.locator('#sheet[open]').count(), 1, "Daily Studio opens log sheet");
       await page.locator('#sheet [data-act="close"]').click();
