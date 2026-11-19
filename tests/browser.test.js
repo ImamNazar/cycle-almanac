@@ -25,6 +25,10 @@ const { spawn } = require("node:child_process");
       await page.locator('[data-act="ob-sample"]').click();
       await page.waitForTimeout(200);
       assert.equal(await page.locator('.v5-checkin__row').count(), 4, "Daily Studio offers mood, energy, pain and flow");
+      // Fertility language must communicate uncertainty rather than guarantee safety.
+      const predictionCopy = await page.locator('.status').first().innerText();
+      assert.equal(/8 times in 10|fertile window has closed for this cycle/i.test(predictionCopy), false, "Prediction copy avoids unsupported certainty");
+
       if (viewport.width <= 390) {
         const geometry = await page.locator('.v5-portal, .v5-checkin, .dock').evaluateAll(els => els.map(el => {
           const r = el.getBoundingClientRect();
