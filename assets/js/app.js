@@ -296,7 +296,7 @@
       <p>One moment is enough. You can always add more later.</p></div>
       ${quickPanel}
       <div class="v5-portal__actions">
-        <button class="v5-portal__action v5-portal__action--primary" type="button" data-act="log"><span class="v5-portal__symbol" aria-hidden="true">✳</span><span><strong>${recorded ? "Continue today's journal" : "Check in with yourself"}</strong><small>${recorded ? "Your entry is saved on this device" : "Mood, energy, symptoms and notes"}</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
+        <button class="v5-portal__action v5-portal__action--primary" type="button" data-act="log"><span class="v5-portal__symbol" aria-hidden="true">✳</span><span><strong>${recorded ? "Continue today's journal" : "Check in with yourself"}</strong><small>${storageStatus === "error" ? "Storage unavailable — protect your entries with a backup" : storageStatus === "saving" ? "Saving your latest changes…" : recorded ? "Your entry is saved on this device" : "Mood, energy, symptoms and notes"}</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
         <button class="v5-portal__action" type="button" data-tab="calendar"><span class="v5-portal__symbol" aria-hidden="true">◌</span><span><strong>Travel through time</strong><small>Explore recorded days and estimates</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
         <button class="v5-portal__action" type="button" data-tab="insights"><span class="v5-portal__symbol" aria-hidden="true">✧</span><span><strong>Visit the observatory</strong><small>See what your history can tell you</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
       </div>
