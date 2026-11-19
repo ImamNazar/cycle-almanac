@@ -25,6 +25,10 @@ const { spawn } = require("node:child_process");
       await page.locator('[data-act="ob-sample"]').click();
       await page.waitForTimeout(200);
       assert.equal(await page.locator('.v5-checkin__row').count(), 4, "Daily Studio offers mood, energy, pain and flow");
+      assert.equal(await page.locator('.dock__btn[aria-current="page"]').count(), 1, "Exactly one navigation tab is current");
+      assert.equal(await page.locator('.dock__btn[data-tab="today"]').getAttribute('aria-current'), 'page', "Today navigation is announced as current");
+      assert.equal(await page.locator('.dock__btn').first().evaluate(el => getComputedStyle(el).touchAction), 'manipulation', "Dock supports reliable touch activation");
+
       assert.equal(await page.locator('.v5-portal__action').first().evaluate(el => getComputedStyle(el).transitionDuration), '0s', "Phase 3 interactions respect reduced motion");
       assert.equal(await page.locator('.v5-portal__action').first().evaluate(el => getComputedStyle(el, '::after').display), 'none', "Decorative shimmer is disabled under reduced motion");
       assert.equal(await page.locator('.v5-checkin__choice').first().evaluate(el => getComputedStyle(el).touchAction), 'manipulation', "Daily check-in is touch optimized");
