@@ -263,10 +263,6 @@
       <h2 id="v5-portal-title">How's your world today?</h2>
       <p>One moment is enough. You can always add more later.</p></div>
       ${quickPanel}
-      <div class="v5-checkin" role="group" aria-label="Quick mood check-in">
-        <div class="v5-checkin__heading"><strong>One-tap mood check-in</strong><span>${today.mood != null ? "Recorded today · tap again to remove" : "Optional · saved privately on this device"}</span></div>
-        <div class="v5-checkin__choices">${C.MOOD.map(([v, emoji, label]) => `<button type="button" class="v5-checkin__choice" data-act="quick" data-k="mood" data-v="${v}" aria-pressed="${String(today.mood) === String(v)}" aria-label="Record mood: ${esc(label)}"><span aria-hidden="true">${emoji}</span><small>${esc(label)}</small></button>`).join("")}</div>
-      </div>
       <div class="v5-portal__actions">
         <button class="v5-portal__action v5-portal__action--primary" type="button" data-act="log"><span class="v5-portal__symbol" aria-hidden="true">✳</span><span><strong>${recorded ? "Continue today's journal" : "Check in with yourself"}</strong><small>${recorded ? "Your entry is saved on this device" : "Mood, energy, symptoms and notes"}</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
         <button class="v5-portal__action" type="button" data-tab="calendar"><span class="v5-portal__symbol" aria-hidden="true">◌</span><span><strong>Travel through time</strong><small>Explore recorded days and estimates</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
