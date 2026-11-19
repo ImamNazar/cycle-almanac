@@ -37,6 +37,15 @@ const { spawn } = require("node:child_process");
         assert.equal(geometry.every(g => g.left >= -2 && g.right <= g.width + 2), true, "Primary mobile surfaces fit within the viewport: " + JSON.stringify(geometry));
       }
 
+
+      // Larger default text must not introduce horizontal page scrolling.
+      if (viewport.width <= 390) {
+        const originalFontSize = await page.locator('html').evaluate(el => el.style.fontSize);
+        await page.locator('html').evaluate(el => { el.style.fontSize = '200%'; });
+        const overflow = await page.evaluate(() => ({ document: document.documentElement.scrollWidth, viewport: innerWidth }));
+        assert.equal(overflow.document <= overflow.viewport + 2, true, "200% root text size does not cause horizontal overflow: " + JSON.stringify(overflow));
+        await page.locator('html').evaluate((el, size) => { el.style.fontSize = size; }, originalFontSize);
+      }
       assert.equal(await page.locator('.v5-portal').evaluate(el => getComputedStyle(el).backgroundImage !== 'none'), true, "Cosmic atmosphere remains visible without motion");
       if (viewport.width < 720) {
         assert.equal(await page.locator('.v5-portal').evaluate(el => getComputedStyle(el, '::after').animationName), 'none', "Mobile disables decorative planet animation");
