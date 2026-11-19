@@ -24,10 +24,31 @@
     return fresh();
   }
   let data, saveT = 0;
+  let storageStatus = storageReadError ? "error" : "saved";
+  function updateStorageStatus(next) {
+    storageStatus = next;
+    const indicator = document.querySelector(".v5-checkin__save");
+    if (indicator) { indicator.textContent = storageStatus === "saving" ? "Saving changes on this device…" : storageStatus === "saved" ? "Saved on this device" : "Not saved — check your browser storage"; indicator.dataset.status = storageStatus; }
+    const journalHint = document.querySelector(".v5-portal__action--primary small");
+    if (journalHint) {
+      const today = data && data.logs && data.logs[isoNow()] || {};
+      const recorded = Object.values(today).some(v => v != null && v !== "" && (!Array.isArray(v) || v.length));
+      journalHint.textContent = storageStatus === "error" ? "Storage unavailable — protect your entries with a backup" : storageStatus === "saving" ? "Saving your latest changes…" : recorded ? "Your entry is saved on this device" : "Mood, energy, symptoms and notes";
+    }
+  }
   function save() {
-    if (storageReadError) { toast("Saved data could not be read. Restore a backup before saving."); return; }
+    if (storageReadError) { updateStorageStatus("error"); toast("Saved data could not be read. Restore a backup before saving."); return; }
     clearTimeout(saveT);
-    saveT = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { toast("Couldn't save on this device. Private browsing can block saving."); } }, 120);
+    updateStorageStatus("saving");
+    saveT = setTimeout(() => {
+      try {
+        localStorage.setItem(KEY, JSON.stringify(data));
+        updateStorageStatus("saved");
+      } catch (e) {
+        updateStorageStatus("error");
+        toast("Couldn't save on this device. Private browsing can block saving.");
+      }
+    }, 120);
   }
 
   /* --------------------------------------------------------- daily rituals */
@@ -111,6 +132,8 @@
   }
 
   data = load();
+  // Storage errors are only known after load() has actually read the device.
+  if (storageReadError) storageStatus = "error";
   /* ---------------------------------------------------------------- time */
   let NOW = new Date(), TODAY = A.localDay(NOW), AN = null, PAT = null;
   const recompute = () => { AN = A.analyze(data, TODAY); PAT = A.patterns(data, AN); };
@@ -136,7 +159,7 @@
   };
 
   /* ------------------------------------------------------------ UI state */
-  const ui = { tab: "today", month: null, day: null, ob: null, calSelected: null };
+  const ui = { tab: "today", month: null, day: null, ob: null, calSelected: null, constellationDays: 14, constellationOffset: 0, constellationPreview: null, observatoryOffset: 0 };
   const monthOf = d => { const iso = A.fromDay(d); return { y: +iso.slice(0, 4), m: +iso.slice(5, 7) - 1 }; };
   ui.month = monthOf(TODAY);
 
@@ -190,18 +213,18 @@
     const n = c.next, b = c.basis;
     if (c.inPeriod) return fact(I.drop, "Period in progress", `Day ${c.day} of your period`);
     if (c.late) return fact(I.clock, "Later than your usual range", `Cycles run late for lots of reasons: stress, illness, travel, changes in routine. If there's any chance you could be pregnant, a test is most reliable from the first day of a missed period.`);
-    const confidence = b.basis === "personal" ? `Usually inside this range about 8 times in 10, based on your last ${b.n} cycles.` : b.basis === "early" ? `A rough guess from ${b.n} cycle${b.n > 1 ? "s" : ""}. Log 2 or 3 more and it'll sharpen.` : `A rough starting guess (${c.predLen} days). It sharpens as you log cycles.`;
+    const confidence = b.basis === "personal" ? `Estimated from your last ${b.n} cycles; individual cycles can fall outside this range.` : b.basis === "early" ? `A rough guess from ${b.n} cycle${b.n > 1 ? "s" : ""}. Log 2 or 3 more and it'll sharpen.` : `A rough starting guess (${c.predLen} days). It sharpens as you log cycles.`;
     return fact(I.drop, `Next period: ${fLong(n.start)} <small>(${rel(n.start)})</small>`, `Likely ${fRange(n.lo, n.hi)}. ${confidence}`);
   }
   function fertileFact(c) {
     const f = c.fertile, o = c.ovu;
-    const src = o.source === "temp" ? "confirmed by your temperature" : o.source === "lh" ? "expected from your LH test" : "estimated from the calendar";
+    const src = o.source === "temp" ? "suggested by your temperature pattern" : o.source === "lh" ? "suggested by your LH test" : "estimated from the calendar";
     let t, s;
-    if (o.confirmed && f.status === "after") { t = "Ovulation likely happened around " + fShort(o.day); s = "Confirmed by your temperature, so the fertile window has closed for this cycle."; }
+    if (o.confirmed && f.status === "after") { t = "Ovulation likely happened around " + fShort(o.day); s = "Temperature patterns suggest ovulation may have occurred; they cannot guarantee when fertility ended."; }
     else if (f.status === "in") { t = "You're in your likely fertile window"; s = `Ovulation is ${src} around ${fShort(o.day)}. The window runs ${fRange(f.start, f.end)}.`; }
     else if (f.status === "before") { t = "Likely fertile window: " + fRange(f.start, f.end); s = `Opens ${rel(f.start)}. Ovulation ${src}.`; }
     else { t = "Your likely fertile window has passed"; s = `Ovulation was ${src} around ${fShort(o.day)}.`; }
-    if (c.imprecise && !o.confirmed) s += " Your cycles vary a lot, so a calendar can't pinpoint this. LH tests, mucus or temperature are far more precise.";
+    if (c.imprecise && !o.confirmed) s += " Your cycles vary a lot, so a calendar can't pinpoint this. LH tests, mucus and temperature provide additional clues, but cannot guarantee timing.";
     return fact(I.sun, t, s);
   }
 
@@ -209,23 +232,36 @@
   /* ORBIT: a navigable constellation of the last 14 days.
      Only observed entries are marked as logged; no inferred health states. */
   function orbitJournal() {
-    const days = Array.from({ length: 14 }, (_, i) => TODAY - 13 + i);
+    const span = ui.constellationDays === 28 ? 28 : 14;
+    const offset = Math.max(0, ui.constellationOffset || 0);
+    const days = Array.from({ length: span }, (_, i) => TODAY - offset - span + 1 + i);
+    const previewDay = ui.constellationPreview && days.includes(A.toDay(ui.constellationPreview)) ? ui.constellationPreview : A.fromDay(days[span - 1]);
     const entries = days.map((d, i) => {
       const iso = A.fromDay(d), L = data.logs[iso] || {};
       const hasLog = Object.keys(L).some(k => L[k] != null && L[k] !== "" && (!Array.isArray(L[k]) || L[k].length));
       const period = Number(L.flow) >= 2;
-      const angle = (i / 14) * Math.PI * 2 - Math.PI / 2;
+      const angle = (i / span) * Math.PI * 2 - Math.PI / 2;
       const radius = 34 + (i % 3) * 3.8;
       const x = 50 + Math.cos(angle) * radius;
       const y = 50 + Math.sin(angle) * radius;
       const label = fmt(d, { weekday: "long", month: "short", day: "numeric" }) + (period ? ", period logged" : hasLog ? ", entry logged" : ", no entry");
-      return `<button type="button" class="orbit-journal__day${period ? " is-period" : hasLog ? " is-logged" : ""}${d === TODAY ? " is-today" : ""}" style="--x:${x.toFixed(2)}%;--y:${y.toFixed(2)}%" data-act="log" data-day="${iso}" aria-label="${esc(label)}" title="${esc(label)}"><span>${fmt(d, { day: "numeric" })}</span></button>`;
+      return `<button type="button" class="orbit-journal__day${period ? " is-period" : hasLog ? " is-logged" : ""}${d === TODAY ? " is-today" : ""}" style="--x:${x.toFixed(2)}%;--y:${y.toFixed(2)}%" data-act="constellation-preview" data-day="${iso}" aria-pressed="${previewDay === iso}" aria-label="${esc(label)}" title="${esc(label)}"><span>${fmt(d, { day: "numeric" })}</span></button>`;
     }).join("");
     const constellationPath = days.map((d, i) => {
-      const angle = (i / 14) * Math.PI * 2 - Math.PI / 2;
+      const angle = (i / span) * Math.PI * 2 - Math.PI / 2;
       const radius = 34 + (i % 3) * 3.8;
       return `${(50 + Math.cos(angle) * radius).toFixed(2)},${(50 + Math.sin(angle) * radius).toFixed(2)}`;
     }).join(" ");
+    const previewLog = data.logs[previewDay] || {};
+    const previewFacts = [
+      previewLog.flow != null ? "Flow: " + (C.FLOW.find(o => String(o[0]) === String(previewLog.flow)) || [null, "Recorded"])[1] : null,
+      previewLog.mood != null ? "Mood: " + (C.MOOD.find(o => String(o[0]) === String(previewLog.mood)) || [null, null, "Recorded"])[2] : null,
+      previewLog.energy != null ? "Energy: " + (C.ENERGY.find(o => String(o[0]) === String(previewLog.energy)) || [null, "Recorded"])[1] : null,
+      previewLog.pain != null ? "Pain: " + (C.PAIN.find(o => String(o[0]) === String(previewLog.pain)) || [null, "Recorded"])[1] : null,
+      Array.isArray(previewLog.sym) && previewLog.sym.length ? previewLog.sym.length + " symptom" + (previewLog.sym.length === 1 ? "" : "s") + " recorded" : null,
+      previewLog.note ? "Private note saved" : null
+    ].filter(Boolean);
+    const preview = `<div class="v5-timeline-preview" aria-live="polite"><div><p class="eyebrow">DAY IN FOCUS</p><h3>${fmt(A.toDay(previewDay), { weekday: "long", month: "short", day: "numeric" })}</h3><p class="fine">${previewFacts.length ? previewFacts.map(esc).join(" · ") : "No observations recorded for this day."}</p></div><button type="button" data-act="log" data-day="${previewDay}">Open journal</button></div>`;
     const logged = days.filter(d => {
       const L = data.logs[A.fromDay(d)] || {};
       return Object.values(L).some(v => v != null && v !== "" && (!Array.isArray(v) || v.length));
@@ -233,21 +269,49 @@
     return `<section class="card orbit-journal" aria-labelledby="orbit-journal-title">
       <p class="eyebrow">YOUR PERSONAL CONSTELLATION</p>
       <h2 class="h2" id="orbit-journal-title">Every day is a little world.</h2>
-      <p class="fine">Explore the last two weeks. Each point opens that day's private journal; brighter points have entries you've logged.</p>
-      <div class="orbit-journal__sky" role="group" aria-label="Open a daily entry from the last fourteen days">
+      <p class="fine">Explore your recorded history. Switch between two and four weeks. Each point opens that day's private journal; brighter points have entries you've logged.</p>
+      <div class="v5-timeline-nav" aria-label="Timeline navigation"><button type="button" data-act="constellation-step" data-step="1" aria-label="Explore earlier days">← Earlier</button><span aria-live="polite">${fmt(days[0], { month: "short", day: "numeric", year: "numeric" })} – ${fmt(days[span - 1], { month: "short", day: "numeric", year: "numeric" })}</span><button type="button" data-act="constellation-step" data-step="-1" ${offset === 0 ? "disabled" : ""} aria-label="Explore later days">Later →</button>${offset ? '<button type="button" data-act="constellation-now">Back to today</button>' : ""}</div>
+      <div class="v5-range" role="group" aria-label="Constellation date range"><button type="button" data-act="constellation-range" data-days="14" aria-pressed="${span === 14}">14 days</button><button type="button" data-act="constellation-range" data-days="28" aria-pressed="${span === 28}">28 days</button></div>
+      <div class="orbit-journal__sky${span === 28 ? " orbit-journal__sky--dense" : ""}" role="group" aria-label="Open a daily entry from the selected ${span}-day period">
         <svg class="orbit-journal__connections" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><polyline points="${constellationPath}" fill="none" stroke="rgba(181,173,255,.55)" stroke-width=".32" stroke-dasharray="1 1.2" stroke-linejoin="round" /></svg>
         <div class="orbit-journal__track orbit-journal__track--a" aria-hidden="true"></div>
         <div class="orbit-journal__track orbit-journal__track--b" aria-hidden="true"></div>
-        <div class="orbit-journal__core" aria-hidden="true"><span>14</span><small>DAYS</small></div>
+        <div class="orbit-journal__core" aria-hidden="true"><span>${span}</span><small>DAYS</small></div>
         ${entries}
       </div>
-      <div class="orbit-journal__footer"><span><b>${logged}</b> of 14 days logged</span><span><i class="orbit-journal__key"></i> Period logged <i class="orbit-journal__key orbit-journal__key--other"></i> Other entry</span></div>
+      <div class="v5-timeline-dates" role="group" aria-label="Choose a day from this timeline">${days.map(d => { const iso = A.fromDay(d), L = data.logs[iso] || {}, hasEntry = Object.values(L).some(v => v != null && v !== "" && (!Array.isArray(v) || v.length)); return `<button type="button" data-act="constellation-preview" data-day="${iso}" aria-pressed="${previewDay === iso}" aria-label="${esc(fmt(d, { weekday: "long", month: "short", day: "numeric" }))}${hasEntry ? ", entry logged" : ", no entry"}"><span>${fmt(d, { weekday: "short" })}</span><strong>${fmt(d, { day: "numeric" })}</strong><i aria-hidden="true">${hasEntry ? "●" : "○"}</i></button>`; }).join("")}</div>
+      ${preview}
+      <div class="orbit-journal__footer"><span><b>${logged}</b> of ${span} days logged</span><span><i class="orbit-journal__key"></i> Period logged <i class="orbit-journal__key orbit-journal__key--other"></i> Other entry</span></div>
       <p class="fine">This is your recorded history, not a prediction. Missing days are perfectly fine.</p>
+    </section>`;
+  }
+  /* V5 Daily Portal: an accessible, low-friction entry point to existing actions.
+     This component reads the existing log model; it creates no new user data. */
+  function dailyPortal() {
+    const today = data.logs[isoNow()] || {};
+    const recorded = Object.values(today).some(v => v != null && v !== "" && (!Array.isArray(v) || v.length));
+    const quickChoices = (key, label, options) => `<div class="v5-checkin__row"><span class="v5-checkin__label">${label}</span><div class="v5-checkin__choices" role="group" aria-label="Log today's ${label.toLowerCase()}">${options.map(o => {
+      const value = String(o[0]), selected = String(today[key]) === value;
+      const title = key === "mood" ? String(o[2] || o[1]) : String(o[1]);
+      return `<button type="button" class="v5-checkin__choice${selected ? " is-selected" : ""}" data-act="quick" data-k="${key}" data-v="${esc(value)}" aria-pressed="${selected}" title="${esc(title)}"><span>${esc(title)}</span></button>`;
+    }).join("")}</div></div>`;
+    const quickPanel = `<div class="v5-checkin" aria-label="Quick daily check-in"><div class="v5-checkin__heading"><strong>One-tap check-in</strong><span>Saved privately on this device</span></div><p class="v5-checkin__save" data-status="${storageStatus}" role="status" aria-live="polite">${storageStatus === "saving" ? "Saving changes on this device…" : storageStatus === "saved" ? "Saved on this device" : "Not saved — check your browser storage"}</p>${quickChoices("mood", "Mood", C.MOOD)}${quickChoices("energy", "Energy", C.ENERGY)}${quickChoices("pain", "Pain", C.PAIN)}${quickChoices("flow", "Flow", C.FLOW)}<p class="v5-checkin__hint">Tap again to remove a choice. None is a real observation, different from leaving a field blank. For symptoms or notes, open your journal.</p></div>`;
+    return `<section class="v5-portal" aria-labelledby="v5-portal-title">
+      <div class="v5-portal__intro"><p class="v5-portal__eyebrow">YOUR DAILY STUDIO <span aria-hidden="true">✦</span></p>
+      <h2 id="v5-portal-title">How's your world today?</h2>
+      <p>One moment is enough. You can always add more later.</p></div>
+      ${quickPanel}
+      <div class="v5-portal__actions">
+        <button class="v5-portal__action v5-portal__action--primary" type="button" data-act="log"><span class="v5-portal__symbol" aria-hidden="true">✳</span><span><strong>${recorded ? "Continue today's journal" : "Check in with yourself"}</strong><small>${storageStatus === "error" ? "Storage unavailable — protect your entries with a backup" : storageStatus === "saving" ? "Saving your latest changes…" : recorded ? "Your entry is saved on this device" : "Mood, energy, symptoms and notes"}</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
+        <button class="v5-portal__action" type="button" data-tab="calendar"><span class="v5-portal__symbol" aria-hidden="true">◌</span><span><strong>Travel through time</strong><small>Explore recorded days and estimates</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
+        <button class="v5-portal__action" type="button" data-tab="insights"><span class="v5-portal__symbol" aria-hidden="true">✧</span><span><strong>Visit the observatory</strong><small>See what your history can tell you</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
+      </div>
+      <p class="v5-portal__privacy">Private by design · No account required · Your observations, not a diagnosis</p>
     </section>`;
   }
   function pageToday() {
     const S = data.settings, c = AN.current;
-    let h = sampleBanner();
+    let h = sampleBanner() + dailyPortal();
     if (!AN.hasData) return h + `<section class="card status"><p class="eyebrow">${greeting()}</p>
       <h1 class="status__h">Welcome to <span class="status__ph">Almanac</span></h1>
       <p class="status__line">Log the first day of your last period and the landscape above starts following your cycle.</p>
@@ -265,7 +329,7 @@
       <p class="status__sci">${P.sci}</p><p class="status__line">${P.line}</p>
       ${hormonal ? "" : ribbon(c)}
       <ul class="facts">${nextFact(c)}${hormonal ? "" : fertileFact(c)}</ul>
-      ${hormonal ? "" : `<p class="fine">Fertile-window dates are estimates and <b>not birth control</b>.</p>`}
+      ${hormonal ? "" : `<p class="fine">Fertile-window and ovulation dates are estimates, even with temperature or LH observations. <b>Do not use these dates as birth control or proof that pregnancy is impossible.</b></p>`}
       <div class="actions">${actionsFor(c)}</div></section>`;
     h += orbitJournal() + todayLogCard() + ritualCard() + flagsHTML() + `<details class="card fold"><summary>Explore your next 7 days</summary>${outlookCard()}</details>` + seasonCard(c);
     return h;
@@ -367,10 +431,10 @@
       if (S.mode === "natural" && c) for (const o of c.ovulations) {
         if (d >= o.day - 5 && d <= o.day) { cls.push("is-fert"); lab.push("estimated fertile window"); }
         else if (!o.confirmed && ((d >= o.lo - 5 && d < o.day - 5) || (d > o.day && d <= o.hi))) { cls.push("is-fert-lo"); lab.push("possible fertile window"); }
-        if (d === o.day) { cls.push("is-ovu"); lab.push(o.confirmed ? "ovulation, confirmed by temperature" : o.source === "lh" ? "ovulation expected from LH test" : "estimated ovulation"); }
+        if (d === o.day) { cls.push("is-ovu"); lab.push(o.confirmed ? "ovulation suggested by temperature" : o.source === "lh" ? "ovulation expected from LH test" : "estimated ovulation"); }
       }
     }
-    if (S.mode === "natural") for (const cy of AN.cycles) if (cy.ovuConfirmed && cy.ovu === d && !cls.includes("is-ovu")) { cls.push("is-ovu"); lab.push("ovulation, confirmed by temperature"); }
+    if (S.mode === "natural") for (const cy of AN.cycles) if (cy.ovuConfirmed && cy.ovu === d && !cls.includes("is-ovu")) { cls.push("is-ovu"); lab.push("ovulation suggested by temperature"); }
     if (d === TODAY) { cls.push("is-today"); lab.unshift("today"); }
     if (L.mood || L.energy || L.pain != null || (L.sym && L.sym.length) || L.note || L.bbt != null || L.lh || L.mucus) cls.push("has-log");
     return { iso, cls, lab };
@@ -419,9 +483,50 @@
       <rect x="${pl}" y="${y(r.max).toFixed(1)}" width="${W - pl - pr}" height="${(y(r.min) - y(r.max)).toFixed(1)}" class="band"/>
       <text x="${pl - 4}" y="${(y(r.max) + 3).toFixed(1)}" text-anchor="end" class="axis">${r.max}</text><text x="${pl - 4}" y="${(y(r.min) + 3).toFixed(1)}" text-anchor="end" class="axis">${r.min}</text>${bars}</svg>`;
   }
+  /* An observation-only chart. No smoothing, inferred values or predictions. */
+  function observationObservatory() {
+    const dims = [["mood", "Mood", 1, 5], ["energy", "Energy", 1, 5], ["pain", "Pain", 0, 3]];
+    const offset = Math.max(0, ui.observatoryOffset || 0);
+    const days = Array.from({ length: 28 }, (_, i) => TODAY - offset - 27 + i);
+    const coverage = days.map(d => {
+      const log = data.logs[A.fromDay(d)] || {};
+      return ["mood", "energy", "pain"].some(key => log[key] != null && log[key] !== "");
+    }).filter(Boolean).length;
+    const coverageMessage = coverage === 0 ? "Nothing logged in this window yet. You can start with a single check-in." : coverage < 7 ? "A few observations are available. Treat any apparent patterns cautiously." : coverage < 14 ? "Some days are recorded, but gaps may affect comparisons." : "A substantial part of this window is recorded. Gaps can still affect comparisons.";
+    const panels = dims.map(([key, label, min, max]) => {
+      const points = days.map(d => {
+        const raw = (data.logs[A.fromDay(d)] || {})[key];
+        const value = raw == null || raw === "" ? null : Number(raw);
+        return { d, value: Number.isFinite(value) && value >= min && value <= max ? value : null };
+      });
+      const observed = points.filter(p => p.value !== null);
+      const n = observed.length;
+      const mean = n ? observed.reduce((sum, p) => sum + p.value, 0) / n : null;
+      const detail = n >= 5 ? `Average recorded score: ${mean.toFixed(1)} of ${max}. This describes logged days only.` : n ? `${n} recorded day${n === 1 ? "" : "s"}; more entries will make a summary more useful.` : "No entries in this window yet.";
+      const cells = points.map(p => {
+        const date = fmt(p.d, { day: "numeric", month: "short" });
+        const present = p.value !== null;
+        const title = present ? `${date}: ${label.toLowerCase()} ${p.value} of ${max}` : `${date}: not recorded`;
+        return `<span class="v5-observation__cell${present ? " is-observed" : ""}" style="--level:${present ? (p.value === 0 ? .12 : p.value / max) : 0}" role="img" aria-label="${esc(title)}" title="${esc(title)}"></span>`;
+      }).join("");
+      return `<div class="v5-observation__row"><div class="v5-observation__row-head"><strong>${label}</strong><small>${n} of 28 days recorded</small></div><div class="v5-observation__grid">${cells}</div><p class="v5-observation__summary">${esc(detail)}</p></div>`;
+    }).join("");
+    return `<section class="v5-observation card" aria-labelledby="v5-observation-title">
+      <p class="eyebrow">THE OBSERVATORY · ACTUAL ENTRIES</p>
+      <h2 class="h2" id="v5-observation-title">A month in little moments.</h2>
+      <p class="fine">Explore 28-day windows of your mood, energy and pain entries. Brighter tiles mean higher recorded scores, not better health. A pain score of zero is a recorded observation, not a missing entry. Empty outlines mean nothing was recorded.</p>
+      <div class="v5-observation__nav" role="group" aria-label="Observation date range"><button type="button" data-act="observatory-step" data-step="1">← Previous 28 days</button><span aria-live="polite">${esc(fShort(days[0]))} – ${esc(fShort(days[27]))}</span><button type="button" data-act="observatory-step" data-step="-1" ${offset === 0 ? "disabled" : ""}>Next 28 days →</button></div>
+      <div class="v5-observation__coverage" role="status"><strong>${coverage} of 28 days with a check-in</strong><div class="v5-observation__coverage-track" role="progressbar" aria-label="Days with mood, energy or pain recorded" aria-valuemin="0" aria-valuemax="28" aria-valuenow="${coverage}"><span style="width:${coverage / 28 * 100}%"></span></div><p>${coverageMessage}</p></div>
+      <div class="v5-observation__rows">${panels}</div>
+      <div class="v5-observation__dates"><span>${esc(fShort(days[0]))}</span><span>${esc(fShort(days[27]))}</span></div>
+      <div class="v5-observation__actions"><button class="btn btn--ghost" type="button" data-act="observatory-timeline">Explore these days in the Living Timeline</button></div>
+      <p class="fine">These are observations only, not a diagnosis or prediction. Tap a date in Calendar to add or correct a record.</p>
+      <button class="btn btn--ghost" type="button" data-tab="calendar">Open calendar</button>
+    </section>`;
+  }
   function pageInsights() {
     const st = AN.stats, S = data.settings;
-    let h = sampleBanner() + ritualInsights();
+    let h = sampleBanner() + observationObservatory() + ritualInsights();
     if (st.n < 1) {
       h += `<section class="card"><h1 class="h2">Your rhythm</h1><p>Almanac needs at least two logged periods to measure a cycle. Once you have them, you'll see your average, how much it varies, and a chart here.</p></section>`;
     } else {
@@ -468,7 +573,7 @@
       if (natural) {
         const od = (c.ovu != null ? c.ovu : c.next - o2n) - c.start + 1, b = c.periodLen, od2 = Math.max(od, b + 3);
         bar = seg("winter", b) + seg("spring", od2 - 2 - b) + seg("summer", 3) + seg("autumn", c.length - (od2 + 1));
-        mk = `<span class="strip__o${c.ovuConfirmed ? " is-conf" : ""}" style="left:${w(od2 - 0.5)}" title="${c.ovuConfirmed ? "Ovulation confirmed" : "Ovulation estimated"}"></span>`;
+        mk = `<span class="strip__o${c.ovuConfirmed ? " is-conf" : ""}" style="left:${w(od2 - 0.5)}" title="${c.ovuConfirmed ? "Ovulation suggested by temperature" : "Ovulation estimated"}"></span>`;
       } else bar = seg("winter", c.periodLen) + `<i style="width:${w(c.length - c.periodLen)};background:var(--line)"></i>`;
       return `<li class="strip"><span class="strip__d">${fShort(c.start)}</span><span class="strip__bar">${bar}${mk}</span><span class="strip__n">${c.length}</span></li>`;
     });
@@ -477,7 +582,7 @@
       rows.push(`<li class="strip strip--now"><span class="strip__d">${fShort(st)}</span><span class="strip__bar">${seg("winter", b)}${seg("spring", od - 2 - b)}${seg("summer", 3)}${seg("autumn", len - (od + 1))}<span class="strip__o${cur.ovu.confirmed ? " is-conf" : ""}" style="left:${w(od - 0.5)}"></span><span class="strip__t" style="left:${w(cur.day - 0.5)}"></span></span><span class="strip__n">now</span></li>`);
     }
     return `<section class="card"><h2 class="h3 ih">${F.ICON.chart}Your last ${cs.length} cycles</h2><ul class="strips" aria-label="Each row is one cycle; the number is its length in days">${rows.join("")}</ul>
-      <p class="fine">Each bar is one cycle, drawn to the same scale. ${natural ? "A solid dot is ovulation confirmed by your own temperature or LH test; a hollow dot is an estimate. The last row is the current cycle (predicted), and the tick is today." : "The coloured part is your bleeding."}</p></section>`;
+      <p class="fine">Each bar is one cycle, drawn to the same scale. ${natural ? "A solid dot is ovulation suggested by temperature or LH observations; a hollow dot is an estimate. The last row is the current cycle (predicted), and the tick is today." : "The coloured part is your bleeding."}</p></section>`;
   }
   function patternsCard() {
     const logged = Object.values(data.logs).filter(l => l.mood || l.energy || l.pain != null).length;
@@ -498,11 +603,11 @@
   }
 
   /* ---------------------------------------------------------------- learn */
-  const GUIDE_SUB = { temp: "Confirms ovulation after the fact", lh: "Predicts ovulation about a day ahead", mucus: "Your body's own fertility signal", products: "Tampons, cups, pads and toxic shock signs", pms: "PMS, PMDD and when to get help", bc: "What hormonal methods do to bleeding" };
+  const GUIDE_SUB = { temp: "Can suggest ovulation occurred", lh: "Predicts ovulation about a day ahead", mucus: "Your body's own fertility signal", products: "Tampons, cups, pads and toxic shock signs", pms: "PMS, PMDD and when to get help", bc: "What hormonal methods do to bleeding" };
   const mucusScale = () => `<ol class="mscale">${C.MUCUS_INFO.map(m => `<li><span class="mscale__ico">${F.MUCUS_GLYPH[m[0]]}</span><span><b>${m[1]}</b><small>${m[2]}</small></span><span class="mscale__bar" role="img" aria-label="Fertility ${m[3]} of 5"><i style="width:${m[3] * 20}%"></i></span></li>`).join("")}</ol>`;
   const figBox = (svg, cap) => `<figure class="figbox">${svg}<figcaption>${cap}</figcaption></figure>`;
   function guideCard(g) {
-    const fig = g.fig === "bbt" ? figBox(F.bbt(), "Example temperature chart with made-up data. A sustained rise after ovulation confirms it happened.")
+    const fig = g.fig === "bbt" ? figBox(F.bbt(), "Example temperature chart with made-up data. A sustained rise may suggest ovulation occurred.")
       : g.fig === "lh" ? figBox(F.lhStrips(), "How an ovulation test typically looks as the LH surge arrives.") : g.fig === "mucus" ? mucusScale() : "";
     return `<details class="card lsec fold fold--big" id="guide-${g.id}"><summary><span class="ph-ico ph-ico--g">${F.ICON[g.ico]}</span><span><b>${g.title}</b><small>${GUIDE_SUB[g.id] || ""}</small></span></summary>
       <p>${g.intro}</p>${fig}<ol class="steps">${g.steps.map(t => `<li>${t}</li>`).join("")}</ol><ul class="notes">${g.notes.map(t => `<li>${t}</li>`).join("")}</ul></details>`;
@@ -777,6 +882,12 @@
       case "settings": return settingsSheet();
       case "hills": return hillsSheet();
       case "log": return openLog(t.dataset.day || isoNow());
+      case "constellation-range": ui.constellationDays = +t.dataset.days === 28 ? 28 : 14; return render();
+      case "constellation-step": ui.constellationOffset = Math.max(0, (ui.constellationOffset || 0) + (+t.dataset.step) * ui.constellationDays); return render();
+      case "constellation-now": ui.constellationOffset = 0; ui.constellationPreview = null; return render();
+      case "observatory-step": ui.observatoryOffset = Math.max(0, (ui.observatoryOffset || 0) + (+t.dataset.step) * 28); return render();
+      case "observatory-timeline": { ui.tab = "today"; ui.constellationDays = 28; ui.constellationOffset = ui.observatoryOffset || 0; ui.constellationPreview = null; render(); const el = document.querySelector(".orbit-journal"); if (el) el.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "start" }); return; }
+      case "constellation-preview": ui.constellationPreview = t.dataset.day; return render();
       case "day-step": { const d = clamp(A.toDay(ui.day) + (+t.dataset.step), 0, TODAY); if (d <= TODAY) { ui.day = A.fromDay(d); openSheet("log", logHTML(ui.day)); syncLog(); } return; }
       case "set": { const k = t.dataset.k, v = t.dataset.v, L = data.logs[ui.day] || {}, num = ["flow", "mood", "energy", "pain"].includes(k) ? +v : v; setLog(ui.day, { [k]: L[k] === num ? undefined : num }); return syncLog(); }
       case "sym": { const L = data.logs[ui.day] || {}, s = new Set(L.sym || []); s.has(t.dataset.v) ? s.delete(t.dataset.v) : s.add(t.dataset.v); setLog(ui.day, { sym: [...s] }); return syncLog(); }

@@ -1,0 +1,281 @@
+/* ALMANAC 5.0 — Daily Studio portal.
+   Editorial restraint around vivid interaction; native controls remain accessible. */
+.v5-portal{position:relative;isolation:isolate;overflow:hidden;margin:0 0 18px;padding:clamp(22px,5vw,38px);border:1px solid rgba(206,196,255,.3);border-radius:28px;background:radial-gradient(circle at 91% 4%,rgba(183,113,251,.29),transparent 38%),radial-gradient(circle at 8% 100%,rgba(89,205,215,.13),transparent 43%),#111631;box-shadow:0 18px 45px rgba(8,8,29,.18);color:#f9f7ff}
+.v5-portal::before{content:"";position:absolute;right:-70px;top:-120px;width:260px;height:260px;border:1px solid rgba(229,208,255,.24);border-radius:50%;box-shadow:0 0 0 40px rgba(205,167,255,.035),0 0 0 82px rgba(205,167,255,.025);z-index:-1;pointer-events:none}
+.v5-portal__eyebrow{font-size:10px!important;font-weight:800;letter-spacing:.2em;color:#cbb8ff!important;margin:0 0 12px!important}
+.v5-portal__intro h2{font-family:var(--font-d,serif);font-size:clamp(30px,5vw,52px);line-height:1.04;letter-spacing:-.045em;font-weight:500;color:white;margin:0 0 12px}
+.v5-portal__intro>p:last-child{color:#d7d1ee;margin:0 0 24px;max-width:35ch}
+.v5-portal__actions{display:grid;grid-template-columns:1fr;gap:10px}
+.v5-portal__action{appearance:none;display:flex;align-items:center;gap:13px;width:100%;min-height:74px;text-align:left;padding:13px 16px;border:1px solid rgba(204,204,245,.23);border-radius:18px;background:rgba(255,255,255,.055);color:white;cursor:pointer;transition:transform .22s ease,background .22s ease,border-color .22s ease}
+.v5-portal__action--primary{background:linear-gradient(105deg,rgba(170,119,234,.3),rgba(109,182,219,.14));border-color:rgba(231,208,255,.46)}
+.v5-portal__action:hover{transform:translateY(-2px);background:rgba(255,255,255,.12);border-color:rgba(238,225,255,.6)}
+.v5-portal__action:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.v5-portal__symbol{flex:0 0 40px;width:40px;height:40px;display:grid;place-items:center;border-radius:14px;background:rgba(229,210,255,.13);font-size:23px;color:#e9d6ff}
+.v5-portal__action>span:nth-child(2){flex:1;min-width:0}
+.v5-portal__action strong,.v5-portal__action small{display:block}
+.v5-portal__action strong{font-size:14px;line-height:1.35}
+.v5-portal__action small{font-size:11px;color:#d4d0e6;margin-top:4px;line-height:1.4}
+.v5-portal__arrow{font-size:20px;color:#e5d7ff}
+.v5-portal__privacy{font-size:10px;line-height:1.5;letter-spacing:.015em;color:#c5bfdc;margin:18px 0 0}
+@media(min-width:720px){.v5-portal__actions{grid-template-columns:repeat(3,minmax(0,1fr))}.v5-portal__action{min-height:128px;flex-direction:column;align-items:flex-start}.v5-portal__action>span:nth-child(2){flex:0}.v5-portal__arrow{position:absolute;align-self:flex-end}}
+@media(prefers-reduced-motion:reduce){.v5-portal__action{transition:none}.v5-portal__action:hover{transform:none}}
+@media(forced-colors:active){.v5-portal{border:1px solid CanvasText}.v5-portal__action{border:1px solid ButtonText;color:ButtonText}.v5-portal__action:focus-visible{outline:3px solid Highlight}}
+
+/* Timeline time-window controls */
+.v5-range{display:flex;gap:6px;width:max-content;max-width:100%;padding:5px;margin:18px 0 8px;border-radius:999px;background:rgba(137,115,196,.12);border:1px solid rgba(150,128,199,.23)}
+.v5-range button{font:inherit;font-size:12px;font-weight:700;min-height:38px;padding:7px 16px;border-radius:999px;border:1px solid transparent;background:transparent;color:inherit;cursor:pointer}
+.v5-range button[aria-pressed="true"]{background:#e7d9ff;color:#251441;border-color:#c4a9ed}
+.v5-range button:focus-visible{outline:3px solid currentColor;outline-offset:2px}
+.orbit-journal__sky--dense .orbit-journal__day{font-size:clamp(9px,2vw,11px);width:clamp(22px,5.8vw,32px);height:clamp(22px,5.8vw,32px)}
+@media(max-width:390px){.orbit-journal__sky--dense .orbit-journal__day{width:21px;height:21px;font-size:9px}}
+@media(forced-colors:active){.v5-range button[aria-pressed="true"]{border-color:Highlight;outline:2px solid Highlight}}
+
+/* Observation Observatory: accessible descriptive 28-day data mosaic */
+.v5-observation{overflow:hidden}
+.v5-observation__rows{display:grid;gap:22px;margin:24px 0 12px}
+.v5-observation__row-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:9px}
+.v5-observation__row-head strong{font-size:14px}
+.v5-observation__row-head small{font-size:11px;opacity:.75;text-align:right}
+.v5-observation__grid{display:grid;grid-template-columns:repeat(28,minmax(0,1fr));gap:clamp(2px,.6vw,6px)}
+.v5-observation__cell{display:block;aspect-ratio:1/1;min-width:0;border-radius:clamp(2px,.5vw,6px);border:1px solid currentColor;opacity:.25}
+.v5-observation__cell.is-observed{opacity:1;border-color:rgba(136,95,204,.35);background:color-mix(in srgb,#9a6bd7 calc(var(--level)*90%),#eee9ff);box-shadow:0 0 10px rgba(143,107,210,.1)}
+.v5-observation__dates{display:flex;justify-content:space-between;font-size:11px;opacity:.7;margin-bottom:20px}
+@media(max-width:440px){.v5-observation__grid{gap:2px}.v5-observation__cell{border-radius:2px}}
+@media(forced-colors:active){.v5-observation__cell.is-observed{background:Highlight;border-color:Highlight}.v5-observation__cell:not(.is-observed){border:1px solid CanvasText}}
+
+/* Living Universe V5 — unified art direction and interaction grammar */
+:root{--v5-aurora:#d7b9ff;--v5-mint:#9ce7df;--v5-coral:#ffb9c7;--v5-night:#0b1027;--v5-radius:26px;--v5-ease:cubic-bezier(.22,1,.36,1)}
+body{background:radial-gradient(ellipse 70vw 70vw at 85% 4%,rgba(144,96,206,.18),transparent 75%),radial-gradient(ellipse 70vw 70vw at 5% 70%,rgba(73,177,181,.09),transparent 80%),var(--v5-night)}
+body .side{position:relative}
+body .side::before{content:"";position:absolute;top:0;right:4%;width:1px;height:100%;background:linear-gradient(to bottom,transparent,rgba(218,195,255,.11),transparent);pointer-events:none}
+#page>.card,#page>.v5-portal{animation:v5-rise .55s var(--v5-ease) both}
+#page>.card:nth-child(2){animation-delay:45ms}
+#page>.card:nth-child(3){animation-delay:90ms}
+#page>.card:nth-child(4){animation-delay:120ms}
+#page>.card:nth-child(n+5){animation-delay:140ms}
+@keyframes v5-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+#page .card{border-radius:var(--v5-radius);border-color:rgba(220,205,255,.18);box-shadow:0 12px 44px rgba(0,0,20,.12)}
+#page .eyebrow{letter-spacing:.17em}
+#page .h2{letter-spacing:-.035em}
+.v5-portal{background:radial-gradient(circle at 80% 12%,rgba(199,124,233,.32),transparent 42%),radial-gradient(circle at 8% 88%,rgba(99,219,212,.18),transparent 42%),linear-gradient(145deg,#16172e,#11132c 75%);border-color:rgba(216,199,252,.33)}
+.v5-portal::after{content:"";position:absolute;right:5%;top:7%;width:clamp(90px,14vw,170px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 28% 25%,#f4d5f8 0%,#bca3f4 22%,#7568c4 47%,#292b60 70%);box-shadow:inset -16px -14px 26px rgba(10,10,35,.45),0 0 55px rgba(180,137,246,.27);opacity:.72;pointer-events:none;z-index:-1;animation:v5-float 8s ease-in-out infinite alternate}
+@keyframes v5-float{from{transform:translateY(0) rotate(-7deg)}to{transform:translateY(12px) rotate(7deg)}}
+.v5-portal__intro{position:relative;z-index:1}
+.v5-portal__intro h2{max-width:14ch;text-wrap:balance}
+.v5-portal__action{position:relative;transition:transform .32s var(--v5-ease),background .32s ease,border-color .32s ease,box-shadow .32s ease}
+.v5-portal__action:hover{box-shadow:0 9px 24px rgba(3,4,19,.18)}
+.v5-portal__action--primary .v5-portal__symbol{background:linear-gradient(135deg,rgba(242,187,225,.3),rgba(151,215,229,.2))}
+.v5-observation__cell.is-observed{transition:transform .25s var(--v5-ease),box-shadow .25s ease}
+.v5-observation__cell.is-observed:hover{transform:scale(1.13);box-shadow:0 0 15px rgba(195,150,255,.5)}
+@media(max-width:600px){.v5-portal::after{width:94px;top:14px;right:-19px;opacity:.45}.v5-portal__intro h2{max-width:15ch}#page>.card{animation-duration:.35s}}
+@media(prefers-reduced-motion:reduce){#page>.card,#page>.v5-portal{animation:none!important}.v5-portal::after{animation:none!important}.v5-observation__cell.is-observed{transition:none!important}.v5-observation__cell.is-observed:hover{transform:none!important}}
+@media(forced-colors:active){.v5-portal::after{display:none}#page .card{border:1px solid CanvasText}}
+
+/* Daily Studio: one-tap, genuinely functional check-in */
+.v5-checkin{position:relative;z-index:1;margin:24px 0 20px;padding:18px;border-radius:20px;background:rgba(245,237,255,.065);border:1px solid rgba(235,216,255,.18)}
+.v5-checkin__heading{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:14px}
+.v5-checkin__heading strong{font-size:14px;color:#fff}
+.v5-checkin__heading>span{font-size:11px;color:#c7c3e0}
+.v5-checkin__row{display:grid;grid-template-columns:68px minmax(0,1fr);align-items:center;gap:12px;margin:10px 0}
+.v5-checkin__label{font-size:12px;color:#ddd4f5;font-weight:700}
+.v5-checkin__choices{display:flex;flex-wrap:wrap;gap:6px}
+.v5-checkin__choice{font:inherit;font-size:12px;min-height:38px;padding:8px 11px;border-radius:12px;color:#eae2ff;background:rgba(255,255,255,.06);border:1px solid rgba(238,218,255,.18);cursor:pointer;transition:background .2s ease,transform .2s ease,border-color .2s ease}
+.v5-checkin__choice:hover{background:rgba(225,202,255,.16);transform:translateY(-1px)}
+.v5-checkin__choice[aria-pressed="true"]{background:#e4d5ff;border-color:#f5eaff;color:#23183d;font-weight:750}
+.v5-checkin__choice:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.v5-checkin__hint{font-size:11px;color:#d0c9e8;margin:12px 0 0}
+@media(max-width:520px){.v5-checkin{padding:14px}.v5-checkin__heading{flex-direction:column;gap:3px}.v5-checkin__row{grid-template-columns:1fr;gap:6px}.v5-checkin__choice{flex:1 1 auto;text-align:center}}
+@media(prefers-reduced-motion:reduce){.v5-checkin__choice{transition:none}.v5-checkin__choice:hover{transform:none}}
+@media(forced-colors:active){.v5-checkin__choice[aria-pressed="true"]{border:2px solid Highlight}}
+
+/* One-tap check-in is always optional; the detailed journal remains available. */
+.v5-checkin{position:relative;z-index:1;margin:22px 0;padding:17px;border:1px solid rgba(220,209,255,.24);border-radius:20px;background:rgba(11,13,38,.32)}
+.v5-checkin__heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.v5-checkin__heading strong{font-size:14px;color:#fff}
+.v5-checkin__heading span{font-size:11px;color:#d9cfea}
+.v5-checkin__choices{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.v5-checkin__choice{display:grid;place-items:center;gap:6px;min-height:66px;padding:9px 3px;border:1px solid rgba(214,202,255,.2);border-radius:15px;background:rgba(245,239,255,.06);color:#fff;font:inherit;cursor:pointer;transition:background .2s ease,transform .2s ease,border-color .2s ease}
+.v5-checkin__choice>span{font-size:clamp(19px,3.5vw,27px);line-height:1.2}
+.v5-checkin__choice small{font-size:10px;line-height:1.25;text-align:center}
+.v5-checkin__choice[aria-pressed="true"]{border-color:#d8b9ff;background:rgba(198,163,248,.29);box-shadow:inset 0 0 0 1px rgba(227,207,255,.4)}
+.v5-checkin__choice:focus-visible{outline:3px solid #e6d3ff;outline-offset:3px}
+@media(hover:hover){.v5-checkin__choice:hover{transform:translateY(-2px);background:rgba(245,239,255,.14)}}
+@media(max-width:390px){.v5-checkin{padding:12px}.v5-checkin__choices{gap:4px}.v5-checkin__choice{min-height:61px;padding:7px 1px}.v5-checkin__choice small{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.v5-checkin__choice{transition:none}.v5-checkin__choice:hover{transform:none}}
+@media(forced-colors:active){.v5-checkin__choice[aria-pressed="true"]{border:2px solid Highlight}}
+
+/* Living Timeline: accessible time travel without gesture-only navigation. */
+.v5-timeline-nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px;margin:18px 0 12px}
+.v5-timeline-nav span{flex:1;text-align:center;font-size:12px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.v5-timeline-nav button{border:1px solid rgba(211,202,255,.26);border-radius:999px;background:rgba(203,184,255,.09);color:var(--ink);padding:9px 12px;font:inherit;font-size:12px;cursor:pointer;min-height:38px}
+.v5-timeline-nav button:hover:not(:disabled){background:rgba(203,184,255,.2)}
+.v5-timeline-nav button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.v5-timeline-nav button:disabled{opacity:.38;cursor:not-allowed}
+@media(max-width:540px){.v5-timeline-nav span{order:-1;flex:0 0 100%}.v5-timeline-nav button{flex:1}}
+
+/* Day-in-focus: observations only, never inferred health conclusions. */
+.v5-timeline-preview{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:15px 0;padding:17px 19px;border:1px solid rgba(204,187,250,.27);border-radius:20px;background:linear-gradient(110deg,rgba(157,130,221,.13),rgba(111,189,197,.07))}
+.v5-timeline-preview>div{min-width:0}
+.v5-timeline-preview .eyebrow{margin:0 0 5px}
+.v5-timeline-preview h3{margin:0 0 6px;font-family:var(--font-d,serif);font-size:clamp(20px,3vw,27px);font-weight:500;line-height:1.15}
+.v5-timeline-preview .fine{margin:0;line-height:1.6;overflow-wrap:anywhere}
+.v5-timeline-preview button{flex:none;min-height:42px;padding:10px 16px;border:1px solid rgba(222,206,255,.45);border-radius:999px;background:rgba(194,164,245,.18);color:var(--ink);font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.v5-timeline-preview button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.orbit-journal__day[aria-pressed="true"]{outline:2px solid #f4d9ff;outline-offset:4px}
+@media(max-width:560px){.v5-timeline-preview{align-items:stretch;flex-direction:column}.v5-timeline-preview button{align-self:flex-start}}
+@media(forced-colors:active){.orbit-journal__day[aria-pressed="true"]{outline-color:Highlight}}
+
+/* Ensure timeline points remain above the decorative sky and mobile dock. */
+.orbit-journal__sky{isolation:isolate}
+.orbit-journal__connections,.orbit-journal__track,.orbit-journal__core{pointer-events:none}
+.orbit-journal__day{z-index:4;touch-action:manipulation}
+.orbit-journal__day:hover,.orbit-journal__day:focus-visible{z-index:5}
+@media(max-width:540px){.orbit-journal__sky{width:min(100%,310px);height:310px;margin:12px auto 22px}.orbit-journal__day{min-width:32px;min-height:32px}.orbit-journal__sky--dense .orbit-journal__day{min-width:26px;min-height:26px}}
+
+/* A conventional, dependable date picker accompanies the exploratory sky. */
+.v5-timeline-dates{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin:14px 0 18px}
+.v5-timeline-dates button{display:flex;align-items:center;flex-direction:column;justify-content:center;gap:3px;min-width:0;min-height:54px;padding:6px 2px;border:1px solid rgba(197,184,238,.25);border-radius:12px;background:rgba(143,131,192,.08);color:var(--ink);cursor:pointer;font:inherit}
+.v5-timeline-dates button span{font-size:10px;opacity:.75}
+.v5-timeline-dates button strong{font-size:14px;font-variant-numeric:tabular-nums}
+.v5-timeline-dates button i{font-size:8px;font-style:normal;opacity:.8}
+.v5-timeline-dates button[aria-pressed="true"]{border-color:#c9b1ff;background:rgba(173,146,239,.23)}
+.v5-timeline-dates button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+@media(max-width:390px){.v5-timeline-dates{gap:3px}.v5-timeline-dates button{min-height:48px}}
+
+.v5-observation__summary{margin:9px 0 18px;font-size:12px;line-height:1.5;opacity:.85}
+
+.v5-observation__nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin:18px 0}
+.v5-observation__nav button{min-height:42px;padding:9px 13px;border:1px solid rgba(195,174,239,.35);border-radius:999px;background:rgba(170,144,219,.1);color:var(--ink);font:inherit;font-size:12px;cursor:pointer}
+.v5-observation__nav button:disabled{opacity:.4;cursor:not-allowed}
+.v5-observation__nav button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.v5-observation__nav span{font-size:12px;font-weight:700;text-align:center}
+@media(max-width:540px){.v5-observation__nav span{order:-1;flex:0 0 100%}.v5-observation__nav button{flex:1}}
+
+.v5-observation__coverage{padding:16px 18px;margin:10px 0 20px;border-radius:17px;border:1px solid rgba(177,162,231,.25);background:rgba(142,129,195,.08)}
+.v5-observation__coverage strong{display:block;margin-bottom:10px;font-size:13px}
+.v5-observation__coverage-track{height:7px;overflow:hidden;border-radius:999px;background:rgba(167,152,205,.24)}
+.v5-observation__coverage-track span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#9b8bdc,#7acac7)}
+.v5-observation__coverage p{margin:10px 0 0;font-size:12px;line-height:1.5;opacity:.82}
+@media(forced-colors:active){.v5-observation__coverage-track{border:1px solid CanvasText}.v5-observation__coverage-track span{background:Highlight}}
+
+.v5-checkin__save{margin:8px 0 16px;font-size:12px;line-height:1.5;opacity:.82}
+.v5-checkin__row{scroll-margin-top:80px}
+.v5-checkin__choice:focus-visible{outline:3px solid #cbb4ff;outline-offset:2px}
+
+/* PHASE 3 — an intentional visual and motion system across all four views.
+   Motion is decorative only; navigation and logging remain ordinary controls. */
+:root{--v5-focus:#e5caff;--v5-surface-edge:rgba(206,188,245,.26);--v5-soft-glow:0 18px 56px rgba(7,9,30,.19)}
+#page{min-width:0}
+#page>.card{position:relative;isolation:isolate;transition:border-color .3s ease,box-shadow .3s ease}
+#page>.card:hover{border-color:var(--v5-surface-edge);box-shadow:var(--v5-soft-glow)}
+#page .card h1,#page .card h2,#page .card h3{text-wrap:balance}
+#page .card p{overflow-wrap:break-word}
+.v5-portal{box-shadow:0 25px 75px rgba(6,8,28,.3),inset 0 1px rgba(255,255,255,.12)}
+.v5-portal__intro{position:relative;z-index:1}
+.v5-portal__intro h2{text-wrap:balance}
+.v5-portal__action{position:relative;overflow:hidden;transform:translateZ(0)}
+.v5-portal__action::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 15%,rgba(255,255,255,.12) 49%,transparent 80%);transform:translateX(-140%);transition:transform .7s ease;pointer-events:none}
+@media(hover:hover) and (pointer:fine){.v5-portal__action:hover::after{transform:translateX(140%)}}
+.v5-checkin__row{padding-block:13px;border-top:1px solid rgba(227,210,255,.1)}
+.v5-checkin__row:first-of-type{border-top:0}
+.v5-checkin__choices{min-width:0}
+.v5-checkin__choice{touch-action:manipulation}
+.v5-checkin__choice[aria-pressed="true"]{box-shadow:0 0 0 1px rgba(242,220,255,.28),0 0 24px rgba(173,139,239,.17)}
+.v5-checkin__save[data-status="saving"]{color:#f7d8ad}
+.v5-checkin__save[data-status="saved"]{color:#b4f2e0}
+.v5-checkin__save[data-status="error"]{color:#ffb4bd;font-weight:700}
+.v5-timeline-dates button,.v5-observation__nav button,.v5-timeline-nav button,.v5-timeline-preview button{touch-action:manipulation;transition:background-color .18s ease,border-color .18s ease,transform .18s ease}
+@media(hover:hover) and (pointer:fine){
+  .v5-timeline-dates button:hover,.v5-observation__nav button:hover:not(:disabled),.v5-timeline-nav button:hover:not(:disabled),.v5-timeline-preview button:hover{transform:translateY(-2px);border-color:rgba(199,171,251,.7)}
+}
+.v5-timeline-dates button[aria-pressed="true"]{box-shadow:inset 0 0 0 1px rgba(208,178,255,.3),0 0 18px rgba(163,133,224,.13)}
+.v5-observation__cell.is-observed{transition:filter .2s ease,box-shadow .2s ease}
+@media(hover:hover) and (pointer:fine){.v5-observation__cell.is-observed:hover{filter:brightness(1.2);box-shadow:0 0 14px rgba(171,129,241,.35)}}
+@media(max-width:720px){
+  .v5-portal{padding:clamp(19px,5vw,28px);border-radius:23px}
+  .v5-portal__actions{gap:9px}
+  .v5-portal__action{min-height:68px}
+  .v5-checkin__row{padding-block:12px}
+  .v5-observation__row-head{align-items:flex-start}
+}
+@media(max-width:390px){
+  .v5-portal__intro h2{font-size:clamp(29px,8.5vw,38px)}
+  .v5-portal__action{padding:12px;gap:10px}
+  .v5-portal__symbol{flex-basis:36px;width:36px;height:36px}
+  .v5-timeline-preview{padding:14px}
+}
+@media(prefers-reduced-motion:reduce){
+  #page>.card,#page>.v5-portal{animation:none!important}
+  #page>.card,.v5-portal__action,.v5-portal__action::after,.v5-checkin__choice,.v5-timeline-dates button,.v5-observation__nav button,.v5-timeline-nav button,.v5-timeline-preview button,.v5-observation__cell{transition:none!important}
+  .v5-portal__action::after{display:none}
+  .v5-portal__action:hover,.v5-timeline-dates button:hover,.v5-observation__nav button:hover,.v5-timeline-nav button:hover,.v5-timeline-preview button:hover{transform:none!important}
+}
+@media(forced-colors:active){
+  .v5-checkin__save[data-status="saving"],.v5-checkin__save[data-status="saved"],.v5-checkin__save[data-status="error"]{color:CanvasText}
+  .v5-checkin__choice[aria-pressed="true"],.v5-timeline-dates button[aria-pressed="true"]{outline:2px solid Highlight;outline-offset:1px}
+}
+
+/* Phase 3 mobile reliability: protect against horizontal clipping and crowded
+   interactive controls on narrow phones and in landscape. */
+@media(max-width:600px){
+  #page,.v5-portal,.v5-checkin,.v5-observation,.orbit-journal{min-width:0;max-width:100%}
+  .v5-portal__actions,.v5-checkin__choices{min-width:0}
+  .v5-checkin__choices{display:flex;flex-wrap:wrap;gap:7px}
+  .v5-checkin__choice{min-width:44px;min-height:44px;flex:1 1 auto}
+  .v5-range{width:100%;display:flex;justify-content:center}
+  .v5-range button{flex:1;min-width:0}
+  .v5-observation__grid{min-width:0}
+  .v5-timeline-dates button{min-height:48px}
+  .v5-observation__nav button,.v5-timeline-nav button{min-height:44px}
+}
+@media(max-width:340px){
+  .v5-timeline-dates{gap:2px}
+  .v5-timeline-dates button{padding-inline:0}
+  .v5-timeline-dates button strong{font-size:12px}
+  .v5-timeline-dates button span{font-size:9px}
+  .v5-range button{padding-inline:8px}
+}
+
+/* Phase 3 — navigation that remains legible and reachable on small screens. */
+.dock{isolation:isolate}
+.dock__btn{position:relative;touch-action:manipulation;transition:background-color .2s ease,color .2s ease,transform .2s ease}
+.dock__btn[aria-current="page"]{font-weight:800}
+.dock__btn[aria-current="page"]::after{content:"";position:absolute;inset:auto 20% 3px;height:3px;border-radius:99px;background:currentColor;opacity:.75;pointer-events:none}
+.dock__btn:focus-visible{outline:3px solid var(--v5-focus,#e5caff);outline-offset:-3px}
+@media(hover:hover) and (pointer:fine){.dock__btn:hover{transform:translateY(-2px)}}
+@media(max-width:720px){
+  .dock{padding-bottom:env(safe-area-inset-bottom,0px)}
+  .dock__btn{min-width:0;min-height:54px}
+  .dock__btn span{white-space:nowrap}
+  .dock__btn[aria-current="page"]::after{bottom:4px}
+  #page{scroll-margin-top:12px}
+}
+@media(max-width:360px){
+  .dock__btn{padding-inline:3px}
+  .dock__btn span{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){.dock__btn{transition:none!important}.dock__btn:hover{transform:none!important}}
+@media(forced-colors:active){.dock__btn[aria-current="page"]{outline:2px solid Highlight;outline-offset:-2px}.dock__btn[aria-current="page"]::after{background:Highlight}}
+
+/* Phase 3 — cinematic atmosphere with a strict performance budget.
+   Static gradients remain the baseline; only fine-pointer devices get glints. */
+.v5-portal{background-color:#11132c;background-image:radial-gradient(ellipse at 78% 4%,rgba(199,124,233,.32),transparent 43%),radial-gradient(ellipse at 8% 88%,rgba(99,219,212,.16),transparent 45%),linear-gradient(145deg,#16172e,#11132c 75%)}
+.v5-portal__eyebrow{display:inline-flex;align-items:center;gap:9px}
+.v5-portal__eyebrow::before{content:"";display:inline-block;width:7px;height:7px;flex:none;border-radius:50%;background:#a9e8df;box-shadow:0 0 12px rgba(169,232,223,.55)}
+.v5-portal__intro h2{letter-spacing:-.05em;line-height:1.06}
+.v5-checkin{backdrop-filter:none}
+.v5-observation__cell{contain:paint}
+@media(hover:none),(pointer:coarse){
+  .v5-portal__action::after{display:none}
+  .v5-portal__action:hover,.v5-checkin__choice:hover,.v5-observation__cell.is-observed:hover{transform:none}
+  .v5-observation__cell.is-observed:hover{box-shadow:none}
+}
+@media(max-width:720px){
+  .v5-portal::after{animation:none}
+  #page>.card{animation-duration:.25s;animation-delay:0s}
+}
+@media(prefers-reduced-motion:reduce){
+  .v5-portal__eyebrow::before{box-shadow:none}
+  .v5-portal::after{animation:none!important}
+}
+@media(forced-colors:active){.v5-portal__eyebrow::before{background:CanvasText;box-shadow:none}}

@@ -1,0 +1,38 @@
+name: Package Almanac 5 preview
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'assets/**'
+      - 'manifest.webmanifest'
+      - 'sw.js'
+      - '.github/workflows/preview-package.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify preview is not the production branch
+        run: |
+          test "${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}" != "main"
+          test -f index.html
+          test -f assets/css/living-universe-v5.css
+      - name: Package isolated preview
+        run: |
+          mkdir -p preview
+          cp index.html manifest.webmanifest sw.js preview/
+          cp -R assets preview/
+          cd preview
+          zip -qr ../almanac-v5-preview.zip .
+      - name: Upload preview bundle (no deployment)
+        uses: actions/upload-artifact@v4
+        with:
+          name: almanac-v5-preview
+          path: almanac-v5-preview.zip
+          retention-days: 14
