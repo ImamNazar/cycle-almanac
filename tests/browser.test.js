@@ -42,12 +42,12 @@ const { spawn } = require("node:child_process");
       await page.locator('.v5-checkin__choice[data-k="mood"]').first().click();
       assert.equal(await page.locator('.v5-checkin__choice[data-k="mood"]').first().getAttribute('aria-pressed'), 'false', "Tapping again removes quick choice");
       // One-tap check-in must persist, toggle off, and never require a journal sheet.
-      const moodButton = page.locator('.v5-checkin__choice[data-v="4"]');
+      const moodButton = page.locator('.v5-checkin__choice[data-k="mood"][data-v="4"]');
       await moodButton.click();
-      assert.equal(await page.locator('.v5-checkin__choice[data-v="4"]').getAttribute('aria-pressed'), 'true', "Mood selected");
+      assert.equal(await page.locator('.v5-checkin__choice[data-k="mood"][data-v="4"]').getAttribute('aria-pressed'), 'true', "Mood selected");
       assert.equal(await page.evaluate(() => Object.values(window.__almanac.data.logs).some(l => l.mood === 4)), true, "Mood saved in existing logs");
-      await page.locator('.v5-checkin__choice[data-v="4"]').click();
-      assert.equal(await page.locator('.v5-checkin__choice[data-v="4"]').getAttribute('aria-pressed'), 'false', "Mood selection removable");
+      await page.locator('.v5-checkin__choice[data-k="mood"][data-v="4"]').click();
+      assert.equal(await page.locator('.v5-checkin__choice[data-k="mood"][data-v="4"]').getAttribute('aria-pressed'), 'false', "Mood selection removable");
       // Almanac 5: the Daily Studio must open the existing private journal.
       assert.equal(await page.locator(".v5-portal").count(), 1, "Daily Studio visible");
       assert.equal(await page.locator(".v5-portal").evaluate(el => getComputedStyle(el, "::after").animationName), "none", "Decorative orb respects reduced motion");
