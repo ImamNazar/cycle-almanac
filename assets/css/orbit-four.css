@@ -1,0 +1,81 @@
+/* Almanac 4.0 / Orbit — a new visual system, scoped to the redesign branch.
+   All predictions, logs and private storage remain in the existing engine. */
+:root{--bg:#080b20;--card:rgba(25,28,65,.84);--ink:#f7f4ff;--muted:#b9b9d8;--line:rgba(211,202,255,.18);--accent:#c8a8ff;--accent-soft:rgba(189,144,255,.17);--r:26px;color-scheme:dark}
+html{background:#080b20}
+body{background:radial-gradient(ellipse 90vw 75vw at 100% -10%,rgba(94,65,182,.28),transparent 70%),radial-gradient(ellipse 70vw 70vw at -20% 65%,rgba(34,164,187,.15),transparent 70%),#080b20;color:var(--ink);letter-spacing:-.012em}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.45;background-image:radial-gradient(#e7dfff 0.7px,transparent 1px);background-size:38px 38px;mask-image:linear-gradient(to bottom,#000,transparent 85%)}
+.app{isolation:isolate}
+.hero{overflow:hidden;position:relative;border-radius:0 0 42px 42px;background:radial-gradient(circle at 54% 49%,#2b215f,#10132d 57%,#080b20 95%);box-shadow:inset 0 -1px rgba(255,255,255,.15)}
+.hero__scene{opacity:.18;filter:blur(17px) saturate(1.5);transform:scale(1.09)}
+.hero__fx{opacity:.65}
+.hero::before{content:"";position:absolute;z-index:1;pointer-events:none;left:50%;top:53%;width:min(67vw,390px);aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle at 31% 26%,rgba(255,242,249,.92),rgba(251,178,225,.8) 9%,rgba(168,122,255,.9) 29%,rgba(80,59,182,.92) 51%,rgba(23,28,85,.93) 73%),radial-gradient(circle,#fff,transparent);box-shadow:inset -32px -30px 55px rgba(12,10,58,.72),inset 13px 11px 30px rgba(255,255,255,.32),0 0 75px 24px rgba(153,91,255,.24),0 0 155px 55px rgba(41,170,210,.12);animation:orb-breathe 9s ease-in-out infinite}
+.hero::after{content:"YOUR OWN UNIVERSE, ONE DAY AT A TIME";position:absolute;z-index:2;left:20px;right:20px;bottom:58px;text-align:center;color:#eae0ff;font-size:10px;letter-spacing:.2em;font-weight:800;text-shadow:0 2px 16px #0d0d32}
+.hero__bar{position:relative;z-index:4;padding:calc(var(--safe-t) + 14px) 22px 16px}
+.brand{border:1px solid rgba(255,255,255,.18);background:rgba(12,12,39,.42);backdrop-filter:blur(16px);border-radius:100px;padding:10px 17px;font-size:15px;letter-spacing:-.025em;font-weight:750;text-transform:none}
+.brand svg{color:#e8b4ff}
+.round{border-radius:50%;background:rgba(16,13,45,.52);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(12px)}
+.side{position:relative;z-index:3}
+#page{max-width:760px}
+.card{background:linear-gradient(145deg,rgba(36,36,79,.88),rgba(20,24,57,.91));border:1px solid var(--line);border-radius:var(--r);box-shadow:0 20px 60px -45px #000, inset 0 1px rgba(255,255,255,.05);padding:26px 23px;margin-bottom:17px;backdrop-filter:blur(14px)}
+.card.status{background:radial-gradient(circle at 100% 0,rgba(149,100,243,.23),transparent 55%),linear-gradient(145deg,#29214e,#141b3a)}
+.eyebrow{color:#e3b8ff;font-weight:850;letter-spacing:.17em;font-size:10px}
+.h2,.h3,.status__h{font-family:var(--font-d);letter-spacing:-.055em}
+.h2{font-size:clamp(30px,7vw,44px)}.h3{font-size:clamp(23px,5vw,31px)}
+.status__h{font-size:clamp(43px,11vw,76px);line-height:1.02}
+.status__ph{background:linear-gradient(95deg,#f6bbeb,#b4b8ff,#9ce9e6);color:transparent;background-clip:text}
+.fine,.status__line{color:var(--muted);line-height:1.65}
+.btn{border-radius:999px;min-height:45px;transition:transform .22s ease,box-shadow .22s ease,filter .22s ease}
+.btn:not(.btn--ghost){background:linear-gradient(115deg,#e7b3ff,#b6b7ff);color:#171332;border:0;box-shadow:0 9px 26px rgba(168,111,249,.22)}
+.btn--ghost{border-color:rgba(207,193,255,.3);color:#f6eeff;background:rgba(255,255,255,.06)}
+.banner{border-radius:16px}
+.dock{background:rgba(14,16,45,.94);border:1px solid rgba(219,202,255,.2);box-shadow:0 10px 42px rgba(0,0,0,.34);backdrop-filter:blur(22px)}
+.dock__btn{border-radius:18px;min-height:58px;color:#c7c4e8;transition:transform .2s ease,background .2s ease,color .2s ease}
+.dock__btn[aria-current="page"]{background:linear-gradient(135deg,rgba(188,134,255,.31),rgba(93,182,229,.18));color:#fff;box-shadow:inset 0 0 0 1px rgba(220,198,255,.26)}
+.dock__btn svg{width:22px;height:22px}
+.cal-clean .cal-day button{border-radius:16px;min-height:53px;background:rgba(255,255,255,.035);border:1px solid transparent;color:var(--ink)}
+.cal-clean .cal-day.is-today button{border-color:#b5b4ff}
+.cal-clean .cal-day.is-selected button{outline-color:#e3b8ff}
+.cal-clean .legend{border-top:1px solid var(--line);padding-top:16px}
+.ritual-card .ritual-grid{gap:4px}.ritual-card .ritual-item{padding:16px 0}
+.ritual-card .ritual-icon{border-radius:17px;background:linear-gradient(135deg,rgba(185,142,255,.22),rgba(96,195,213,.15))}
+.ritual-card .ritual-copy b{font-size:15px}
+.personal-discovery{display:grid;grid-template-columns:42px 1fr;gap:13px;align-items:start;padding:19px;margin:18px 0 10px;border:1px solid rgba(211,173,255,.25);border-radius:20px;background:linear-gradient(130deg,rgba(149,93,235,.23),rgba(75,164,196,.13))}
+.personal-discovery__symbol{font-size:30px;color:#dcb6ff}
+.personal-discovery .eyebrow{margin-bottom:8px}
+.personal-discovery .fine{margin-top:8px}
+.sheet{border-radius:28px;background:#171832;color:var(--ink);border-color:var(--line)}
+#toast{border-radius:18px}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #d8b7ff;outline-offset:3px}
+@media(hover:hover) and (pointer:fine){
+ .card{transition:transform .28s ease,border-color .28s ease,box-shadow .28s ease}
+ .card:hover{transform:translateY(-3px);border-color:rgba(220,193,255,.33);box-shadow:0 22px 65px -35px #000}
+ .dock__btn:hover,.round:hover{transform:translateY(-3px)}
+ .btn:hover{transform:translateY(-2px);filter:brightness(1.07)}
+ .cal-clean .cal-day button:hover{background:rgba(192,156,255,.18);transform:scale(1.045)}
+}
+button:active{transform:scale(.97)}
+@keyframes orb-breathe{0%,100%{filter:hue-rotate(0deg);scale:1}50%{filter:hue-rotate(13deg);scale:1.035}}
+@media(min-width:1000px){
+ .app{grid-template-columns:minmax(380px,46vw) minmax(480px,1fr)}
+ .hero{border-radius:0}
+ .hero::before{width:min(32vw,510px)}
+ .hero::after{bottom:44px}
+ #page,body:not([data-view="today"]) #page{padding:42px clamp(24px,5vw,80px) 80px;max-width:850px;margin:auto}
+ .dock{padding:12px clamp(24px,5vw,80px);gap:8px}
+ .dock__btn{flex:0 1 140px}.card{padding:32px}
+}
+@media(max-width:999px){
+ body:not([data-view="today"]) .hero{border-radius:0;height:calc(var(--safe-t) + 74px)}
+ body:not([data-view="today"]) .hero::before,body:not([data-view="today"]) .hero::after{display:none}
+ body:not([data-view="today"]) #page{padding-top:20px}
+ .hero::before{width:min(64vw,320px)}
+}
+@media(max-width:420px){
+ #page{padding-left:12px;padding-right:12px}.card{padding:22px 17px}
+ .hero::after{font-size:9px;bottom:58px}
+ .cal-clean .cal-day button{min-height:45px;border-radius:12px}
+ .ritual-card .ritual-icon{background:var(--accent-soft)}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
