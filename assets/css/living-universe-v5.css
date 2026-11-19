@@ -87,3 +87,19 @@ body .side::before{content:"";position:absolute;top:0;right:4%;width:1px;height:
 @media(max-width:520px){.v5-checkin{padding:14px}.v5-checkin__heading{flex-direction:column;gap:3px}.v5-checkin__row{grid-template-columns:1fr;gap:6px}.v5-checkin__choice{flex:1 1 auto;text-align:center}}
 @media(prefers-reduced-motion:reduce){.v5-checkin__choice{transition:none}.v5-checkin__choice:hover{transform:none}}
 @media(forced-colors:active){.v5-checkin__choice[aria-pressed="true"]{border:2px solid Highlight}}
+
+/* One-tap check-in is always optional; the detailed journal remains available. */
+.v5-checkin{position:relative;z-index:1;margin:22px 0;padding:17px;border:1px solid rgba(220,209,255,.24);border-radius:20px;background:rgba(11,13,38,.32)}
+.v5-checkin__heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.v5-checkin__heading strong{font-size:14px;color:#fff}
+.v5-checkin__heading span{font-size:11px;color:#d9cfea}
+.v5-checkin__choices{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.v5-checkin__choice{display:grid;place-items:center;gap:6px;min-height:66px;padding:9px 3px;border:1px solid rgba(214,202,255,.2);border-radius:15px;background:rgba(245,239,255,.06);color:#fff;font:inherit;cursor:pointer;transition:background .2s ease,transform .2s ease,border-color .2s ease}
+.v5-checkin__choice>span{font-size:clamp(19px,3.5vw,27px);line-height:1.2}
+.v5-checkin__choice small{font-size:10px;line-height:1.25;text-align:center}
+.v5-checkin__choice[aria-pressed="true"]{border-color:#d8b9ff;background:rgba(198,163,248,.29);box-shadow:inset 0 0 0 1px rgba(227,207,255,.4)}
+.v5-checkin__choice:focus-visible{outline:3px solid #e6d3ff;outline-offset:3px}
+@media(hover:hover){.v5-checkin__choice:hover{transform:translateY(-2px);background:rgba(245,239,255,.14)}}
+@media(max-width:390px){.v5-checkin{padding:12px}.v5-checkin__choices{gap:4px}.v5-checkin__choice{min-height:61px;padding:7px 1px}.v5-checkin__choice small{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.v5-checkin__choice{transition:none}.v5-checkin__choice:hover{transform:none}}
+@media(forced-colors:active){.v5-checkin__choice[aria-pressed="true"]{border:2px solid Highlight}}
