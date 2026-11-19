@@ -24,6 +24,14 @@ const { spawn } = require("node:child_process");
       // Start with sample data to avoid relying on a specific calendar date.
       await page.locator('[data-act="ob-sample"]').click();
       await page.waitForTimeout(200);
+      // One-tap check-in must persist and allow removal by tapping again.
+      await page.locator('.v5-checkin__choice[data-k="mood"]').first().click();
+      assert.equal(await page.locator('.v5-checkin__choice[data-k="mood"]').first().getAttribute('aria-pressed'), 'true', "Mood quick choice selected");
+      await page.reload();
+      await page.waitForFunction(() => !!window.__almanac);
+      assert.equal(await page.locator('.v5-checkin__choice[data-k="mood"]').first().getAttribute('aria-pressed'), 'true', "Mood choice persists after reload");
+      await page.locator('.v5-checkin__choice[data-k="mood"]').first().click();
+      assert.equal(await page.locator('.v5-checkin__choice[data-k="mood"]').first().getAttribute('aria-pressed'), 'false', "Tapping again removes quick choice");
       // Almanac 5: the Daily Studio must open the existing private journal.
       assert.equal(await page.locator(".v5-portal").count(), 1, "Daily Studio visible");
       assert.equal(await page.locator(".v5-portal").evaluate(el => getComputedStyle(el, "::after").animationName), "none", "Decorative orb respects reduced motion");
