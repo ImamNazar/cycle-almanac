@@ -136,7 +136,7 @@
   };
 
   /* ------------------------------------------------------------ UI state */
-  const ui = { tab: "today", month: null, day: null, ob: null, calSelected: null, constellationDays: 14, constellationOffset: 0, constellationPreview: null };
+  const ui = { tab: "today", month: null, day: null, ob: null, calSelected: null, constellationDays: 14, constellationOffset: 0, constellationPreview: null, observatoryOffset: 0 };
   const monthOf = d => { const iso = A.fromDay(d); return { y: +iso.slice(0, 4), m: +iso.slice(5, 7) - 1 }; };
   ui.month = monthOf(TODAY);
 
@@ -463,7 +463,8 @@
   /* An observation-only chart. No smoothing, inferred values or predictions. */
   function observationObservatory() {
     const dims = [["mood", "Mood", 1, 5], ["energy", "Energy", 1, 5], ["pain", "Pain", 0, 3]];
-    const days = Array.from({ length: 28 }, (_, i) => TODAY - 27 + i);
+    const offset = Math.max(0, ui.observatoryOffset || 0);
+    const days = Array.from({ length: 28 }, (_, i) => TODAY - offset - 27 + i);
     const panels = dims.map(([key, label, min, max]) => {
       const points = days.map(d => {
         const raw = (data.logs[A.fromDay(d)] || {})[key];
@@ -485,9 +486,10 @@
     return `<section class="v5-observation card" aria-labelledby="v5-observation-title">
       <p class="eyebrow">THE OBSERVATORY · ACTUAL ENTRIES</p>
       <h2 class="h2" id="v5-observation-title">A month in little moments.</h2>
-      <p class="fine">Your last 28 days of mood, energy and pain entries. Brighter tiles mean higher recorded scores, not better health. A pain score of zero is a recorded observation, not a missing entry. Empty outlines mean nothing was recorded.</p>
+      <p class="fine">Explore 28-day windows of your mood, energy and pain entries. Brighter tiles mean higher recorded scores, not better health. A pain score of zero is a recorded observation, not a missing entry. Empty outlines mean nothing was recorded.</p>
+      <div class="v5-observation__nav" role="group" aria-label="Observation date range"><button type="button" data-act="observatory-step" data-step="1">← Previous 28 days</button><span aria-live="polite">${esc(fShort(days[0]))} – ${esc(fShort(days[27]))}</span><button type="button" data-act="observatory-step" data-step="-1" ${offset === 0 ? "disabled" : ""}>Next 28 days →</button></div>
       <div class="v5-observation__rows">${panels}</div>
-      <div class="v5-observation__dates"><span>${esc(fShort(TODAY - 27))}</span><span>${esc(fShort(TODAY))}</span></div>
+      <div class="v5-observation__dates"><span>${esc(fShort(days[0]))}</span><span>${esc(fShort(days[27]))}</span></div>
       <div class="v5-observation__actions"><button class="btn btn--ghost" type="button" data-act="observatory-timeline">Explore these days in the Living Timeline</button></div>
       <p class="fine">These are observations only, not a diagnosis or prediction. Tap a date in Calendar to add or correct a record.</p>
       <button class="btn btn--ghost" type="button" data-tab="calendar">Open calendar</button>
@@ -854,7 +856,8 @@
       case "constellation-range": ui.constellationDays = +t.dataset.days === 28 ? 28 : 14; return render();
       case "constellation-step": ui.constellationOffset = Math.max(0, (ui.constellationOffset || 0) + (+t.dataset.step) * ui.constellationDays); return render();
       case "constellation-now": ui.constellationOffset = 0; ui.constellationPreview = null; return render();
-      case "observatory-timeline": { ui.tab = "today"; ui.constellationDays = 28; ui.constellationOffset = 0; ui.constellationPreview = null; render(); const el = document.querySelector(".orbit-journal"); if (el) el.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "start" }); return; }
+      case "observatory-step": ui.observatoryOffset = Math.max(0, (ui.observatoryOffset || 0) + (+t.dataset.step) * 28); return render();
+      case "observatory-timeline": { ui.tab = "today"; ui.constellationDays = 28; ui.constellationOffset = ui.observatoryOffset || 0; ui.constellationPreview = null; render(); const el = document.querySelector(".orbit-journal"); if (el) el.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "start" }); return; }
       case "constellation-preview": ui.constellationPreview = t.dataset.day; return render();
       case "day-step": { const d = clamp(A.toDay(ui.day) + (+t.dataset.step), 0, TODAY); if (d <= TODAY) { ui.day = A.fromDay(d); openSheet("log", logHTML(ui.day)); syncLog(); } return; }
       case "set": { const k = t.dataset.k, v = t.dataset.v, L = data.logs[ui.day] || {}, num = ["flow", "mood", "energy", "pain"].includes(k) ? +v : v; setLog(ui.day, { [k]: L[k] === num ? undefined : num }); return syncLog(); }
