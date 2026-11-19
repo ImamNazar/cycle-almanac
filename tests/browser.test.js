@@ -24,6 +24,18 @@ const { spawn } = require("node:child_process");
       // Start with sample data to avoid relying on a specific calendar date.
       await page.locator('[data-act="ob-sample"]').click();
       await page.waitForTimeout(200);
+      // Almanac 5: the Daily Studio must open the existing private journal.
+      assert.equal(await page.locator(".v5-portal").count(), 1, "Daily Studio visible");
+      await page.locator('.v5-portal [data-act="log"]').click();
+      assert.equal(await page.locator('#sheet[open]').count(), 1, "Daily Studio opens log sheet");
+      await page.locator('#sheet [data-act="close"]').click();
+      // Time-window switching changes the real date controls, not stored data.
+      assert.equal(await page.locator('.orbit-journal__day').count(), 14, "14-day constellation default");
+      await page.locator('[data-act="constellation-range"][data-days="28"]').click();
+      assert.equal(await page.locator('.orbit-journal__day').count(), 28, "28-day constellation");
+      assert.equal(await page.locator('[data-act="constellation-range"][data-days="28"]').getAttribute('aria-pressed'), 'true', "28-day control selected");
+      await page.locator('[data-act="constellation-range"][data-days="14"]').click();
+      assert.equal(await page.locator('.orbit-journal__day').count(), 14, "14-day constellation restored");
       assert.equal(await page.locator(".ritual-card").count(), 1, "Rituals visible on Today");
       await page.locator('[data-act="ritual-pick"][data-ritual="walk"]').click();
       await page.locator('[data-act="ritual-save"][data-result="better"]').click();
@@ -33,6 +45,8 @@ const { spawn } = require("node:child_process");
       await page.waitForFunction(() => !!window.__almanac, { timeout: 10000 }).catch(async error => { throw new Error(`App did not initialise after reload: ${error.message}; page errors: ${JSON.stringify(errors)}; page: ${page.url()}; scripts: ${await page.locator("script[src]").evaluateAll(els => els.map(e => e.src))}`); });
       assert.equal(await page.evaluate(() => Object.values(window.__almanac.data.rituals || {}).flat().some(x => x.id === "walk" && x.result === "better")), true, "Ritual reflection persisted");
       await page.locator('[data-tab="insights"]').first().click();
+      assert.equal(await page.locator(".v5-observation__row").count(), 3, "Observatory shows three dimensions");
+      assert.equal(await page.locator(".v5-observation__cell").count(), 84, "Observatory has 28 days per dimension");
       assert.equal(await page.getByText(/felt better on 1 of 1 reflected occasions/i).count() > 0, true, "Insight reflects log");
       await page.locator('[data-tab="calendar"]').first().click();
       const date = page.locator('[data-act="cal-select"]').first();
