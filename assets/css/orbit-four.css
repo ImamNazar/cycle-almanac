@@ -112,3 +112,25 @@ button:active{transform:scale(.97)}
 }
 @media(max-width:420px){.orbit-caption{left:20px;bottom:20px}.orbit-caption strong{font-size:34px}.orbit-art__planet{width:58%}}
 @media(prefers-reduced-motion:reduce){.orbit-art,.orbit-art *{animation:none!important;transition:none!important;transform-origin:center}}
+
+/* Constellation journal: each star is an actual date, never an invented phase. */
+.orbit-journal{overflow:hidden;background:radial-gradient(circle at 50% 48%,rgba(99,66,182,.25),transparent 62%),linear-gradient(150deg,#171b42,#11152e)}
+.orbit-journal .h2{margin:8px 0 10px}
+.orbit-journal__sky{position:relative;width:min(100%,450px);aspect-ratio:1;margin:16px auto 8px;isolation:isolate;background:radial-gradient(circle at center,rgba(139,92,246,.12),transparent 45%);border-radius:50%}
+.orbit-journal__track{position:absolute;inset:12%;border:1px dashed rgba(197,183,255,.23);border-radius:50%;pointer-events:none}
+.orbit-journal__track--b{inset:20%;border-style:solid;border-color:rgba(134,213,236,.12)}
+.orbit-journal__core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:29%;aspect-ratio:1;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 28% 23%,#f1c6ff,#8b6ada 55%,#3c3d9a);box-shadow:0 0 30px rgba(192,137,255,.36),inset -8px -11px 24px rgba(30,20,98,.5);color:white}
+.orbit-journal__core span{font-family:var(--font-d);font-size:clamp(28px,8vw,46px);line-height:1}
+.orbit-journal__core small{font-size:9px;letter-spacing:.22em;font-weight:800}
+.orbit-journal__day{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);width:clamp(32px,9vw,43px);height:clamp(32px,9vw,43px);display:grid;place-items:center;border-radius:50%;border:1px solid rgba(221,214,255,.28);background:#24294e;color:#dddaf3;font:700 12px var(--font-b);cursor:pointer;box-shadow:0 0 0 4px rgba(13,18,46,.75);transition:background .2s,box-shadow .2s,scale .2s}
+.orbit-journal__day.is-logged{background:#43617e;border-color:#a3e2ed;color:white;box-shadow:0 0 16px rgba(110,216,238,.2)}
+.orbit-journal__day.is-period{background:#a65ba5;border-color:#f4c5eb;color:white;box-shadow:0 0 18px rgba(241,155,227,.35)}
+.orbit-journal__day.is-today{outline:2px solid #e4d4ff;outline-offset:3px}
+.orbit-journal__day:hover{scale:1.14;z-index:2}
+.orbit-journal__day:focus-visible{outline:3px solid #fff;outline-offset:4px;z-index:3}
+.orbit-journal__footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding:14px 0;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.orbit-journal__footer b{color:#fff}
+.orbit-journal__key{display:inline-block;width:9px;height:9px;margin:0 4px 0 10px;border-radius:50%;background:#d88acb}
+.orbit-journal__key--other{background:#86d5e5}
+@media(max-width:420px){.orbit-journal__sky{margin:12px auto}.orbit-journal__day{width:32px;height:32px;font-size:11px}.orbit-journal__footer{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.orbit-journal__day{transition:none}}
