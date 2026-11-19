@@ -58,3 +58,24 @@ Transform Almanac from a calendar-first cycle tracker into a private, navigable 
 
 ### Launch boundaries
 The development branch and draft PR are **not** the live site. Do not merge, publish, or represent these manual gates as passed until independently verified.
+
+## Hands-on preview script
+
+The draft branch is **not** hosted at the public GitHub Pages URL. A reviewer needs a locally served checkout or a separately approved, isolated preview. Do not change Pages settings or merge to `main` just to preview.
+
+Use disposable sample data, not private health records. On iPhone Safari and Android Chrome:
+
+1. **First launch:** check onboarding, navigation, contrast and whether the Daily Studio makes sense without instructions.
+2. **Check-in:** select and deselect mood, energy, pain (including explicit “none”) and flow; refresh and verify the chosen entries remain.
+3. **Timeline:** switch 14/28 days, navigate backwards, choose a date, inspect Day in Focus and return to today. Verify no date button is obscured.
+4. **Observatory:** compare an empty period with a recorded period. Ensure empty days do not look like zero scores and that the date range is obvious.
+5. **Accessibility:** enable device text enlargement and reduced motion; test external keyboard focus, screen-reader labels and touch without precision tapping.
+6. **Offline:** load the app online first, disconnect, reopen, save a disposable observation and reload while still offline.
+7. **Data safety:** export disposable data, import into a fresh profile, verify matching entries; then clear test data and verify the app returns to a clean state.
+8. **Performance:** test a lower-end phone, scroll through the longest screens and check that animations never block logging or navigation.
+
+### Feedback capture
+For each issue record device/browser, viewport or text-size setting, screen, expected behavior, actual behavior and a screenshot if appropriate. Never include private cycle data in screenshots or public issues.
+
+### Decision
+Only consider release after automated checks pass, critical manual issues are resolved, and the user explicitly approves merge and deployment.
