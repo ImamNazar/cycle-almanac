@@ -86,3 +86,10 @@ button:focus-visible,.dock__btn:focus-visible,.cal-clean .cal-day button:focus-v
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/* Personal discovery: editorial annotation, not another dashboard card */
+.personal-discovery{display:grid;grid-template-columns:38px 1fr;gap:12px;align-items:start;margin:18px 0 8px;padding:18px 16px;background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 5px 5px 0}
+.personal-discovery__symbol{font-size:27px;line-height:1;color:var(--accent)}
+.personal-discovery p{line-height:1.5}
+.personal-discovery .eyebrow{margin-bottom:8px}
+.personal-discovery .fine{margin-top:8px}
