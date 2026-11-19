@@ -79,3 +79,8 @@ For each issue record device/browser, viewport or text-size setting, screen, exp
 
 ### Decision
 Only consider release after automated checks pass, critical manual issues are resolved, and the user explicitly approves merge and deployment.
+
+### Isolated preview package
+A separate `Package Almanac 5 preview` GitHub Actions workflow builds a downloadable `almanac-v5-preview.zip` artifact for this PR. This **does not host or deploy the site** and cannot modify GitHub Pages. After a successful workflow run, download the artifact from the run's Artifacts section and unzip it.
+
+For local desktop review, serve the extracted directory over HTTP, for example `python3 -m http.server 8765`, and open `http://localhost:8765/`. Do not open `index.html` directly as a `file://` URL; service-worker behavior requires an appropriate secure origin. Testing on a separate phone requires an explicitly configured HTTPS preview host; localhost on a desktop is not a phone-accessible URL. Never upload real cycle data to preview services.
