@@ -214,3 +214,24 @@ body .side::before{content:"";position:absolute;top:0;right:4%;width:1px;height:
   .v5-checkin__save[data-status="saving"],.v5-checkin__save[data-status="saved"],.v5-checkin__save[data-status="error"]{color:CanvasText}
   .v5-checkin__choice[aria-pressed="true"],.v5-timeline-dates button[aria-pressed="true"]{outline:2px solid Highlight;outline-offset:1px}
 }
+
+/* Phase 3 mobile reliability: protect against horizontal clipping and crowded
+   interactive controls on narrow phones and in landscape. */
+@media(max-width:600px){
+  #page,.v5-portal,.v5-checkin,.v5-observation,.orbit-journal{min-width:0;max-width:100%}
+  .v5-portal__actions,.v5-checkin__choices{min-width:0}
+  .v5-checkin__choices{display:flex;flex-wrap:wrap;gap:7px}
+  .v5-checkin__choice{min-width:44px;min-height:44px;flex:1 1 auto}
+  .v5-range{width:100%;display:flex;justify-content:center}
+  .v5-range button{flex:1;min-width:0}
+  .v5-observation__grid{min-width:0}
+  .v5-timeline-dates button{min-height:48px}
+  .v5-observation__nav button,.v5-timeline-nav button{min-height:44px}
+}
+@media(max-width:340px){
+  .v5-timeline-dates{gap:2px}
+  .v5-timeline-dates button{padding-inline:0}
+  .v5-timeline-dates button strong{font-size:12px}
+  .v5-timeline-dates button span{font-size:9px}
+  .v5-range button{padding-inline:8px}
+}
