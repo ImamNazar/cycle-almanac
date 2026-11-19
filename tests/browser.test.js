@@ -35,6 +35,8 @@ const { spawn } = require("node:child_process");
       // One-tap check-in must persist and allow removal by tapping again.
       await page.locator('.v5-checkin__choice[data-k="mood"]').first().click();
       assert.equal(await page.locator('.v5-checkin__choice[data-k="mood"]').first().getAttribute('aria-pressed'), 'true', "Mood quick choice selected");
+      await page.waitForFunction(() => document.querySelector('.v5-checkin__save')?.dataset.status === 'saved');
+      assert.match(await page.locator('.v5-checkin__save').innerText(), /Saved on this device/, "Save status confirms completed storage write");
       // Almanac debounces local writes; wait for durable storage before reload.
       await page.waitForFunction(() => {
         try {
