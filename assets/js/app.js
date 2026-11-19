@@ -465,6 +465,11 @@
     const dims = [["mood", "Mood", 1, 5], ["energy", "Energy", 1, 5], ["pain", "Pain", 0, 3]];
     const offset = Math.max(0, ui.observatoryOffset || 0);
     const days = Array.from({ length: 28 }, (_, i) => TODAY - offset - 27 + i);
+    const coverage = days.map(d => {
+      const log = data.logs[A.fromDay(d)] || {};
+      return ["mood", "energy", "pain"].some(key => log[key] != null && log[key] !== "");
+    }).filter(Boolean).length;
+    const coverageMessage = coverage === 0 ? "Nothing logged in this window yet. You can start with a single check-in." : coverage < 7 ? "A few observations are available. Treat any apparent patterns cautiously." : coverage < 14 ? "Some days are recorded, but gaps may affect comparisons." : "A substantial part of this window is recorded. Gaps can still affect comparisons.";
     const panels = dims.map(([key, label, min, max]) => {
       const points = days.map(d => {
         const raw = (data.logs[A.fromDay(d)] || {})[key];
@@ -488,6 +493,7 @@
       <h2 class="h2" id="v5-observation-title">A month in little moments.</h2>
       <p class="fine">Explore 28-day windows of your mood, energy and pain entries. Brighter tiles mean higher recorded scores, not better health. A pain score of zero is a recorded observation, not a missing entry. Empty outlines mean nothing was recorded.</p>
       <div class="v5-observation__nav" role="group" aria-label="Observation date range"><button type="button" data-act="observatory-step" data-step="1">← Previous 28 days</button><span aria-live="polite">${esc(fShort(days[0]))} – ${esc(fShort(days[27]))}</span><button type="button" data-act="observatory-step" data-step="-1" ${offset === 0 ? "disabled" : ""}>Next 28 days →</button></div>
+      <div class="v5-observation__coverage" role="status"><strong>${coverage} of 28 days with a check-in</strong><div class="v5-observation__coverage-track" role="progressbar" aria-label="Days with mood, energy or pain recorded" aria-valuemin="0" aria-valuemax="28" aria-valuenow="${coverage}"><span style="width:${coverage / 28 * 100}%"></span></div><p>${coverageMessage}</p></div>
       <div class="v5-observation__rows">${panels}</div>
       <div class="v5-observation__dates"><span>${esc(fShort(days[0]))}</span><span>${esc(fShort(days[27]))}</span></div>
       <div class="v5-observation__actions"><button class="btn btn--ghost" type="button" data-act="observatory-timeline">Explore these days in the Living Timeline</button></div>
