@@ -136,7 +136,7 @@
   };
 
   /* ------------------------------------------------------------ UI state */
-  const ui = { tab: "today", month: null, day: null, ob: null, calSelected: null, constellationDays: 14 };
+  const ui = { tab: "today", month: null, day: null, ob: null, calSelected: null, constellationDays: 14, constellationOffset: 0 };
   const monthOf = d => { const iso = A.fromDay(d); return { y: +iso.slice(0, 4), m: +iso.slice(5, 7) - 1 }; };
   ui.month = monthOf(TODAY);
 
@@ -210,7 +210,8 @@
      Only observed entries are marked as logged; no inferred health states. */
   function orbitJournal() {
     const span = ui.constellationDays === 28 ? 28 : 14;
-    const days = Array.from({ length: span }, (_, i) => TODAY - span + 1 + i);
+    const offset = Math.max(0, ui.constellationOffset || 0);
+    const days = Array.from({ length: span }, (_, i) => TODAY - offset - span + 1 + i);
     const entries = days.map((d, i) => {
       const iso = A.fromDay(d), L = data.logs[iso] || {};
       const hasLog = Object.keys(L).some(k => L[k] != null && L[k] !== "" && (!Array.isArray(L[k]) || L[k].length));
@@ -235,8 +236,9 @@
       <p class="eyebrow">YOUR PERSONAL CONSTELLATION</p>
       <h2 class="h2" id="orbit-journal-title">Every day is a little world.</h2>
       <p class="fine">Explore your recorded history. Switch between two and four weeks. Each point opens that day's private journal; brighter points have entries you've logged.</p>
+      <div class="v5-timeline-nav" aria-label="Timeline navigation"><button type="button" data-act="constellation-step" data-step="1" aria-label="Explore earlier days">← Earlier</button><span aria-live="polite">${fmt(days[0], { month: "short", day: "numeric", year: "numeric" })} – ${fmt(days[span - 1], { month: "short", day: "numeric", year: "numeric" })}</span><button type="button" data-act="constellation-step" data-step="-1" ${offset === 0 ? "disabled" : ""} aria-label="Explore later days">Later →</button>${offset ? '<button type="button" data-act="constellation-now">Back to today</button>' : ""}</div>
       <div class="v5-range" role="group" aria-label="Constellation date range"><button type="button" data-act="constellation-range" data-days="14" aria-pressed="${span === 14}">14 days</button><button type="button" data-act="constellation-range" data-days="28" aria-pressed="${span === 28}">28 days</button></div>
-      <div class="orbit-journal__sky${span === 28 ? " orbit-journal__sky--dense" : ""}" role="group" aria-label="Open a daily entry from the last ${span} days">
+      <div class="orbit-journal__sky${span === 28 ? " orbit-journal__sky--dense" : ""}" role="group" aria-label="Open a daily entry from the selected ${span}-day period">
         <svg class="orbit-journal__connections" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><polyline points="${constellationPath}" fill="none" stroke="rgba(181,173,255,.55)" stroke-width=".32" stroke-dasharray="1 1.2" stroke-linejoin="round" /></svg>
         <div class="orbit-journal__track orbit-journal__track--a" aria-hidden="true"></div>
         <div class="orbit-journal__track orbit-journal__track--b" aria-hidden="true"></div>
@@ -833,6 +835,8 @@
       case "hills": return hillsSheet();
       case "log": return openLog(t.dataset.day || isoNow());
       case "constellation-range": ui.constellationDays = +t.dataset.days === 28 ? 28 : 14; return render();
+      case "constellation-step": ui.constellationOffset = Math.max(0, (ui.constellationOffset || 0) + (+t.dataset.step) * ui.constellationDays); return render();
+      case "constellation-now": ui.constellationOffset = 0; return render();
       case "day-step": { const d = clamp(A.toDay(ui.day) + (+t.dataset.step), 0, TODAY); if (d <= TODAY) { ui.day = A.fromDay(d); openSheet("log", logHTML(ui.day)); syncLog(); } return; }
       case "set": { const k = t.dataset.k, v = t.dataset.v, L = data.logs[ui.day] || {}, num = ["flow", "mood", "energy", "pain"].includes(k) ? +v : v; setLog(ui.day, { [k]: L[k] === num ? undefined : num }); return syncLog(); }
       case "sym": { const L = data.logs[ui.day] || {}, s = new Set(L.sym || []); s.has(t.dataset.v) ? s.delete(t.dataset.v) : s.add(t.dataset.v); setLog(ui.day, { sym: [...s] }); return syncLog(); }
