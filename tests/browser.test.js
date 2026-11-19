@@ -21,14 +21,14 @@ const { spawn } = require("node:child_process");
       page.on("pageerror", error => errors.push(error.message));
       await page.goto("http://127.0.0.1:8765/", { waitUntil: "load" });
       await page.waitForFunction(() => !!window.__almanac);
+      // Start with sample data to avoid relying on a specific calendar date.
+      await page.locator('[data-act="ob-sample"]').click();
+      await page.waitForTimeout(200);
       assert.equal(await page.locator('.v5-checkin__row').count(), 4, "Daily Studio offers mood, energy, pain and flow");
       await page.locator('.v5-checkin__choice[data-k="pain"][data-v="0"]').click();
       assert.equal(await page.locator('.v5-checkin__choice[data-k="pain"][data-v="0"]').getAttribute('aria-pressed'), 'true', "No pain is explicitly recorded");
       await page.locator('.v5-checkin__choice[data-k="pain"][data-v="0"]').click();
       assert.equal(await page.locator('.v5-checkin__choice[data-k="pain"][data-v="0"]').getAttribute('aria-pressed'), 'false', "Tapping again removes a quick observation");
-      // Start with sample data to avoid relying on a specific calendar date.
-      await page.locator('[data-act="ob-sample"]').click();
-      await page.waitForTimeout(200);
       // One-tap check-in must persist and allow removal by tapping again.
       await page.locator('.v5-checkin__choice[data-k="mood"]').first().click();
       assert.equal(await page.locator('.v5-checkin__choice[data-k="mood"]').first().getAttribute('aria-pressed'), 'true', "Mood quick choice selected");
