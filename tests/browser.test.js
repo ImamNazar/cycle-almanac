@@ -92,6 +92,11 @@ const { spawn } = require("node:child_process");
       await page.locator('[data-tab="today"]').first().click();
       await page.locator('[data-tab="insights"]').first().click();
       assert.match(await page.locator(".v5-observation__row").nth(2).locator(".v5-observation__cell").last().getAttribute("aria-label"), /pain 0 of 3/, "Zero pain is a valid recorded observation");
+      await page.locator('[data-act="observatory-timeline"]').click();
+      assert.equal(await page.locator('.orbit-journal__day').count(), 28, "Observatory opens matching 28-day Living Timeline");
+      assert.equal(await page.locator('[data-act="constellation-range"][data-days="28"]').getAttribute('aria-pressed'), 'true', "28-day window selected from Observatory");
+      await page.locator('[data-tab="insights"]').first().click();
+
 
       assert.equal(await page.getByText(/felt better on 1 of 1 reflected occasions/i).count() > 0, true, "Insight reflects log");
       await page.locator('[data-tab="calendar"]').first().click();
