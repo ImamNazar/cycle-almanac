@@ -27,6 +27,15 @@ const { spawn } = require("node:child_process");
       // One-tap check-in must persist and allow removal by tapping again.
       await page.locator('.v5-checkin__choice[data-k="mood"]').first().click();
       assert.equal(await page.locator('.v5-checkin__choice[data-k="mood"]').first().getAttribute('aria-pressed'), 'true', "Mood quick choice selected");
+      // Almanac debounces local writes; wait for durable storage before reload.
+      await page.waitForFunction(() => {
+        try {
+          const saved = JSON.parse(localStorage.getItem("almanac.v1") || "{}");
+          const today = new Date();
+          const iso = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, "0"), String(today.getDate()).padStart(2, "0")].join("-");
+          return saved.logs && saved.logs[iso] && saved.logs[iso].mood === 1;
+        } catch { return false; }
+      });
       await page.reload();
       await page.waitForFunction(() => !!window.__almanac);
       assert.equal(await page.locator('.v5-checkin__choice[data-k="mood"]').first().getAttribute('aria-pressed'), 'true', "Mood choice persists after reload");
