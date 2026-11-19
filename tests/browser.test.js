@@ -82,6 +82,7 @@ const { spawn } = require("node:child_process");
       await page.locator('.v5-checkin__choice[data-k="energy"]').first().click();
       await page.waitForFunction(() => document.querySelector('.v5-checkin__save')?.dataset.status === 'error');
       assert.match(await page.locator('.v5-checkin__save').innerText(), /Not saved/, "Failed storage is explicitly reported");
+      assert.match(await page.locator('.v5-portal__action--primary').innerText(), /Storage unavailable/, "Journal action also warns that the entry is not saved");
       await page.evaluate(() => { Storage.prototype.setItem = window.__originalSetItem; });
       await page.locator('.v5-checkin__choice[data-k="energy"]').first().click();
       await page.waitForFunction(() => document.querySelector('.v5-checkin__save')?.dataset.status === 'saved');
