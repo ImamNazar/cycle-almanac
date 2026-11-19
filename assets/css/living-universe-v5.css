@@ -70,3 +70,20 @@ body .side::before{content:"";position:absolute;top:0;right:4%;width:1px;height:
 @media(max-width:600px){.v5-portal::after{width:94px;top:14px;right:-19px;opacity:.45}.v5-portal__intro h2{max-width:15ch}#page>.card{animation-duration:.35s}}
 @media(prefers-reduced-motion:reduce){#page>.card,#page>.v5-portal{animation:none!important}.v5-portal::after{animation:none!important}.v5-observation__cell.is-observed{transition:none!important}.v5-observation__cell.is-observed:hover{transform:none!important}}
 @media(forced-colors:active){.v5-portal::after{display:none}#page .card{border:1px solid CanvasText}}
+
+/* Daily Studio: one-tap, genuinely functional check-in */
+.v5-checkin{position:relative;z-index:1;margin:24px 0 20px;padding:18px;border-radius:20px;background:rgba(245,237,255,.065);border:1px solid rgba(235,216,255,.18)}
+.v5-checkin__heading{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:14px}
+.v5-checkin__heading strong{font-size:14px;color:#fff}
+.v5-checkin__heading>span{font-size:11px;color:#c7c3e0}
+.v5-checkin__row{display:grid;grid-template-columns:68px minmax(0,1fr);align-items:center;gap:12px;margin:10px 0}
+.v5-checkin__label{font-size:12px;color:#ddd4f5;font-weight:700}
+.v5-checkin__choices{display:flex;flex-wrap:wrap;gap:6px}
+.v5-checkin__choice{font:inherit;font-size:12px;min-height:38px;padding:8px 11px;border-radius:12px;color:#eae2ff;background:rgba(255,255,255,.06);border:1px solid rgba(238,218,255,.18);cursor:pointer;transition:background .2s ease,transform .2s ease,border-color .2s ease}
+.v5-checkin__choice:hover{background:rgba(225,202,255,.16);transform:translateY(-1px)}
+.v5-checkin__choice[aria-pressed="true"]{background:#e4d5ff;border-color:#f5eaff;color:#23183d;font-weight:750}
+.v5-checkin__choice:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.v5-checkin__hint{font-size:11px;color:#d0c9e8;margin:12px 0 0}
+@media(max-width:520px){.v5-checkin{padding:14px}.v5-checkin__heading{flex-direction:column;gap:3px}.v5-checkin__row{grid-template-columns:1fr;gap:6px}.v5-checkin__choice{flex:1 1 auto;text-align:center}}
+@media(prefers-reduced-motion:reduce){.v5-checkin__choice{transition:none}.v5-checkin__choice:hover{transform:none}}
+@media(forced-colors:active){.v5-checkin__choice[aria-pressed="true"]{border:2px solid Highlight}}
