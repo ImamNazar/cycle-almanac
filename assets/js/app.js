@@ -221,6 +221,11 @@
       const label = fmt(d, { weekday: "long", month: "short", day: "numeric" }) + (period ? ", period logged" : hasLog ? ", entry logged" : ", no entry");
       return `<button type="button" class="orbit-journal__day${period ? " is-period" : hasLog ? " is-logged" : ""}${d === TODAY ? " is-today" : ""}" style="--x:${x.toFixed(2)}%;--y:${y.toFixed(2)}%" data-act="log" data-day="${iso}" aria-label="${esc(label)}" title="${esc(label)}"><span>${fmt(d, { day: "numeric" })}</span></button>`;
     }).join("");
+    const constellationPath = days.map((d, i) => {
+      const angle = (i / 14) * Math.PI * 2 - Math.PI / 2;
+      const radius = 34 + (i % 3) * 3.8;
+      return `${(50 + Math.cos(angle) * radius).toFixed(2)},${(50 + Math.sin(angle) * radius).toFixed(2)}`;
+    }).join(" ");
     const logged = days.filter(d => {
       const L = data.logs[A.fromDay(d)] || {};
       return Object.values(L).some(v => v != null && v !== "" && (!Array.isArray(v) || v.length));
@@ -230,7 +235,7 @@
       <h2 class="h2" id="orbit-journal-title">Every day is a little world.</h2>
       <p class="fine">Explore the last two weeks. Each point opens that day's private journal; brighter points have entries you've logged.</p>
       <div class="orbit-journal__sky" role="group" aria-label="Open a daily entry from the last fourteen days">
-        <div class="orbit-journal__track orbit-journal__track--a" aria-hidden="true"></div>
+        <svg class="orbit-journal__connections" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><polyline points="${constellationPath}" fill="none" stroke="rgba(181,173,255,.55)" stroke-width=".32" stroke-dasharray="1 1.2" stroke-linejoin="round" /></svg>\n        <div class="orbit-journal__track orbit-journal__track--a" aria-hidden="true"></div>
         <div class="orbit-journal__track orbit-journal__track--b" aria-hidden="true"></div>
         <div class="orbit-journal__core" aria-hidden="true"><span>14</span><small>DAYS</small></div>
         ${entries}
