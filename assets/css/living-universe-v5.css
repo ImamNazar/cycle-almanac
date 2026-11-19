@@ -143,3 +143,10 @@ body .side::before{content:"";position:absolute;top:0;right:4%;width:1px;height:
 @media(max-width:390px){.v5-timeline-dates{gap:3px}.v5-timeline-dates button{min-height:48px}}
 
 .v5-observation__summary{margin:9px 0 18px;font-size:12px;line-height:1.5;opacity:.85}
+
+.v5-observation__nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin:18px 0}
+.v5-observation__nav button{min-height:42px;padding:9px 13px;border:1px solid rgba(195,174,239,.35);border-radius:999px;background:rgba(170,144,219,.1);color:var(--ink);font:inherit;font-size:12px;cursor:pointer}
+.v5-observation__nav button:disabled{opacity:.4;cursor:not-allowed}
+.v5-observation__nav button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.v5-observation__nav span{font-size:12px;font-weight:700;text-align:center}
+@media(max-width:540px){.v5-observation__nav span{order:-1;flex:0 0 100%}.v5-observation__nav button{flex:1}}
