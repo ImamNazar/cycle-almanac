@@ -24,8 +24,14 @@
     return fresh();
   }
   let data, saveT = 0;
+  let storageStatus = storageReadError ? "error" : "saved";
+  function updateStorageStatus(next) {
+    storageStatus = next;
+    const indicator = document.querySelector(".v5-checkin__save");
+    if (indicator) { indicator.textContent = storageStatus === "saving" ? "Saving changes on this device…" : storageStatus === "saved" ? "Saved on this device" : "Not saved — check your browser storage"; indicator.dataset.status = storageStatus; }
+  }
   function save() {
-    if (storageReadError) { toast("Saved data could not be read. Restore a backup before saving."); return; }
+    if (storageReadError) { updateStorageStatus("error"); toast("Saved data could not be read. Restore a backup before saving."); return; }
     clearTimeout(saveT);
     saveT = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { toast("Couldn't save on this device. Private browsing can block saving."); } }, 120);
   }
@@ -272,7 +278,7 @@
       const title = key === "mood" ? String(o[2] || o[1]) : String(o[1]);
       return `<button type="button" class="v5-checkin__choice${selected ? " is-selected" : ""}" data-act="quick" data-k="${key}" data-v="${esc(value)}" aria-pressed="${selected}" title="${esc(title)}"><span>${esc(title)}</span></button>`;
     }).join("")}</div></div>`;
-    const quickPanel = `<div class="v5-checkin" aria-label="Quick daily check-in"><div class="v5-checkin__heading"><strong>One-tap check-in</strong><span>Saved privately on this device</span></div><p class="v5-checkin__save" role="status" aria-live="polite">${recorded ? "Today has recorded observations · Changes save automatically" : "Nothing recorded today yet · Changes save automatically"}</p>${quickChoices("mood", "Mood", C.MOOD)}${quickChoices("energy", "Energy", C.ENERGY)}${quickChoices("pain", "Pain", C.PAIN)}${quickChoices("flow", "Flow", C.FLOW)}<p class="v5-checkin__hint">Tap again to remove a choice. None is a real observation, different from leaving a field blank. For symptoms or notes, open your journal.</p></div>`;
+    const quickPanel = `<div class="v5-checkin" aria-label="Quick daily check-in"><div class="v5-checkin__heading"><strong>One-tap check-in</strong><span>Saved privately on this device</span></div><p class="v5-checkin__save" data-status="${storageStatus}" role="status" aria-live="polite">${storageStatus === "saving" ? "Saving changes on this device…" : storageStatus === "saved" ? "Saved on this device" : "Not saved — check your browser storage"}</p>${quickChoices("mood", "Mood", C.MOOD)}${quickChoices("energy", "Energy", C.ENERGY)}${quickChoices("pain", "Pain", C.PAIN)}${quickChoices("flow", "Flow", C.FLOW)}<p class="v5-checkin__hint">Tap again to remove a choice. None is a real observation, different from leaving a field blank. For symptoms or notes, open your journal.</p></div>`;
     return `<section class="v5-portal" aria-labelledby="v5-portal-title">
       <div class="v5-portal__intro"><p class="v5-portal__eyebrow">YOUR DAILY STUDIO <span aria-hidden="true">✦</span></p>
       <h2 id="v5-portal-title">How's your world today?</h2>
