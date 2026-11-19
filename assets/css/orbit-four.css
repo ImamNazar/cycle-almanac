@@ -1,0 +1,160 @@
+/* Almanac 4.0 / Orbit — a new visual system, scoped to the redesign branch.
+   All predictions, logs and private storage remain in the existing engine. */
+:root{--bg:#080b20;--card:rgba(25,28,65,.84);--ink:#f7f4ff;--muted:#b9b9d8;--line:rgba(211,202,255,.18);--accent:#c8a8ff;--accent-soft:rgba(189,144,255,.17);--r:26px;color-scheme:dark}
+html{background:#080b20}
+body{background:radial-gradient(ellipse 90vw 75vw at 100% -10%,rgba(94,65,182,.28),transparent 70%),radial-gradient(ellipse 70vw 70vw at -20% 65%,rgba(34,164,187,.15),transparent 70%),#080b20;color:var(--ink);letter-spacing:-.012em}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.45;background-image:radial-gradient(#e7dfff 0.7px,transparent 1px);background-size:38px 38px;mask-image:linear-gradient(to bottom,#000,transparent 85%)}
+.app{isolation:isolate}
+.hero{overflow:hidden;position:relative;border-radius:0 0 42px 42px;background:radial-gradient(circle at 54% 49%,#2b215f,#10132d 57%,#080b20 95%);box-shadow:inset 0 -1px rgba(255,255,255,.15)}
+.hero__scene{opacity:.18;filter:blur(17px) saturate(1.5);transform:scale(1.09)}
+.hero__fx{opacity:.65}
+.hero::before{content:"";position:absolute;z-index:1;pointer-events:none;left:50%;top:53%;width:min(67vw,390px);aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle at 31% 26%,rgba(255,242,249,.92),rgba(251,178,225,.8) 9%,rgba(168,122,255,.9) 29%,rgba(80,59,182,.92) 51%,rgba(23,28,85,.93) 73%),radial-gradient(circle,#fff,transparent);box-shadow:inset -32px -30px 55px rgba(12,10,58,.72),inset 13px 11px 30px rgba(255,255,255,.32),0 0 75px 24px rgba(153,91,255,.24),0 0 155px 55px rgba(41,170,210,.12);animation:orb-breathe 9s ease-in-out infinite}
+.hero::after{content:"YOUR OWN UNIVERSE, ONE DAY AT A TIME";position:absolute;z-index:2;left:20px;right:20px;bottom:58px;text-align:center;color:#eae0ff;font-size:10px;letter-spacing:.2em;font-weight:800;text-shadow:0 2px 16px #0d0d32}
+.hero__bar{position:relative;z-index:4;padding:calc(var(--safe-t) + 14px) 22px 16px}
+.brand{border:1px solid rgba(255,255,255,.18);background:rgba(12,12,39,.42);backdrop-filter:blur(16px);border-radius:100px;padding:10px 17px;font-size:15px;letter-spacing:-.025em;font-weight:750;text-transform:none}
+.brand svg{color:#e8b4ff}
+.round{border-radius:50%;background:rgba(16,13,45,.52);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(12px)}
+.side{position:relative;z-index:3}
+#page{max-width:760px}
+.card{background:linear-gradient(145deg,rgba(36,36,79,.88),rgba(20,24,57,.91));border:1px solid var(--line);border-radius:var(--r);box-shadow:0 20px 60px -45px #000, inset 0 1px rgba(255,255,255,.05);padding:26px 23px;margin-bottom:17px;backdrop-filter:blur(14px)}
+.card.status{background:radial-gradient(circle at 100% 0,rgba(149,100,243,.23),transparent 55%),linear-gradient(145deg,#29214e,#141b3a)}
+.eyebrow{color:#e3b8ff;font-weight:850;letter-spacing:.17em;font-size:10px}
+.h2,.h3,.status__h{font-family:var(--font-d);letter-spacing:-.055em}
+.h2{font-size:clamp(30px,7vw,44px)}.h3{font-size:clamp(23px,5vw,31px)}
+.status__h{font-size:clamp(43px,11vw,76px);line-height:1.02}
+.status__ph{background:linear-gradient(95deg,#f6bbeb,#b4b8ff,#9ce9e6);color:transparent;background-clip:text}
+.fine,.status__line{color:var(--muted);line-height:1.65}
+.btn{border-radius:999px;min-height:45px;transition:transform .22s ease,box-shadow .22s ease,filter .22s ease}
+.btn:not(.btn--ghost){background:linear-gradient(115deg,#e7b3ff,#b6b7ff);color:#171332;border:0;box-shadow:0 9px 26px rgba(168,111,249,.22)}
+.btn--ghost{border-color:rgba(207,193,255,.3);color:#f6eeff;background:rgba(255,255,255,.06)}
+.banner{border-radius:16px}
+.dock{background:rgba(14,16,45,.94);border:1px solid rgba(219,202,255,.2);box-shadow:0 10px 42px rgba(0,0,0,.34);backdrop-filter:blur(22px)}
+.dock__btn{border-radius:18px;min-height:58px;color:#c7c4e8;transition:transform .2s ease,background .2s ease,color .2s ease}
+.dock__btn[aria-current="page"]{background:linear-gradient(135deg,rgba(188,134,255,.31),rgba(93,182,229,.18));color:#fff;box-shadow:inset 0 0 0 1px rgba(220,198,255,.26)}
+.dock__btn svg{width:22px;height:22px}
+.cal-clean .cal-day button{border-radius:16px;min-height:53px;background:rgba(255,255,255,.035);border:1px solid transparent;color:var(--ink)}
+.cal-clean .cal-day.is-today button{border-color:#b5b4ff}
+.cal-clean .cal-day.is-selected button{outline-color:#e3b8ff}
+.cal-clean .legend{border-top:1px solid var(--line);padding-top:16px}
+.ritual-card .ritual-grid{gap:4px}.ritual-card .ritual-item{padding:16px 0}
+.ritual-card .ritual-icon{border-radius:17px;background:linear-gradient(135deg,rgba(185,142,255,.22),rgba(96,195,213,.15))}
+.ritual-card .ritual-copy b{font-size:15px}
+.personal-discovery{display:grid;grid-template-columns:42px 1fr;gap:13px;align-items:start;padding:19px;margin:18px 0 10px;border:1px solid rgba(211,173,255,.25);border-radius:20px;background:linear-gradient(130deg,rgba(149,93,235,.23),rgba(75,164,196,.13))}
+.personal-discovery__symbol{font-size:30px;color:#dcb6ff}
+.personal-discovery .eyebrow{margin-bottom:8px}
+.personal-discovery .fine{margin-top:8px}
+.sheet{border-radius:28px;background:#171832;color:var(--ink);border-color:var(--line)}
+#toast{border-radius:18px}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #d8b7ff;outline-offset:3px}
+@media(hover:hover) and (pointer:fine){
+ .card{transition:transform .28s ease,border-color .28s ease,box-shadow .28s ease}
+ .card:hover{transform:translateY(-3px);border-color:rgba(220,193,255,.33);box-shadow:0 22px 65px -35px #000}
+ .dock__btn:hover,.round:hover{transform:translateY(-3px)}
+ .btn:hover{transform:translateY(-2px);filter:brightness(1.07)}
+ .cal-clean .cal-day button:hover{background:rgba(192,156,255,.18);transform:scale(1.045)}
+}
+button:active{transform:scale(.97)}
+@keyframes orb-breathe{0%,100%{filter:hue-rotate(0deg);scale:1}50%{filter:hue-rotate(13deg);scale:1.035}}
+@media(min-width:1000px){
+ .app{grid-template-columns:minmax(380px,46vw) minmax(480px,1fr)}
+ .hero{border-radius:0}
+ .hero::before{width:min(32vw,510px)}
+ .hero::after{bottom:44px}
+ #page,body:not([data-view="today"]) #page{padding:42px clamp(24px,5vw,80px) 80px;max-width:850px;margin:auto}
+ .dock{padding:12px clamp(24px,5vw,80px);gap:8px}
+ .dock__btn{flex:0 1 140px}.card{padding:32px}
+}
+@media(max-width:999px){
+ body:not([data-view="today"]) .hero{border-radius:0;height:calc(var(--safe-t) + 74px)}
+ body:not([data-view="today"]) .hero::before,body:not([data-view="today"]) .hero::after{display:none}
+ body:not([data-view="today"]) #page{padding-top:20px}
+ .hero::before{width:min(64vw,320px)}
+}
+@media(max-width:420px){
+ #page{padding-left:12px;padding-right:12px}.card{padding:22px 17px}
+ .hero::after{font-size:9px;bottom:58px}
+ .cal-clean .cal-day button{min-height:45px;border-radius:12px}
+ .ritual-card .ritual-icon{background:var(--accent-soft)}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
+/* Orbit installation — multi-layer orbital illustration, responsive to pointer movement. */
+.hero::before,.hero::after{content:none!important;display:none!important}
+.hero{--orbit-x:0;--orbit-y:0;min-height:450px}
+.orbit-art{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;transform:translate3d(calc(var(--orbit-x) * -9px),calc(var(--orbit-y) * -7px),0);transition:transform .4s ease-out}
+.orbit-art__halo{position:absolute;left:51%;top:49%;width:min(95%,570px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(177,112,255,.26),rgba(68,120,235,.12) 35%,transparent 70%);filter:blur(9px)}
+.orbit-art__planet{position:absolute;left:51%;top:49%;width:min(55%,310px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 27% 20%,rgba(255,249,255,.96),rgba(248,181,237,.9) 10%,rgba(173,125,253,.94) 31%,rgba(82,65,191,.96) 56%,rgba(18,29,95,.97) 78%);box-shadow:inset -25px -28px 48px rgba(6,9,49,.7),inset 12px 11px 25px rgba(255,255,255,.25),0 0 65px rgba(164,109,255,.35),0 0 140px rgba(50,175,208,.16);animation:orb-breathe 9s ease-in-out infinite}
+.orbit-art__ring{position:absolute;left:51%;top:49%;width:min(80%,460px);aspect-ratio:1;border:1px solid rgba(211,193,255,.4);border-radius:50%;transform:translate(-50%,-50%) rotate(-27deg) scaleY(.49);box-shadow:0 0 16px rgba(175,141,255,.15);animation:ring-turn 28s linear infinite}
+.orbit-art__ring--two{width:min(95%,570px);transform:translate(-50%,-50%) rotate(39deg) scaleY(.62);border-color:rgba(140,228,240,.25);animation-duration:42s;animation-direction:reverse}
+.orbit-art__moon{position:absolute;display:block;width:15px;height:15px;border-radius:50%;background:#e6d4ff;box-shadow:0 0 24px 8px rgba(205,164,255,.4)}
+.orbit-art__moon--one{top:29%;left:19%}.orbit-art__moon--two{top:72%;right:16%;width:9px;height:9px;background:#9ee9f1}
+.orbit-art__spark{position:absolute;font-size:25px;color:#f7dfff;text-shadow:0 0 25px #d3a4ff;animation:star-pulse 5s ease-in-out infinite}
+.orbit-art__spark--one{left:18%;top:56%}.orbit-art__spark--two{right:16%;top:21%;animation-delay:-2s}
+.orbit-caption{position:absolute;z-index:3;bottom:24px;left:26px;right:26px;display:flex;flex-direction:column;align-items:flex-start;gap:8px;pointer-events:none;text-shadow:0 3px 22px #090b27}
+.orbit-caption__kicker{font-size:10px;letter-spacing:.2em;font-weight:850;color:#d8c4ff}
+.orbit-caption strong{font-family:var(--font-d);font-weight:450;font-size:clamp(32px,6vw,56px);line-height:.98;letter-spacing:-.06em;color:#fff}
+.orbit-caption__foot{font-size:12px;color:#e0d8fa}
+@keyframes ring-turn{from{rotate:0deg}to{rotate:360deg}}
+@keyframes star-pulse{0%,100%{opacity:.35;scale:.85}50%{opacity:1;scale:1.2}}
+@media(min-width:1000px){
+ .hero{min-height:100dvh}
+ .orbit-art__planet{width:min(56%,410px)}
+ .orbit-art__ring{width:min(85%,590px)}
+ .orbit-art__ring--two{width:min(96%,690px)}
+ .orbit-caption{bottom:8%;left:8%}
+ .orbit-caption strong{font-size:clamp(52px,5.5vw,88px)}
+}
+@media(max-width:999px){
+ body:not([data-view="today"]) .hero{min-height:0}
+ body:not([data-view="today"]) .orbit-art,body:not([data-view="today"]) .orbit-caption{display:none}
+}
+@media(max-width:420px){.orbit-caption{left:20px;bottom:20px}.orbit-caption strong{font-size:34px}.orbit-art__planet{width:58%}}
+@media(prefers-reduced-motion:reduce){.orbit-art,.orbit-art *{animation:none!important;transition:none!important;transform-origin:center}}
+
+/* Constellation journal: each star is an actual date, never an invented phase. */
+.orbit-journal{overflow:hidden;background:radial-gradient(circle at 50% 48%,rgba(99,66,182,.25),transparent 62%),linear-gradient(150deg,#171b42,#11152e)}
+.orbit-journal .h2{margin:8px 0 10px}
+.orbit-journal__sky{position:relative;width:min(100%,450px);aspect-ratio:1;margin:16px auto 8px;isolation:isolate;background:radial-gradient(circle at center,rgba(139,92,246,.12),transparent 45%);border-radius:50%}
+.orbit-journal__track{position:absolute;inset:12%;border:1px dashed rgba(197,183,255,.23);border-radius:50%;pointer-events:none}
+.orbit-journal__track--b{inset:20%;border-style:solid;border-color:rgba(134,213,236,.12)}
+.orbit-journal__core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:29%;aspect-ratio:1;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 28% 23%,#f1c6ff,#8b6ada 55%,#3c3d9a);box-shadow:0 0 30px rgba(192,137,255,.36),inset -8px -11px 24px rgba(30,20,98,.5);color:white}
+.orbit-journal__core span{font-family:var(--font-d);font-size:clamp(28px,8vw,46px);line-height:1}
+.orbit-journal__core small{font-size:9px;letter-spacing:.22em;font-weight:800}
+.orbit-journal__day{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);width:clamp(32px,9vw,43px);height:clamp(32px,9vw,43px);display:grid;place-items:center;border-radius:50%;border:1px solid rgba(221,214,255,.28);background:#24294e;color:#dddaf3;font:700 12px var(--font-b);cursor:pointer;box-shadow:0 0 0 4px rgba(13,18,46,.75);transition:background .2s,box-shadow .2s,scale .2s}
+.orbit-journal__day.is-logged{background:#43617e;border-color:#a3e2ed;color:white;box-shadow:0 0 16px rgba(110,216,238,.2)}
+.orbit-journal__day.is-period{background:#a65ba5;border-color:#f4c5eb;color:white;box-shadow:0 0 18px rgba(241,155,227,.35)}
+.orbit-journal__day.is-today{outline:2px solid #e4d4ff;outline-offset:3px}
+.orbit-journal__day:hover{scale:1.14;z-index:2}
+.orbit-journal__day:focus-visible{outline:3px solid #fff;outline-offset:4px;z-index:3}
+.orbit-journal__footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding:14px 0;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.orbit-journal__footer b{color:#fff}
+.orbit-journal__key{display:inline-block;width:9px;height:9px;margin:0 4px 0 10px;border-radius:50%;background:#d88acb}
+.orbit-journal__key--other{background:#86d5e5}
+@media(max-width:420px){.orbit-journal__sky{margin:12px auto}.orbit-journal__day{width:32px;height:32px;font-size:11px}.orbit-journal__footer{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.orbit-journal__day{transition:none}}
+
+.orbit-journal__connections{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;filter:drop-shadow(0 0 2px rgba(168,157,255,.5))}
+.orbit-journal__day{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.orbit-journal__sky:focus-within .orbit-journal__connections{filter:drop-shadow(0 0 5px rgba(194,173,255,.8))}
+@media(prefers-contrast:more){.orbit-journal__day{border:2px solid white}.orbit-journal__footer,.orbit-caption__foot{color:white}.orbit-journal__connections{filter:none}}
+
+/* Compact-screen and landscape resilience */
+@media(max-height:650px) and (max-width:999px){
+ body[data-view="today"] .hero{min-height:360px;max-height:55svh}
+ body[data-view="today"] .orbit-art__planet{width:min(48%,210px)}
+ body[data-view="today"] .orbit-caption{bottom:15px}
+ body[data-view="today"] .orbit-caption strong{font-size:30px}
+}
+@media(max-width:350px){
+ .orbit-journal__day{width:29px;height:29px;font-size:10px}
+ .orbit-journal__footer{gap:8px}
+ .orbit-caption__foot{font-size:11px}
+}
+@media(forced-colors:active){
+ .orbit-journal__day{border:2px solid ButtonText;background:ButtonFace;color:ButtonText}
+ .orbit-journal__day.is-today{outline:2px solid Highlight}
+ .orbit-journal__core{border:2px solid CanvasText;background:Canvas;color:CanvasText}
+ .orbit-art__planet{border:2px solid CanvasText}
+}
