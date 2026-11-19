@@ -245,9 +245,26 @@
       <p class="fine">This is your recorded history, not a prediction. Missing days are perfectly fine.</p>
     </section>`;
   }
+  /* V5 Daily Portal: an accessible, low-friction entry point to existing actions.
+     This component reads the existing log model; it creates no new user data. */
+  function dailyPortal() {
+    const today = data.logs[isoNow()] || {};
+    const recorded = Object.values(today).some(v => v != null && v !== "" && (!Array.isArray(v) || v.length));
+    return `<section class="v5-portal" aria-labelledby="v5-portal-title">
+      <div class="v5-portal__intro"><p class="v5-portal__eyebrow">YOUR DAILY STUDIO <span aria-hidden="true">✦</span></p>
+      <h2 id="v5-portal-title">How's your world today?</h2>
+      <p>One moment is enough. You can always add more later.</p></div>
+      <div class="v5-portal__actions">
+        <button class="v5-portal__action v5-portal__action--primary" type="button" data-act="log"><span class="v5-portal__symbol" aria-hidden="true">✳</span><span><strong>${recorded ? "Continue today's journal" : "Check in with yourself"}</strong><small>${recorded ? "Your entry is saved on this device" : "Mood, energy, symptoms and notes"}</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
+        <button class="v5-portal__action" type="button" data-tab="calendar"><span class="v5-portal__symbol" aria-hidden="true">◌</span><span><strong>Travel through time</strong><small>Explore recorded days and estimates</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
+        <button class="v5-portal__action" type="button" data-tab="insights"><span class="v5-portal__symbol" aria-hidden="true">✧</span><span><strong>Visit the observatory</strong><small>See what your history can tell you</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
+      </div>
+      <p class="v5-portal__privacy">Private by design · No account required · Your observations, not a diagnosis</p>
+    </section>`;
+  }
   function pageToday() {
     const S = data.settings, c = AN.current;
-    let h = sampleBanner();
+    let h = sampleBanner() + dailyPortal();
     if (!AN.hasData) return h + `<section class="card status"><p class="eyebrow">${greeting()}</p>
       <h1 class="status__h">Welcome to <span class="status__ph">Almanac</span></h1>
       <p class="status__line">Log the first day of your last period and the landscape above starts following your cycle.</p>
