@@ -157,3 +157,7 @@ body .side::before{content:"";position:absolute;top:0;right:4%;width:1px;height:
 .v5-observation__coverage-track span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#9b8bdc,#7acac7)}
 .v5-observation__coverage p{margin:10px 0 0;font-size:12px;line-height:1.5;opacity:.82}
 @media(forced-colors:active){.v5-observation__coverage-track{border:1px solid CanvasText}.v5-observation__coverage-track span{background:Highlight}}
+
+.v5-checkin__save{margin:8px 0 16px;font-size:12px;line-height:1.5;opacity:.82}
+.v5-checkin__row{scroll-margin-top:80px}
+.v5-checkin__choice:focus-visible{outline:3px solid #cbb4ff;outline-offset:2px}
