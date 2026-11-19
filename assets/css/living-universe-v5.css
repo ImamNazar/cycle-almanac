@@ -124,3 +124,10 @@ body .side::before{content:"";position:absolute;top:0;right:4%;width:1px;height:
 .orbit-journal__day[aria-pressed="true"]{outline:2px solid #f4d9ff;outline-offset:4px}
 @media(max-width:560px){.v5-timeline-preview{align-items:stretch;flex-direction:column}.v5-timeline-preview button{align-self:flex-start}}
 @media(forced-colors:active){.orbit-journal__day[aria-pressed="true"]{outline-color:Highlight}}
+
+/* Ensure timeline points remain above the decorative sky and mobile dock. */
+.orbit-journal__sky{isolation:isolate}
+.orbit-journal__connections,.orbit-journal__track,.orbit-journal__core{pointer-events:none}
+.orbit-journal__day{z-index:4;touch-action:manipulation}
+.orbit-journal__day:hover,.orbit-journal__day:focus-visible{z-index:5}
+@media(max-width:540px){.orbit-journal__sky{width:min(100%,310px);height:310px;margin:12px auto 22px}.orbit-journal__day{min-width:32px;min-height:32px}.orbit-journal__sky--dense .orbit-journal__day{min-width:26px;min-height:26px}}
