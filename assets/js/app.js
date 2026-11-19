@@ -136,7 +136,7 @@
   };
 
   /* ------------------------------------------------------------ UI state */
-  const ui = { tab: "today", month: null, day: null, ob: null, calSelected: null, constellationDays: 14, constellationOffset: 0 };
+  const ui = { tab: "today", month: null, day: null, ob: null, calSelected: null, constellationDays: 14, constellationOffset: 0, constellationPreview: null };
   const monthOf = d => { const iso = A.fromDay(d); return { y: +iso.slice(0, 4), m: +iso.slice(5, 7) - 1 }; };
   ui.month = monthOf(TODAY);
 
@@ -212,6 +212,7 @@
     const span = ui.constellationDays === 28 ? 28 : 14;
     const offset = Math.max(0, ui.constellationOffset || 0);
     const days = Array.from({ length: span }, (_, i) => TODAY - offset - span + 1 + i);
+    const previewDay = ui.constellationPreview && days.includes(A.toDay(ui.constellationPreview)) ? ui.constellationPreview : A.fromDay(days[span - 1]);
     const entries = days.map((d, i) => {
       const iso = A.fromDay(d), L = data.logs[iso] || {};
       const hasLog = Object.keys(L).some(k => L[k] != null && L[k] !== "" && (!Array.isArray(L[k]) || L[k].length));
@@ -221,13 +222,23 @@
       const x = 50 + Math.cos(angle) * radius;
       const y = 50 + Math.sin(angle) * radius;
       const label = fmt(d, { weekday: "long", month: "short", day: "numeric" }) + (period ? ", period logged" : hasLog ? ", entry logged" : ", no entry");
-      return `<button type="button" class="orbit-journal__day${period ? " is-period" : hasLog ? " is-logged" : ""}${d === TODAY ? " is-today" : ""}" style="--x:${x.toFixed(2)}%;--y:${y.toFixed(2)}%" data-act="log" data-day="${iso}" aria-label="${esc(label)}" title="${esc(label)}"><span>${fmt(d, { day: "numeric" })}</span></button>`;
+      return `<button type="button" class="orbit-journal__day${period ? " is-period" : hasLog ? " is-logged" : ""}${d === TODAY ? " is-today" : ""}" style="--x:${x.toFixed(2)}%;--y:${y.toFixed(2)}%" data-act="constellation-preview" data-day="${iso}" aria-pressed="${previewDay === iso}" aria-label="${esc(label)}" title="${esc(label)}"><span>${fmt(d, { day: "numeric" })}</span></button>`;
     }).join("");
     const constellationPath = days.map((d, i) => {
       const angle = (i / span) * Math.PI * 2 - Math.PI / 2;
       const radius = 34 + (i % 3) * 3.8;
       return `${(50 + Math.cos(angle) * radius).toFixed(2)},${(50 + Math.sin(angle) * radius).toFixed(2)}`;
     }).join(" ");
+    const previewLog = data.logs[previewDay] || {};
+    const previewFacts = [
+      previewLog.flow != null ? "Flow: " + (C.FLOW.find(o => String(o[0]) === String(previewLog.flow)) || [null, "Recorded"])[1] : null,
+      previewLog.mood != null ? "Mood: " + (C.MOOD.find(o => String(o[0]) === String(previewLog.mood)) || [null, null, "Recorded"])[2] : null,
+      previewLog.energy != null ? "Energy: " + (C.ENERGY.find(o => String(o[0]) === String(previewLog.energy)) || [null, "Recorded"])[1] : null,
+      previewLog.pain != null ? "Pain: " + (C.PAIN.find(o => String(o[0]) === String(previewLog.pain)) || [null, "Recorded"])[1] : null,
+      Array.isArray(previewLog.sym) && previewLog.sym.length ? previewLog.sym.length + " symptom" + (previewLog.sym.length === 1 ? "" : "s") + " recorded" : null,
+      previewLog.note ? "Private note saved" : null
+    ].filter(Boolean);
+    const preview = `<div class="v5-timeline-preview" aria-live="polite"><div><p class="eyebrow">DAY IN FOCUS</p><h3>${fmt(A.toDay(previewDay), { weekday: "long", month: "short", day: "numeric" })}</h3><p class="fine">${previewFacts.length ? previewFacts.map(esc).join(" · ") : "No observations recorded for this day."}</p></div><button type="button" data-act="log" data-day="${previewDay}">Open journal</button></div>`;
     const logged = days.filter(d => {
       const L = data.logs[A.fromDay(d)] || {};
       return Object.values(L).some(v => v != null && v !== "" && (!Array.isArray(v) || v.length));
@@ -245,6 +256,7 @@
         <div class="orbit-journal__core" aria-hidden="true"><span>${span}</span><small>DAYS</small></div>
         ${entries}
       </div>
+      ${preview}
       <div class="orbit-journal__footer"><span><b>${logged}</b> of ${span} days logged</span><span><i class="orbit-journal__key"></i> Period logged <i class="orbit-journal__key orbit-journal__key--other"></i> Other entry</span></div>
       <p class="fine">This is your recorded history, not a prediction. Missing days are perfectly fine.</p>
     </section>`;
@@ -836,7 +848,8 @@
       case "log": return openLog(t.dataset.day || isoNow());
       case "constellation-range": ui.constellationDays = +t.dataset.days === 28 ? 28 : 14; return render();
       case "constellation-step": ui.constellationOffset = Math.max(0, (ui.constellationOffset || 0) + (+t.dataset.step) * ui.constellationDays); return render();
-      case "constellation-now": ui.constellationOffset = 0; return render();
+      case "constellation-now": ui.constellationOffset = 0; ui.constellationPreview = null; return render();
+      case "constellation-preview": ui.constellationPreview = t.dataset.day; return render();
       case "day-step": { const d = clamp(A.toDay(ui.day) + (+t.dataset.step), 0, TODAY); if (d <= TODAY) { ui.day = A.fromDay(d); openSheet("log", logHTML(ui.day)); syncLog(); } return; }
       case "set": { const k = t.dataset.k, v = t.dataset.v, L = data.logs[ui.day] || {}, num = ["flow", "mood", "energy", "pain"].includes(k) ? +v : v; setLog(ui.day, { [k]: L[k] === num ? undefined : num }); return syncLog(); }
       case "sym": { const L = data.logs[ui.day] || {}, s = new Set(L.sym || []); s.has(t.dataset.v) ? s.delete(t.dataset.v) : s.add(t.dataset.v); setLog(ui.day, { sym: [...s] }); return syncLog(); }
