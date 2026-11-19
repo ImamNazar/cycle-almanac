@@ -87,6 +87,10 @@ const { spawn } = require("node:child_process");
       assert.equal(await page.locator(".v5-observation__row").count(), 3, "Observatory shows three dimensions");
       assert.equal(await page.locator(".v5-observation__cell").count(), 84, "Observatory has 28 days per dimension");
       assert.equal(await page.locator(".v5-observation__summary").count(), 3, "Each observed dimension has an explanatory summary");
+      assert.equal(await page.locator('.v5-observation__coverage [role="progressbar"]').count(), 1, "Observatory exposes coverage progress");
+      const coverage = Number(await page.locator('.v5-observation__coverage [role="progressbar"]').getAttribute('aria-valuenow'));
+      assert.equal(coverage >= 0 && coverage <= 28, true, "Coverage is within valid day range");
+
       const todayIso = await page.evaluate(() => { const d = new Date(); return [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-"); });
       await page.evaluate(iso => { const saved = window.__almanac.data; saved.logs[iso] = { ...(saved.logs[iso] || {}), pain: 0 }; }, todayIso);
       await page.locator('[data-tab="today"]').first().click();
