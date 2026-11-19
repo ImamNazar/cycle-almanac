@@ -462,27 +462,30 @@
   }
   /* An observation-only chart. No smoothing, inferred values or predictions. */
   function observationObservatory() {
-    const dims = [["mood", "Mood", 5], ["energy", "Energy", 5], ["pain", "Pain", 3]];
+    const dims = [["mood", "Mood", 1, 5], ["energy", "Energy", 1, 5], ["pain", "Pain", 0, 3]];
     const days = Array.from({ length: 28 }, (_, i) => TODAY - 27 + i);
-    const panels = dims.map(([key, label, max]) => {
+    const panels = dims.map(([key, label, min, max]) => {
       const points = days.map(d => {
         const raw = (data.logs[A.fromDay(d)] || {})[key];
         const value = raw == null || raw === "" ? null : Number(raw);
-        return { d, value: Number.isFinite(value) && value >= 1 && value <= max ? value : null };
+        return { d, value: Number.isFinite(value) && value >= min && value <= max ? value : null };
       });
-      const n = points.filter(p => p.value !== null).length;
+      const observed = points.filter(p => p.value !== null);
+      const n = observed.length;
+      const mean = n ? observed.reduce((sum, p) => sum + p.value, 0) / n : null;
+      const detail = n >= 5 ? `Average recorded score: ${mean.toFixed(1)} of ${max}. This describes logged days only.` : n ? `${n} recorded day${n === 1 ? "" : "s"}; more entries will make a summary more useful.` : "No entries in this window yet.";
       const cells = points.map(p => {
         const date = fmt(p.d, { day: "numeric", month: "short" });
         const present = p.value !== null;
         const title = present ? `${date}: ${label.toLowerCase()} ${p.value} of ${max}` : `${date}: not recorded`;
-        return `<span class="v5-observation__cell${present ? " is-observed" : ""}" style="--level:${present ? p.value / max : 0}" role="img" aria-label="${esc(title)}" title="${esc(title)}"></span>`;
+        return `<span class="v5-observation__cell${present ? " is-observed" : ""}" style="--level:${present ? (p.value === 0 ? .12 : p.value / max) : 0}" role="img" aria-label="${esc(title)}" title="${esc(title)}"></span>`;
       }).join("");
-      return `<div class="v5-observation__row"><div class="v5-observation__row-head"><strong>${label}</strong><small>${n} of 28 days recorded</small></div><div class="v5-observation__grid">${cells}</div></div>`;
+      return `<div class="v5-observation__row"><div class="v5-observation__row-head"><strong>${label}</strong><small>${n} of 28 days recorded</small></div><div class="v5-observation__grid">${cells}</div><p class="v5-observation__summary">${esc(detail)}</p></div>`;
     }).join("");
     return `<section class="v5-observation card" aria-labelledby="v5-observation-title">
       <p class="eyebrow">THE OBSERVATORY · ACTUAL ENTRIES</p>
       <h2 class="h2" id="v5-observation-title">A month in little moments.</h2>
-      <p class="fine">Your last 28 days of mood, energy and pain entries. Brighter tiles mean higher recorded scores, not better health. Empty outlines mean nothing was recorded.</p>
+      <p class="fine">Your last 28 days of mood, energy and pain entries. Brighter tiles mean higher recorded scores, not better health. A pain score of zero is a recorded observation, not a missing entry. Empty outlines mean nothing was recorded.</p>
       <div class="v5-observation__rows">${panels}</div>
       <div class="v5-observation__dates"><span>${esc(fShort(TODAY - 27))}</span><span>${esc(fShort(TODAY))}</span></div>
       <p class="fine">These are observations only, not a diagnosis or prediction. Tap a date in Calendar to add or correct a record.</p>
