@@ -51,11 +51,30 @@
     }
     return out;
   }
+  // A personal, opt-in-feeling discovery from the user's own reflections.
+  // Only describe observed counts; never infer medical benefit or prescribe activities.
+  function personalDiscovery() {
+    const records = Object.values(data.rituals || {}).flat();
+    const ranked = RITUALS.map(r => {
+      const observations = records.filter(e => e.id === r.id && e.result !== "tried");
+      return { ritual: r, total: observations.length, positive: observations.filter(e => e.result === "better").length };
+    }).filter(x => x.total >= 3 && x.positive >= 2)
+      .sort((a, b) => (b.positive / b.total) - (a.positive / a.total) || b.total - a.total);
+    if (!ranked.length) return "";
+    const top = ranked[0];
+    return `<aside class="personal-discovery" aria-label="Your personal discovery">
+      <span class="personal-discovery__symbol" aria-hidden="true">✳</span>
+      <div><p class="eyebrow">A NOTE FROM YOUR ALMANAC</p>
+      <p><b>${top.ritual.title}</b> was followed by a “felt better” reflection on
+      <b>${top.positive} of ${top.total}</b> occasions you recorded.</p>
+      <p class="fine">A personal observation, not proof of cause and effect. Your experience may change.</p></div>
+    </aside>`;
+  }
   function ritualCard() {
     const done = (data.rituals || {})[isoNow()] || [];
     return `<section class="card ritual-card"><p class="eyebrow">LITTLE THINGS</p><h2 class="h3">What might feel good today?</h2>
       <p class="fine">Optional ideas, not phase rules. Try something and note how it felt.</p>
-      <div class="ritual-grid">${RITUALS.map(r => {
+      ${personalDiscovery()}<div class="ritual-grid">${RITUALS.map(r => {
         const entry = done.find(x => x.id === r.id);
         return `<div class="ritual-item"><span class="ritual-icon" aria-hidden="true">${r.icon}</span><div class="ritual-copy"><b>${r.title}</b><span class="fine">${r.note}</span>
           ${entry ? `<span class="fine">Your reflection: ${{tried:"Tried it",better:"Felt better",same:"About the same",not:"Not helpful"}[entry.result]}</span>` : ""}</div>
