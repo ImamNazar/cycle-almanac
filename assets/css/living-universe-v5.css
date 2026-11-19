@@ -150,3 +150,10 @@ body .side::before{content:"";position:absolute;top:0;right:4%;width:1px;height:
 .v5-observation__nav button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 .v5-observation__nav span{font-size:12px;font-weight:700;text-align:center}
 @media(max-width:540px){.v5-observation__nav span{order:-1;flex:0 0 100%}.v5-observation__nav button{flex:1}}
+
+.v5-observation__coverage{padding:16px 18px;margin:10px 0 20px;border-radius:17px;border:1px solid rgba(177,162,231,.25);background:rgba(142,129,195,.08)}
+.v5-observation__coverage strong{display:block;margin-bottom:10px;font-size:13px}
+.v5-observation__coverage-track{height:7px;overflow:hidden;border-radius:999px;background:rgba(167,152,205,.24)}
+.v5-observation__coverage-track span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#9b8bdc,#7acac7)}
+.v5-observation__coverage p{margin:10px 0 0;font-size:12px;line-height:1.5;opacity:.82}
+@media(forced-colors:active){.v5-observation__coverage-track{border:1px solid CanvasText}.v5-observation__coverage-track span{background:Highlight}}
