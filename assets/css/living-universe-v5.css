@@ -29,3 +29,16 @@
 .orbit-journal__sky--dense .orbit-journal__day{font-size:clamp(9px,2vw,11px);width:clamp(22px,5.8vw,32px);height:clamp(22px,5.8vw,32px)}
 @media(max-width:390px){.orbit-journal__sky--dense .orbit-journal__day{width:21px;height:21px;font-size:9px}}
 @media(forced-colors:active){.v5-range button[aria-pressed="true"]{border-color:Highlight;outline:2px solid Highlight}}
+
+/* Observation Observatory: accessible descriptive 28-day data mosaic */
+.v5-observation{overflow:hidden}
+.v5-observation__rows{display:grid;gap:22px;margin:24px 0 12px}
+.v5-observation__row-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:9px}
+.v5-observation__row-head strong{font-size:14px}
+.v5-observation__row-head small{font-size:11px;opacity:.75;text-align:right}
+.v5-observation__grid{display:grid;grid-template-columns:repeat(28,minmax(0,1fr));gap:clamp(2px,.6vw,6px)}
+.v5-observation__cell{display:block;aspect-ratio:1/1;min-width:0;border-radius:clamp(2px,.5vw,6px);border:1px solid currentColor;opacity:.25}
+.v5-observation__cell.is-observed{opacity:1;border-color:rgba(136,95,204,.35);background:color-mix(in srgb,#9a6bd7 calc(var(--level)*90%),#eee9ff);box-shadow:0 0 10px rgba(143,107,210,.1)}
+.v5-observation__dates{display:flex;justify-content:space-between;font-size:11px;opacity:.7;margin-bottom:20px}
+@media(max-width:440px){.v5-observation__grid{gap:2px}.v5-observation__cell{border-radius:2px}}
+@media(forced-colors:active){.v5-observation__cell.is-observed{background:Highlight;border-color:Highlight}.v5-observation__cell:not(.is-observed){border:1px solid CanvasText}}
