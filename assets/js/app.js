@@ -136,7 +136,7 @@
   };
 
   /* ------------------------------------------------------------ UI state */
-  const ui = { tab: "today", month: null, day: null, ob: null, calSelected: null };
+  const ui = { tab: "today", month: null, day: null, ob: null, calSelected: null, constellationDays: 14 };
   const monthOf = d => { const iso = A.fromDay(d); return { y: +iso.slice(0, 4), m: +iso.slice(5, 7) - 1 }; };
   ui.month = monthOf(TODAY);
 
@@ -209,12 +209,13 @@
   /* ORBIT: a navigable constellation of the last 14 days.
      Only observed entries are marked as logged; no inferred health states. */
   function orbitJournal() {
-    const days = Array.from({ length: 14 }, (_, i) => TODAY - 13 + i);
+    const span = ui.constellationDays === 28 ? 28 : 14;
+    const days = Array.from({ length: span }, (_, i) => TODAY - span + 1 + i);
     const entries = days.map((d, i) => {
       const iso = A.fromDay(d), L = data.logs[iso] || {};
       const hasLog = Object.keys(L).some(k => L[k] != null && L[k] !== "" && (!Array.isArray(L[k]) || L[k].length));
       const period = Number(L.flow) >= 2;
-      const angle = (i / 14) * Math.PI * 2 - Math.PI / 2;
+      const angle = (i / span) * Math.PI * 2 - Math.PI / 2;
       const radius = 34 + (i % 3) * 3.8;
       const x = 50 + Math.cos(angle) * radius;
       const y = 50 + Math.sin(angle) * radius;
@@ -222,7 +223,7 @@
       return `<button type="button" class="orbit-journal__day${period ? " is-period" : hasLog ? " is-logged" : ""}${d === TODAY ? " is-today" : ""}" style="--x:${x.toFixed(2)}%;--y:${y.toFixed(2)}%" data-act="log" data-day="${iso}" aria-label="${esc(label)}" title="${esc(label)}"><span>${fmt(d, { day: "numeric" })}</span></button>`;
     }).join("");
     const constellationPath = days.map((d, i) => {
-      const angle = (i / 14) * Math.PI * 2 - Math.PI / 2;
+      const angle = (i / span) * Math.PI * 2 - Math.PI / 2;
       const radius = 34 + (i % 3) * 3.8;
       return `${(50 + Math.cos(angle) * radius).toFixed(2)},${(50 + Math.sin(angle) * radius).toFixed(2)}`;
     }).join(" ");
@@ -233,15 +234,16 @@
     return `<section class="card orbit-journal" aria-labelledby="orbit-journal-title">
       <p class="eyebrow">YOUR PERSONAL CONSTELLATION</p>
       <h2 class="h2" id="orbit-journal-title">Every day is a little world.</h2>
-      <p class="fine">Explore the last two weeks. Each point opens that day's private journal; brighter points have entries you've logged.</p>
-      <div class="orbit-journal__sky" role="group" aria-label="Open a daily entry from the last fourteen days">
+      <p class="fine">Explore your recorded history. Switch between two and four weeks. Each point opens that day's private journal; brighter points have entries you've logged.</p>
+      <div class="v5-range" role="group" aria-label="Constellation date range"><button type="button" data-act="constellation-range" data-days="14" aria-pressed="${span === 14}">14 days</button><button type="button" data-act="constellation-range" data-days="28" aria-pressed="${span === 28}">28 days</button></div>
+      <div class="orbit-journal__sky${span === 28 ? " orbit-journal__sky--dense" : ""}" role="group" aria-label="Open a daily entry from the last ${span} days">
         <svg class="orbit-journal__connections" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><polyline points="${constellationPath}" fill="none" stroke="rgba(181,173,255,.55)" stroke-width=".32" stroke-dasharray="1 1.2" stroke-linejoin="round" /></svg>
         <div class="orbit-journal__track orbit-journal__track--a" aria-hidden="true"></div>
         <div class="orbit-journal__track orbit-journal__track--b" aria-hidden="true"></div>
-        <div class="orbit-journal__core" aria-hidden="true"><span>14</span><small>DAYS</small></div>
+        <div class="orbit-journal__core" aria-hidden="true"><span>${span}</span><small>DAYS</small></div>
         ${entries}
       </div>
-      <div class="orbit-journal__footer"><span><b>${logged}</b> of 14 days logged</span><span><i class="orbit-journal__key"></i> Period logged <i class="orbit-journal__key orbit-journal__key--other"></i> Other entry</span></div>
+      <div class="orbit-journal__footer"><span><b>${logged}</b> of ${span} days logged</span><span><i class="orbit-journal__key"></i> Period logged <i class="orbit-journal__key orbit-journal__key--other"></i> Other entry</span></div>
       <p class="fine">This is your recorded history, not a prediction. Missing days are perfectly fine.</p>
     </section>`;
   }
@@ -794,6 +796,7 @@
       case "settings": return settingsSheet();
       case "hills": return hillsSheet();
       case "log": return openLog(t.dataset.day || isoNow());
+      case "constellation-range": ui.constellationDays = +t.dataset.days === 28 ? 28 : 14; return render();
       case "day-step": { const d = clamp(A.toDay(ui.day) + (+t.dataset.step), 0, TODAY); if (d <= TODAY) { ui.day = A.fromDay(d); openSheet("log", logHTML(ui.day)); syncLog(); } return; }
       case "set": { const k = t.dataset.k, v = t.dataset.v, L = data.logs[ui.day] || {}, num = ["flow", "mood", "energy", "pain"].includes(k) ? +v : v; setLog(ui.day, { [k]: L[k] === num ? undefined : num }); return syncLog(); }
       case "sym": { const L = data.logs[ui.day] || {}, s = new Set(L.sym || []); s.has(t.dataset.v) ? s.delete(t.dataset.v) : s.add(t.dataset.v); setLog(ui.day, { sym: [...s] }); return syncLog(); }
