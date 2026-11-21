@@ -1,6 +1,7 @@
 /* Browser smoke tests. Run: npm install --no-save playwright && npx playwright install chromium && node tests/browser.test.js */
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
+const path = require("node:path");
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 
@@ -39,13 +40,19 @@ const { spawn } = require("node:child_process");
         assert.equal(editorialBounds.every(x => x.left >= -2 && x.right <= x.width + 2), true, "Editorial mobile surfaces fit viewport: " + JSON.stringify(editorialBounds));
       }
 
+      // Keep actual rendered screenshots for human visual review of the draft PR.
+      const shotDir = path.join("artifacts", "almanac-6-screens");
+      fs.mkdirSync(shotDir, { recursive: true });
+      await page.screenshot({ path: path.join(shotDir, `today-${viewport.width}.png`), fullPage: true });
       // Phase 3 editorial pages must remain reachable and preserve functional navigation.
       await page.locator('.dock__btn[data-tab="calendar"]').click();
       assert.equal(await page.locator('.al6-calendar').count(), 1, "Editorial Calendar renders");
+      await page.screenshot({ path: path.join(shotDir, `calendar-${viewport.width}.png`), fullPage: true });
       assert.equal(await page.locator('.al6-calendar [data-act="cal-step"]').count(), 2, "Month navigation remains available");
       await page.locator('.dock__btn[data-tab="insights"]').click();
       assert.equal(await page.locator('.al6-insights-intro').count(), 1, "Editorial Insights intro renders");
       assert.equal(await page.locator('.al6-observation').count(), 1, "Recorded observations remain visible");
+      await page.screenshot({ path: path.join(shotDir, `insights-${viewport.width}.png`), fullPage: true });
       await page.locator('.dock__btn[data-tab="today"]').click();
       // Fertility language must communicate uncertainty rather than guarantee safety.
       const predictionCopy = await page.locator('.status').first().innerText();
