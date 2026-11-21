@@ -1,0 +1,27 @@
+/* Almanac 6 / editorial rebirth. Visual-only layer: data and navigation stay intact. */
+:root{--al-ink:#342c36;--al-paper:#fffaf4;--al-rose:#eab2b1;--al-plum:#6b4b67;--al-peach:#f7d9c6}
+html{background:#f7f1eb}
+body{background:radial-gradient(ellipse at 15% 2%,#fff4e8 0,transparent 45%),linear-gradient(160deg,#f8eee9,#f9f6ef 58%,#f4e8ed);color:var(--al-ink)}
+.app{max-width:1440px;margin-inline:auto}
+.hero{position:relative;min-height:clamp(310px,43vw,540px);overflow:hidden;background:radial-gradient(circle at 77% 48%,#e9c0bb 0 12%,transparent 12.2%),radial-gradient(circle at 76% 48%,#f7d8c9 0 24%,transparent 24.2%),linear-gradient(125deg,#fff6ec,#f2dfe1 62%,#e4d5e6);color:#3e3040;border-radius:0 0 42px 42px;box-shadow:0 22px 65px #68445717}
+.hero__scene,.hero__fx,.orbit-art{opacity:.15;pointer-events:none}
+.orbit-caption{position:absolute;inset:auto auto 12% 7%;max-width:650px;z-index:3;color:#43303d;text-shadow:none}
+.orbit-caption__kicker{color:#8d596c!important;letter-spacing:.24em;font-size:11px}
+.orbit-caption strong{font-family:Fraunces,Georgia,serif;font-size:clamp(44px,7.4vw,104px);line-height:1.03;letter-spacing:-.055em;font-weight:500;color:#493449}
+.orbit-caption__foot{color:#745b67!important;font-size:clamp(13px,1.7vw,18px)}
+.hero__bar{position:relative;z-index:4}
+.brand{color:#54394e!important;font-family:Fraunces,Georgia,serif;font-size:clamp(22px,2.4vw,32px);letter-spacing:-.04em}
+.hero .round{background:#fff9f0d9!important;color:#573b52!important;border:1px solid #6b4b6730!important}
+.hero::after{content:"";position:absolute;right:10%;bottom:-30%;width:clamp(210px,38vw,510px);aspect-ratio:1;border-radius:49% 51% 40% 60%;transform:rotate(-24deg);background:radial-gradient(circle at 37% 28%,#fff8e7 0 7%,transparent 8%),radial-gradient(circle at 35% 35%,#f5c3b6 0 28%,#cc93a3 65%,#9e7298 100%);box-shadow:-28px -26px 0 #fff9f080,35px 28px 0 #a9759626;opacity:.92}
+.side{position:relative;z-index:2}
+#page{color:var(--al-ink)}
+#page .card,#page .v5-portal,#page .v5-observatory{border-radius:28px;box-shadow:0 12px 45px #714d5b12}
+#page .card{background:#fffaf5;border-color:#eadedb}
+#page h1,#page h2,#page h3{font-family:Fraunces,Georgia,serif;letter-spacing:-.035em}
+.v5-portal{background:radial-gradient(circle at 95% 2%,#b77891 0,transparent 38%),linear-gradient(135deg,#5a3e5e,#876176)!important;border:1px solid #ffffff70!important;box-shadow:0 18px 50px #66445e29!important}
+.dock{background:#fffaf4ed!important;backdrop-filter:blur(20px);border:1px solid #e5d5d8!important;box-shadow:0 8px 30px #4f2d4818}
+.dock__btn{color:#715b69!important}
+.dock__btn[aria-current="page"]{background:#f4dce0!important;color:#593a56!important;border-radius:16px}
+button:focus-visible,a:focus-visible{outline:3px solid #99577c!important;outline-offset:3px}
+@media(max-width:700px){.hero{min-height:330px;border-radius:0 0 30px 30px}.orbit-caption{left:7%;bottom:15%;max-width:80%}.orbit-caption strong{font-size:clamp(43px,10vw,66px)}.hero::after{right:-17%;bottom:-18%;width:270px;opacity:.55}.dock{border-radius:22px 22px 0 0!important}}
+@media(prefers-reduced-motion:reduce){.hero::after{animation:none!important}*{scroll-behavior:auto!important}}
