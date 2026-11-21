@@ -58,7 +58,7 @@ const { spawn } = require("node:child_process");
         assert.equal(overflow.document <= overflow.viewport + 2, true, "200% root text size does not cause horizontal overflow: " + JSON.stringify(overflow));
         await page.locator('html').evaluate((el, size) => { el.style.fontSize = size; }, originalFontSize);
       }
-      assert.equal(await page.locator('.v5-portal').evaluate(el => getComputedStyle(el).backgroundImage !== 'none'), true, "Cosmic atmosphere remains visible without motion");
+      assert.equal(await page.locator('.al6-today').evaluate(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)'), true, "Editorial Today paper surface remains visible without motion");
       if (viewport.width < 720) {
         assert.equal(await page.locator('.v5-portal').evaluate(el => getComputedStyle(el, '::after').animationName), 'none', "Mobile disables decorative planet animation");
       }
