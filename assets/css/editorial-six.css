@@ -106,3 +106,22 @@ button:focus-visible,a:focus-visible{outline:3px solid #99577c!important;outline
 .al6-insights-intro::after{content:"✳";float:right;font-size:clamp(40px,9vw,90px);line-height:1;color:#b7849c;opacity:.38;margin-top:-24px}
 @media(max-width:600px){.al6-insights-intro::after{display:none}.al6-calendar .cal-day button{min-height:38px}.al6-calendar .cal-detail{padding:14px}}
 @media(prefers-reduced-motion:reduce){.al6-calendar *,.al6-today *,.al6-observation *{scroll-behavior:auto!important}}
+
+/* Almanac 6 · Phase 4: lightweight editorial motion, CSS-only and progressive. */
+@keyframes al6-arrive{from{opacity:0;transform:translate3d(0,12px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes al6-bloom{from{opacity:.45;transform:rotate(-9deg) scale(.94)}to{opacity:1;transform:rotate(0) scale(1)}}
+@media(prefers-reduced-motion:no-preference){
+  .al6-today__layout,.al6-page-intro,.al6-insights-intro{animation:al6-arrive .56s cubic-bezier(.2,.7,.2,1) both}
+  .al6-today__aside{animation:al6-arrive .68s .12s cubic-bezier(.2,.7,.2,1) both}
+  .al6-today__aside::before{animation:al6-bloom .9s .15s ease-out both}
+  .al6-calendar .cal__head,.al6-observation{animation:al6-arrive .45s .1s ease-out both}
+  .al6-calendar .cal-day button,.al6-today button,.al6-observation button{transition:background-color .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease}
+  @media(hover:hover) and (pointer:fine){
+    .al6-calendar .cal-day button:hover,.al6-today button:hover{transform:translateY(-2px)}
+    .al6-calendar .cal-day button:active,.al6-today button:active{transform:translateY(0) scale(.98)}
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .al6-today__layout,.al6-page-intro,.al6-insights-intro,.al6-today__aside,.al6-today__aside::before,.al6-calendar .cal__head,.al6-observation{animation:none!important}
+  .al6-calendar .cal-day button,.al6-today button,.al6-observation button{transition:none!important}
+}
