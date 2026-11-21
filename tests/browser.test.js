@@ -53,6 +53,9 @@ const { spawn } = require("node:child_process");
       }
       await page.screenshot({ path: path.join(shotDir, `calendar-${viewport.width}.png`), fullPage: true });
       assert.equal(await page.locator('.al6-calendar [data-act="cal-step"]').count(), 2, "Month navigation remains available");
+      await page.locator('.al6-calendar [data-act="cal-step"][data-step="1"]').click();
+      assert.equal(await page.locator('.al6-calendar').count(), 1, "Calendar remains rendered after moving forward a month");
+      await page.locator('.al6-calendar [data-act="cal-step"][data-step="-1"]').click();
       await page.locator('.dock__btn[data-tab="insights"]').click();
       assert.equal(await page.locator('.al6-insights-intro').count(), 1, "Editorial Insights intro renders");
       assert.equal(await page.locator('.al6-observation').count(), 1, "Recorded observations remain visible");
