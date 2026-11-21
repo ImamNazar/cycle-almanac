@@ -47,6 +47,10 @@ const { spawn } = require("node:child_process");
       // Phase 3 editorial pages must remain reachable and preserve functional navigation.
       await page.locator('.dock__btn[data-tab="calendar"]').click();
       assert.equal(await page.locator('.al6-calendar').count(), 1, "Editorial Calendar renders");
+      if (viewport.width <= 390) {
+        const calendarWidth = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, viewport: innerWidth }));
+        assert.equal(calendarWidth.scroll <= calendarWidth.viewport + 2, true, "Calendar must not overflow narrow viewports: " + JSON.stringify(calendarWidth));
+      }
       await page.screenshot({ path: path.join(shotDir, `calendar-${viewport.width}.png`), fullPage: true });
       assert.equal(await page.locator('.al6-calendar [data-act="cal-step"]').count(), 2, "Month navigation remains available");
       await page.locator('.dock__btn[data-tab="insights"]').click();
