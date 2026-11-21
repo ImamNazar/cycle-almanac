@@ -176,6 +176,7 @@ const { spawn } = require("node:child_process");
       assert.equal(await page.locator('.orbit-journal__day').count(), 14, "14-day constellation default");
       await page.locator('[data-act="constellation-range"][data-days="28"]').click();
       assert.equal(await page.locator('.orbit-journal__day').count(), 28, "28-day constellation");
+      assert.equal(await page.locator(".al6-more:not(.al6-more--insights)").evaluate(el => el.open), true, "Journal remains expanded after range changes");
       assert.equal(await page.locator('[data-act="constellation-range"][data-days="28"]').getAttribute('aria-pressed'), 'true', "28-day control selected");
       await page.locator('[data-act="constellation-range"][data-days="14"]').click();
       assert.equal(await page.locator('.orbit-journal__day').count(), 14, "14-day constellation restored");
