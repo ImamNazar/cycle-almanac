@@ -862,11 +862,17 @@
   /* ================================================================= RENDER */
   const PHASE_ACCENT = { winter: "winter", spring: "spring", summer: "summer", autumn: "autumn", bleed: "winter", steady: "spring" };
   function render() {
+    const openEditorialDetails = Array.from(document.querySelectorAll("#page details.al6-more[open]")).map(el => el.classList.contains("al6-more--insights") ? "insights" : "today");
     recompute();
     document.body.dataset.view = ui.tab;
     document.body.dataset.phase = AN.current ? PHASE_ACCENT[AN.current.phase] || "spring" : "spring";
     $("#page").innerHTML = ({ today: pageToday, calendar: pageCalendar, insights: pageInsights, learn: pageLearn })[ui.tab]();
-    $$(".dock__btn").forEach(b => b.setAttribute("aria-current", b.dataset.tab === ui.tab ? "page" : "false"));
+    for (const section of openEditorialDetails) {
+      if (section !== ui.tab) continue;
+      const details = document.querySelector(section === "insights" ? "#page details.al6-more--insights" : "#page details.al6-more:not(.al6-more--insights)");
+      if (details) details.open = true;
+    }
+    $(".dock__btn").forEach(b => b.setAttribute("aria-current", b.dataset.tab === ui.tab ? "page" : "false"));
     updateScene();
   }
   function go(tab) { ui.tab = tab; render(); window.scrollTo(0, 0); $("#page").focus({ preventScroll: true }); if (fx) requestAnimationFrame(() => fx.fit()); }
