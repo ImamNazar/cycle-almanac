@@ -21,7 +21,7 @@ const { spawn } = require("node:child_process");
       const errors = [];
       page.on("pageerror", error => errors.push(error.message));
       await page.goto("http://127.0.0.1:8765/", { waitUntil: "load" });
-      await page.waitForFunction(() => !!window.__almanac);
+      await page.waitForFunction(() => !!window.__almanac, null, { timeout: 12000 }).catch(async error => { throw Error("Almanac boot failed: " + JSON.stringify({ errors, scripts: await page.locator("script[src]").evaluateAll(xs => xs.map(x => x.src)), page: (await page.locator("body").innerText()).slice(0, 300) }) + " " + error.message); });
       // Start with sample data to avoid relying on a specific calendar date.
       await page.locator('[data-act="ob-sample"]').click();
       await page.waitForTimeout(200);
