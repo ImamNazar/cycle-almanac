@@ -1,6 +1,7 @@
 /* Browser smoke tests. Run: npm install --no-save playwright && npx playwright install chromium && node tests/browser.test.js */
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
+const path = require("node:path");
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 
@@ -20,11 +21,52 @@ const { spawn } = require("node:child_process");
       const errors = [];
       page.on("pageerror", error => errors.push(error.message));
       await page.goto("http://127.0.0.1:8765/", { waitUntil: "load" });
-      await page.waitForFunction(() => !!window.__almanac);
+      await page.waitForFunction(() => !!window.__almanac, null, { timeout: 12000 }).catch(async error => { throw Error("Almanac boot failed: " + JSON.stringify({ errors, scripts: await page.locator("script[src]").evaluateAll(xs => xs.map(x => x.src)), page: (await page.locator("body").innerText()).slice(0, 300) }) + " " + error.message); });
       // Start with sample data to avoid relying on a specific calendar date.
       await page.locator('[data-act="ob-sample"]').click();
       await page.waitForTimeout(200);
       assert.equal(await page.locator('.v5-checkin__row').count(), 4, "Daily Studio offers mood, energy, pain and flow");
+      assert.equal(await page.locator('.al6-today').count(), 1, "Editorial Today experience renders");
+      assert.equal(await page.locator('.al6-today__date').count(), 1, "Today shows a human-readable date");
+      assert.equal(await page.locator('.al6-today__private').count(), 1, "Local privacy is clearly signposted");
+      assert.equal(await page.locator('.al6-today__aside').count(), 1, "Editorial companion card renders");
+      assert.equal(await page.locator('.al6-more').count(), 1, "Optional Today details are available without crowding the primary check-in");
+      assert.match(await page.locator('#v5-portal-title').innerText(), /How are you feeling today/i, "New Today heading appears");
+      assert.equal(await page.locator('.al6-today .v5-portal__action').count(), 3, "Journal, calendar and insights shortcuts remain available");
+      assert.equal(await page.locator('.al6-today .v5-checkin__choice').count() > 10, true, "Working check-in choices remain visible");
+      if (viewport.width <= 390) {
+        const editorialBounds = await page.locator('.al6-today, .al6-today__layout, .al6-today__aside, .al6-today .v5-portal__actions').evaluateAll(els => els.map(el => {
+          const rect = el.getBoundingClientRect(); return { cls: el.className, left: rect.left, right: rect.right, width: innerWidth };
+        }));
+        assert.equal(editorialBounds.every(x => x.left >= -2 && x.right <= x.width + 2), true, "Editorial mobile surfaces fit viewport: " + JSON.stringify(editorialBounds));
+      }
+
+      assert.equal(await page.locator('.al6-today__layout').evaluate(el => getComputedStyle(el).animationName), "none", "Today respects reduced-motion preference");
+      // Keep actual rendered screenshots for human visual review of the draft PR.
+      const shotDir = path.join("artifacts", "almanac-6-screens");
+      fs.mkdirSync(shotDir, { recursive: true });
+      await page.screenshot({ path: path.join(shotDir, `today-${viewport.width}.png`), fullPage: true });
+      // Phase 3 editorial pages must remain reachable and preserve functional navigation.
+      await page.locator('.dock__btn[data-tab="calendar"]').click();
+      assert.equal(await page.locator('.al6-calendar').count(), 1, "Editorial Calendar renders");
+      assert.equal(await page.locator('.al6-calendar .cal__head').evaluate(el => getComputedStyle(el).animationName), "none", "Calendar respects reduced-motion preference");
+      if (viewport.width <= 390) {
+        const calendarWidth = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, viewport: innerWidth }));
+        assert.equal(calendarWidth.scroll <= calendarWidth.viewport + 2, true, "Calendar must not overflow narrow viewports: " + JSON.stringify(calendarWidth));
+      }
+      await page.screenshot({ path: path.join(shotDir, `calendar-${viewport.width}.png`), fullPage: true });
+      assert.equal(await page.locator('.al6-calendar [data-act="cal-step"]').count(), 2, "Month navigation remains available");
+      await page.locator('.al6-calendar [data-act="cal-step"][data-step="1"]').click();
+      assert.equal(await page.locator('.al6-calendar').count(), 1, "Calendar remains rendered after moving forward a month");
+      await page.locator('.al6-calendar [data-act="cal-step"][data-step="-1"]').click();
+      await page.locator('.dock__btn[data-tab="insights"]').click();
+      assert.equal(await page.locator('.al6-insights-intro').count(), 1, "Editorial Insights intro renders");
+      assert.equal(await page.locator('.al6-observation').count(), 1, "Recorded observations remain visible");
+      assert.equal(await page.locator('.al6-more--insights').count(), 1, "Deeper insights remain available on demand");
+      await page.locator('.al6-more--insights summary').click();
+      assert.equal(await page.locator('.al6-more--insights').evaluate(el => el.open), true, "Expanded insights can be accessed");
+      await page.screenshot({ path: path.join(shotDir, `insights-${viewport.width}.png`), fullPage: true });
+      await page.locator('.dock__btn[data-tab="today"]').click();
       // Fertility language must communicate uncertainty rather than guarantee safety.
       const predictionCopy = await page.locator('.status').first().innerText();
       assert.equal(/8 times in 10|fertile window has closed for this cycle/i.test(predictionCopy), false, "Prediction copy avoids unsupported certainty");
@@ -46,7 +88,7 @@ const { spawn } = require("node:child_process");
         assert.equal(overflow.document <= overflow.viewport + 2, true, "200% root text size does not cause horizontal overflow: " + JSON.stringify(overflow));
         await page.locator('html').evaluate((el, size) => { el.style.fontSize = size; }, originalFontSize);
       }
-      assert.equal(await page.locator('.v5-portal').evaluate(el => getComputedStyle(el).backgroundImage !== 'none'), true, "Cosmic atmosphere remains visible without motion");
+      assert.equal(await page.locator('.al6-today').evaluate(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)'), true, "Editorial Today paper surface remains visible without motion");
       if (viewport.width < 720) {
         assert.equal(await page.locator('.v5-portal').evaluate(el => getComputedStyle(el, '::after').animationName), 'none', "Mobile disables decorative planet animation");
       }
@@ -127,10 +169,14 @@ const { spawn } = require("node:child_process");
       await page.locator('.v5-portal [data-act="log"]').click();
       assert.equal(await page.locator('#sheet[open]').count(), 1, "Daily Studio opens log sheet");
       await page.locator('#sheet [data-act="close"]').click();
+      // Expand optional journal tools before exercising their visible controls.
+      await page.locator(".al6-more:not(.al6-more--insights) > summary").click();
+      assert.equal(await page.locator(".al6-more:not(.al6-more--insights)").evaluate(el => el.open), true, "Journal tools expand accessibly");
       // Time-window switching changes the real date controls, not stored data.
       assert.equal(await page.locator('.orbit-journal__day').count(), 14, "14-day constellation default");
       await page.locator('[data-act="constellation-range"][data-days="28"]').click();
       assert.equal(await page.locator('.orbit-journal__day').count(), 28, "28-day constellation");
+      assert.equal(await page.locator(".al6-more:not(.al6-more--insights)").evaluate(el => el.open), true, "Journal remains expanded after range changes");
       assert.equal(await page.locator('[data-act="constellation-range"][data-days="28"]').getAttribute('aria-pressed'), 'true', "28-day control selected");
       await page.locator('[data-act="constellation-range"][data-days="14"]').click();
       assert.equal(await page.locator('.orbit-journal__day').count(), 14, "14-day constellation restored");

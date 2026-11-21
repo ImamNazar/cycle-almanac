@@ -295,18 +295,18 @@
       const title = key === "mood" ? String(o[2] || o[1]) : String(o[1]);
       return `<button type="button" class="v5-checkin__choice${selected ? " is-selected" : ""}" data-act="quick" data-k="${key}" data-v="${esc(value)}" aria-pressed="${selected}" title="${esc(title)}"><span>${esc(title)}</span></button>`;
     }).join("")}</div></div>`;
-    const quickPanel = `<div class="v5-checkin" aria-label="Quick daily check-in"><div class="v5-checkin__heading"><strong>One-tap check-in</strong><span>Saved privately on this device</span></div><p class="v5-checkin__save" data-status="${storageStatus}" role="status" aria-live="polite">${storageStatus === "saving" ? "Saving changes on this device…" : storageStatus === "saved" ? "Saved on this device" : "Not saved — check your browser storage"}</p>${quickChoices("mood", "Mood", C.MOOD)}${quickChoices("energy", "Energy", C.ENERGY)}${quickChoices("pain", "Pain", C.PAIN)}${quickChoices("flow", "Flow", C.FLOW)}<p class="v5-checkin__hint">Tap again to remove a choice. None is a real observation, different from leaving a field blank. For symptoms or notes, open your journal.</p></div>`;
-    return `<section class="v5-portal" aria-labelledby="v5-portal-title">
-      <div class="v5-portal__intro"><p class="v5-portal__eyebrow">YOUR DAILY STUDIO <span aria-hidden="true">✦</span></p>
-      <h2 id="v5-portal-title">How's your world today?</h2>
-      <p>One moment is enough. You can always add more later.</p></div>
-      ${quickPanel}
+    const quickPanel = `<div class="v5-checkin" aria-label="Quick daily check-in"><div class="v5-checkin__heading"><strong>Your daily notes</strong><span>Four little ways to check in</span></div><p class="v5-checkin__save" data-status="${storageStatus}" role="status" aria-live="polite">${storageStatus === "saving" ? "Saving changes on this device…" : storageStatus === "saved" ? "Saved on this device" : "Not saved — check your browser storage"}</p>${quickChoices("mood", "Mood", C.MOOD)}${quickChoices("energy", "Energy", C.ENERGY)}${quickChoices("pain", "Pain", C.PAIN)}${quickChoices("flow", "Flow", C.FLOW)}<p class="v5-checkin__hint">Tap a selected answer to clear it. “None” is a recorded observation, not an empty answer. Your private journal holds notes and symptoms.</p></div>`;
+    return `<section class="v5-portal al6-today" aria-labelledby="v5-portal-title"><div class="al6-today__top"><span class="al6-today__date">${fmt(TODAY, {weekday:"long",month:"long",day:"numeric"})}</span><span class="al6-today__private">✳ Only on your device</span></div>
+      <div class="v5-portal__intro"><p class="v5-portal__eyebrow">A MOMENT FOR YOURSELF <span aria-hidden="true">✦</span></p>
+      <h2 id="v5-portal-title">How are you feeling today?</h2>
+      <p>There’s no right way to feel. Take a moment, notice what’s here, and keep what matters.</p></div>
+      <div class="al6-today__layout"><div class="al6-today__checkin">${quickPanel}</div><aside class="al6-today__aside"><span class="al6-today__flower" aria-hidden="true">✿</span><p class="al6-today__aside-kicker">A gentle reminder</p><p class="al6-today__aside-quote">Every day deserves a little space.</p><p class="al6-today__aside-foot">Your pace. Your patterns. Your story.</p></aside></div>
       <div class="v5-portal__actions">
-        <button class="v5-portal__action v5-portal__action--primary" type="button" data-act="log"><span class="v5-portal__symbol" aria-hidden="true">✳</span><span><strong>${recorded ? "Continue today's journal" : "Check in with yourself"}</strong><small>${storageStatus === "error" ? "Storage unavailable — protect your entries with a backup" : storageStatus === "saving" ? "Saving your latest changes…" : recorded ? "Your entry is saved on this device" : "Mood, energy, symptoms and notes"}</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
-        <button class="v5-portal__action" type="button" data-tab="calendar"><span class="v5-portal__symbol" aria-hidden="true">◌</span><span><strong>Travel through time</strong><small>Explore recorded days and estimates</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
-        <button class="v5-portal__action" type="button" data-tab="insights"><span class="v5-portal__symbol" aria-hidden="true">✧</span><span><strong>Visit the observatory</strong><small>See what your history can tell you</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
+        <button class="v5-portal__action v5-portal__action--primary" type="button" data-act="log"><span class="v5-portal__symbol" aria-hidden="true">✳</span><span><strong>${recorded ? "Continue your journal" : "Write in your journal"}</strong><small>${storageStatus === "error" ? "Storage unavailable — protect your entries with a backup" : storageStatus === "saving" ? "Saving your latest changes…" : recorded ? "Your entry is saved on this device" : "Mood, energy, symptoms and notes"}</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
+        <button class="v5-portal__action" type="button" data-tab="calendar"><span class="v5-portal__symbol" aria-hidden="true">◌</span><span><strong>Your calendar</strong><small>Explore recorded days and estimates</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
+        <button class="v5-portal__action" type="button" data-tab="insights"><span class="v5-portal__symbol" aria-hidden="true">✧</span><span><strong>Your insights</strong><small>See what your history can tell you</small></span><span class="v5-portal__arrow" aria-hidden="true">↗</span></button>
       </div>
-      <p class="v5-portal__privacy">Private by design · No account required · Your observations, not a diagnosis</p>
+      <p class="v5-portal__privacy">Made for your everyday · Private by design · Not medical advice</p>
     </section>`;
   }
   function pageToday() {
@@ -316,10 +316,10 @@
       <h1 class="status__h">Welcome to <span class="status__ph">Almanac</span></h1>
       <p class="status__line">Log the first day of your last period and the landscape above starts following your cycle.</p>
       <div class="actions"><button class="btn" data-act="start-period" type="button">My period started today</button><button class="btn btn--ghost" data-act="pick-start" type="button">It started earlier</button></div>
-      <p class="fine">Everything stays on this device. No account, no server.</p></section>` + orbitJournal() + todayLogCard() + ritualCard() + learnTeaser();
+      <p class="fine">Everything stays on this device. No account, no server.</p></section>` + `<details class="al6-more"><summary>Explore your journal and daily rituals</summary>${orbitJournal()}${todayLogCard()}${ritualCard()}${learnTeaser()}</details>`;
     if (S.mode === "paused") return h + `<section class="card status"><p class="eyebrow">${greeting()}</p><h1 class="status__h">Predictions <span class="status__ph">paused</span></h1>
       <p class="status__line">Cycle estimates are off, which makes sense during pregnancy, postpartum or whenever your cycle isn't following its usual pattern. You can still log how you feel, and switch predictions back on in Settings.</p>
-      <div class="actions"><button class="btn" data-act="log" type="button">Log today</button></div></section>` + orbitJournal() + todayLogCard() + ritualCard() + flagsHTML();
+      <div class="actions"><button class="btn" data-act="log" type="button">Log today</button></div></section>` + `<details class="al6-more"><summary>Explore your journal and daily rituals</summary>${orbitJournal()}${todayLogCard()}${ritualCard()}</details>` + flagsHTML();
 
     const P = C.PHASES[c.phase];
     const hormonal = S.mode === "hormonal";
@@ -331,7 +331,7 @@
       <ul class="facts">${nextFact(c)}${hormonal ? "" : fertileFact(c)}</ul>
       ${hormonal ? "" : `<p class="fine">Fertile-window and ovulation dates are estimates, even with temperature or LH observations. <b>Do not use these dates as birth control or proof that pregnancy is impossible.</b></p>`}
       <div class="actions">${actionsFor(c)}</div></section>`;
-    h += orbitJournal() + todayLogCard() + ritualCard() + flagsHTML() + `<details class="card fold"><summary>Explore your next 7 days</summary>${outlookCard()}</details>` + seasonCard(c);
+    h += `<details class="al6-more"><summary>Explore your journal and daily rituals</summary>${orbitJournal()}${todayLogCard()}${ritualCard()}</details>` + flagsHTML() + `<details class="card fold"><summary>Explore your next 7 days</summary>${outlookCard()}</details>` + seasonCard(c);
     return h;
   }
   function actionsFor(c) {
@@ -457,10 +457,10 @@
     const selectedDay = ui.calSelected ? A.toDay(ui.calSelected) : null;
     const selectedInfo = selectedDay != null ? dayInfo(selectedDay) : null;
     const details = selectedInfo ? `<div class="cal-detail" aria-live="polite"><div><b>${fLong(selectedDay)}</b><p class="fine">${selectedInfo.lab.length ? esc(selectedInfo.lab.join(" · ")) : "No events recorded"}</p></div>${selectedDay <= TODAY ? `<button class="btn btn--ghost" data-act="log" data-day="${selectedInfo.iso}" type="button">Log this day</button>` : '<span class="fine">Future dates are estimates</span>'}</div>` : '<p class="fine cal-prompt">Choose a date to see its details.</p>';
-    return sampleBanner() + `<section class="card cal-clean"><div class="cal__head"><button class="icon" data-act="cal-step" data-step="-1" type="button" aria-label="Previous month">${I.chev(-1)}</button>
+    return sampleBanner() + `<section class="card cal-clean al6-calendar"><div class="al6-page-intro"><p class="eyebrow">YOUR DAYS, AT A GLANCE</p><h2>Every day tells a story.</h2><p>A gentle place to look back, notice patterns and keep track of what matters.</p></div><div class="cal__head"><button class="icon" data-act="cal-step" data-step="-1" type="button" aria-label="Previous month">${I.chev(-1)}</button>
       <h1 class="cal__title">${fmt(first, { month: "long", year: "numeric" })}</h1>
       <button class="icon" data-act="cal-step" data-step="1" type="button" aria-label="Next month">${I.chev(1)}</button></div>
-      <p class="fine">A clearer view of your cycle. Select a day for the details.</p>
+      <p class="fine al6-calendar__instruction">Choose a date to explore your notes and cycle history.</p>
       <div class="cal__dow" aria-hidden="true">${dows}</div><ol class="cal">${cells}</ol>
       <ul class="legend"><li><i class="cal-dot cal-dot--period"></i>Logged period</li><li><i class="cal-dot cal-dot--pred"></i>Predicted period</li>${data.settings.mode === "natural" ? '<li><i class="cal-dot cal-dot--fert"></i>Fertility estimate</li><li><i class="cal-dot cal-dot--ovu"></i>Ovulation estimate</li>' : ""}<li><i class="cal-dot cal-dot--log"></i>Other log</li></ul>
       ${details}<div class="row"><button class="link" data-act="cal-today" type="button">Jump to today</button></div>
@@ -511,9 +511,9 @@
       }).join("");
       return `<div class="v5-observation__row"><div class="v5-observation__row-head"><strong>${label}</strong><small>${n} of 28 days recorded</small></div><div class="v5-observation__grid">${cells}</div><p class="v5-observation__summary">${esc(detail)}</p></div>`;
     }).join("");
-    return `<section class="v5-observation card" aria-labelledby="v5-observation-title">
-      <p class="eyebrow">THE OBSERVATORY · ACTUAL ENTRIES</p>
-      <h2 class="h2" id="v5-observation-title">A month in little moments.</h2>
+    return `<section class="v5-observation card al6-observation" aria-labelledby="v5-observation-title">
+      <p class="eyebrow">YOUR MONTH IN MOMENTS</p>
+      <h2 class="h2" id="v5-observation-title">The days, in detail.</h2>
       <p class="fine">Explore 28-day windows of your mood, energy and pain entries. Brighter tiles mean higher recorded scores, not better health. A pain score of zero is a recorded observation, not a missing entry. Empty outlines mean nothing was recorded.</p>
       <div class="v5-observation__nav" role="group" aria-label="Observation date range"><button type="button" data-act="observatory-step" data-step="1">← Previous 28 days</button><span aria-live="polite">${esc(fShort(days[0]))} – ${esc(fShort(days[27]))}</span><button type="button" data-act="observatory-step" data-step="-1" ${offset === 0 ? "disabled" : ""}>Next 28 days →</button></div>
       <div class="v5-observation__coverage" role="status"><strong>${coverage} of 28 days with a check-in</strong><div class="v5-observation__coverage-track" role="progressbar" aria-label="Days with mood, energy or pain recorded" aria-valuemin="0" aria-valuemax="28" aria-valuenow="${coverage}"><span style="width:${coverage / 28 * 100}%"></span></div><p>${coverageMessage}</p></div>
@@ -526,7 +526,7 @@
   }
   function pageInsights() {
     const st = AN.stats, S = data.settings;
-    let h = sampleBanner() + observationObservatory() + ritualInsights();
+    let h = sampleBanner() + `<section class="al6-insights-intro"><p class="eyebrow">YOUR PERSONAL PATTERNS</p><h1>Little details, bigger picture.</h1><p>Explore what you’ve actually recorded, at your own pace. These reflections are descriptive, not diagnoses.</p></section>` + observationObservatory();
     if (st.n < 1) {
       h += `<section class="card"><h1 class="h2">Your rhythm</h1><p>Almanac needs at least two logged periods to measure a cycle. Once you have them, you'll see your average, how much it varies, and a chart here.</p></section>`;
     } else {
@@ -545,8 +545,7 @@
         <p class="fine">For comparison: in a study of over 600,000 logged cycles the average was 29.3 days, and only 13% were exactly 28. Typical adult cycles run ${r.min} to ${r.max} days.</p></section>`;
     }
     h += flagsHTML();
-    h += wheelCard() + stripsCard();
-    h += patternsCard() + symptomsCard();
+    h += `<details class="al6-more al6-more--insights"><summary>Explore deeper cycle patterns</summary>${wheelCard()}${stripsCard()}${patternsCard()}${symptomsCard()}${ritualInsights()}</details>`;
     h += `<section class="card"><h2 class="h3">Take it with you</h2>
       <p>A one-page summary of your cycles to bring to an appointment, or your predictions as calendar events.</p>
       <div class="actions"><button class="btn btn--ghost" data-act="summary" type="button">Doctor summary</button>${AN.upcoming.length ? '<button class="btn btn--ghost" data-act="ics" type="button">Add predictions to calendar</button>' : ""}</div>
@@ -863,11 +862,17 @@
   /* ================================================================= RENDER */
   const PHASE_ACCENT = { winter: "winter", spring: "spring", summer: "summer", autumn: "autumn", bleed: "winter", steady: "spring" };
   function render() {
+    const openEditorialDetails = Array.from(document.querySelectorAll("#page details.al6-more[open]")).map(el => el.classList.contains("al6-more--insights") ? "insights" : "today");
     recompute();
     document.body.dataset.view = ui.tab;
     document.body.dataset.phase = AN.current ? PHASE_ACCENT[AN.current.phase] || "spring" : "spring";
     $("#page").innerHTML = ({ today: pageToday, calendar: pageCalendar, insights: pageInsights, learn: pageLearn })[ui.tab]();
-    $$(".dock__btn").forEach(b => b.setAttribute("aria-current", b.dataset.tab === ui.tab ? "page" : "false"));
+    for (const section of openEditorialDetails) {
+      if (section !== ui.tab) continue;
+      const details = document.querySelector(section === "insights" ? "#page details.al6-more--insights" : "#page details.al6-more:not(.al6-more--insights)");
+      if (details) details.open = true;
+    }
+    $(".dock__btn").forEach(b => b.setAttribute("aria-current", b.dataset.tab === ui.tab ? "page" : "false"));
     updateScene();
   }
   function go(tab) { ui.tab = tab; render(); window.scrollTo(0, 0); $("#page").focus({ preventScroll: true }); if (fx) requestAnimationFrame(() => fx.fit()); }

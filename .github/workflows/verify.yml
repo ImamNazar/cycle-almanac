@@ -23,3 +23,11 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Run browser smoke tests (mobile and desktop)
         run: node tests/browser.test.js
+      - name: Upload Almanac 6 visual review screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: almanac-6-visual-review
+          path: artifacts/almanac-6-screens/
+          if-no-files-found: warn
+          retention-days: 14
