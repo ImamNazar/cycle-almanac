@@ -457,10 +457,10 @@
     const selectedDay = ui.calSelected ? A.toDay(ui.calSelected) : null;
     const selectedInfo = selectedDay != null ? dayInfo(selectedDay) : null;
     const details = selectedInfo ? `<div class="cal-detail" aria-live="polite"><div><b>${fLong(selectedDay)}</b><p class="fine">${selectedInfo.lab.length ? esc(selectedInfo.lab.join(" · ")) : "No events recorded"}</p></div>${selectedDay <= TODAY ? `<button class="btn btn--ghost" data-act="log" data-day="${selectedInfo.iso}" type="button">Log this day</button>` : '<span class="fine">Future dates are estimates</span>'}</div>` : '<p class="fine cal-prompt">Choose a date to see its details.</p>';
-    return sampleBanner() + `<section class="card cal-clean"><div class="cal__head"><button class="icon" data-act="cal-step" data-step="-1" type="button" aria-label="Previous month">${I.chev(-1)}</button>
+    return sampleBanner() + `<section class="card cal-clean al6-calendar"><div class="al6-page-intro"><p class="eyebrow">YOUR DAYS, AT A GLANCE</p><h2>Every day tells a story.</h2><p>A gentle place to look back, notice patterns and keep track of what matters.</p></div><div class="cal__head"><button class="icon" data-act="cal-step" data-step="-1" type="button" aria-label="Previous month">${I.chev(-1)}</button>
       <h1 class="cal__title">${fmt(first, { month: "long", year: "numeric" })}</h1>
       <button class="icon" data-act="cal-step" data-step="1" type="button" aria-label="Next month">${I.chev(1)}</button></div>
-      <p class="fine">A clearer view of your cycle. Select a day for the details.</p>
+      <p class="fine al6-calendar__instruction">Choose a date to explore your notes and cycle history.</p>
       <div class="cal__dow" aria-hidden="true">${dows}</div><ol class="cal">${cells}</ol>
       <ul class="legend"><li><i class="cal-dot cal-dot--period"></i>Logged period</li><li><i class="cal-dot cal-dot--pred"></i>Predicted period</li>${data.settings.mode === "natural" ? '<li><i class="cal-dot cal-dot--fert"></i>Fertility estimate</li><li><i class="cal-dot cal-dot--ovu"></i>Ovulation estimate</li>' : ""}<li><i class="cal-dot cal-dot--log"></i>Other log</li></ul>
       ${details}<div class="row"><button class="link" data-act="cal-today" type="button">Jump to today</button></div>
@@ -511,9 +511,9 @@
       }).join("");
       return `<div class="v5-observation__row"><div class="v5-observation__row-head"><strong>${label}</strong><small>${n} of 28 days recorded</small></div><div class="v5-observation__grid">${cells}</div><p class="v5-observation__summary">${esc(detail)}</p></div>`;
     }).join("");
-    return `<section class="v5-observation card" aria-labelledby="v5-observation-title">
-      <p class="eyebrow">THE OBSERVATORY · ACTUAL ENTRIES</p>
-      <h2 class="h2" id="v5-observation-title">A month in little moments.</h2>
+    return `<section class="v5-observation card al6-observation" aria-labelledby="v5-observation-title">
+      <p class="eyebrow">YOUR MONTH IN MOMENTS</p>
+      <h2 class="h2" id="v5-observation-title">The days, in detail.</h2>
       <p class="fine">Explore 28-day windows of your mood, energy and pain entries. Brighter tiles mean higher recorded scores, not better health. A pain score of zero is a recorded observation, not a missing entry. Empty outlines mean nothing was recorded.</p>
       <div class="v5-observation__nav" role="group" aria-label="Observation date range"><button type="button" data-act="observatory-step" data-step="1">← Previous 28 days</button><span aria-live="polite">${esc(fShort(days[0]))} – ${esc(fShort(days[27]))}</span><button type="button" data-act="observatory-step" data-step="-1" ${offset === 0 ? "disabled" : ""}>Next 28 days →</button></div>
       <div class="v5-observation__coverage" role="status"><strong>${coverage} of 28 days with a check-in</strong><div class="v5-observation__coverage-track" role="progressbar" aria-label="Days with mood, energy or pain recorded" aria-valuemin="0" aria-valuemax="28" aria-valuenow="${coverage}"><span style="width:${coverage / 28 * 100}%"></span></div><p>${coverageMessage}</p></div>
@@ -526,7 +526,7 @@
   }
   function pageInsights() {
     const st = AN.stats, S = data.settings;
-    let h = sampleBanner() + observationObservatory() + ritualInsights();
+    let h = sampleBanner() + `<section class="al6-insights-intro"><p class="eyebrow">YOUR PERSONAL PATTERNS</p><h1>Little details, bigger picture.</h1><p>Explore what you’ve actually recorded, at your own pace. These reflections are descriptive, not diagnoses.</p></section>` + observationObservatory() + ritualInsights();
     if (st.n < 1) {
       h += `<section class="card"><h1 class="h2">Your rhythm</h1><p>Almanac needs at least two logged periods to measure a cycle. Once you have them, you'll see your average, how much it varies, and a chart here.</p></section>`;
     } else {
