@@ -30,6 +30,7 @@ const { spawn } = require("node:child_process");
       assert.equal(await page.locator('.al6-today__date').count(), 1, "Today shows a human-readable date");
       assert.equal(await page.locator('.al6-today__private').count(), 1, "Local privacy is clearly signposted");
       assert.equal(await page.locator('.al6-today__aside').count(), 1, "Editorial companion card renders");
+      assert.equal(await page.locator('.al6-more').count(), 1, "Optional Today details are available without crowding the primary check-in");
       assert.match(await page.locator('#v5-portal-title').innerText(), /How are you feeling today/i, "New Today heading appears");
       assert.equal(await page.locator('.al6-today .v5-portal__action').count(), 3, "Journal, calendar and insights shortcuts remain available");
       assert.equal(await page.locator('.al6-today .v5-checkin__choice').count() > 10, true, "Working check-in choices remain visible");
@@ -61,6 +62,9 @@ const { spawn } = require("node:child_process");
       await page.locator('.dock__btn[data-tab="insights"]').click();
       assert.equal(await page.locator('.al6-insights-intro').count(), 1, "Editorial Insights intro renders");
       assert.equal(await page.locator('.al6-observation').count(), 1, "Recorded observations remain visible");
+      assert.equal(await page.locator('.al6-more--insights').count(), 1, "Deeper insights remain available on demand");
+      await page.locator('.al6-more--insights summary').click();
+      assert.equal(await page.locator('.al6-more--insights').evaluate(el => el.open), true, "Expanded insights can be accessed");
       await page.screenshot({ path: path.join(shotDir, `insights-${viewport.width}.png`), fullPage: true });
       await page.locator('.dock__btn[data-tab="today"]').click();
       // Fertility language must communicate uncertainty rather than guarantee safety.
