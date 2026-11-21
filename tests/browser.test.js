@@ -169,6 +169,9 @@ const { spawn } = require("node:child_process");
       await page.locator('.v5-portal [data-act="log"]').click();
       assert.equal(await page.locator('#sheet[open]').count(), 1, "Daily Studio opens log sheet");
       await page.locator('#sheet [data-act="close"]').click();
+      // Expand optional journal tools before exercising their visible controls.
+      await page.locator(".al6-more:not(.al6-more--insights) > summary").click();
+      assert.equal(await page.locator(".al6-more:not(.al6-more--insights)").evaluate(el => el.open), true, "Journal tools expand accessibly");
       // Time-window switching changes the real date controls, not stored data.
       assert.equal(await page.locator('.orbit-journal__day').count(), 14, "14-day constellation default");
       await page.locator('[data-act="constellation-range"][data-days="28"]').click();
