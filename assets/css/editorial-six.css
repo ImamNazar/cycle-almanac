@@ -82,3 +82,13 @@ button:focus-visible,a:focus-visible{outline:3px solid #99577c!important;outline
 #page .stats .stat b{font-family:Fraunces,Georgia,serif;color:#66455e}
 @media(max-width:600px){.al6-page-intro{margin-bottom:20px}.al6-calendar{padding:16px!important}.al6-calendar .cal__head{padding:8px}.al6-calendar .legend{padding:10px}.al6-insights-intro{padding:22px}.al6-observation .v5-observation__row{padding:10px}}
 @media(prefers-reduced-motion:reduce){.al6-today .v5-checkin__choice,.al6-calendar .cal-day button,.al6-observation button{transition:none!important;transform:none!important}}
+
+/* Visual-review correction: prevent calendar controls from widening 320px viewports. */
+.al6-calendar,.al6-calendar .cal__head,.al6-calendar .cal,.al6-calendar .cal__dow,.al6-calendar .legend{min-width:0;max-width:100%;box-sizing:border-box}
+.al6-calendar .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.al6-calendar .cal__dow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.al6-calendar .cal-day,.al6-calendar .cal-day button{min-width:0;max-width:100%;box-sizing:border-box}
+.al6-calendar .cal__head{display:flex;justify-content:space-between;gap:4px}
+.al6-calendar .cal__title{min-width:0;text-align:center;overflow-wrap:anywhere}
+.al6-calendar .legend{display:flex;flex-wrap:wrap}
+@media(max-width:390px){.al6-calendar .cal__head .icon{flex:0 0 32px;width:32px}.al6-calendar .cal__title{font-size:21px}}
