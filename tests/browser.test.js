@@ -25,6 +25,18 @@ const { spawn } = require("node:child_process");
       await page.locator('[data-act="ob-sample"]').click();
       await page.waitForTimeout(200);
       assert.equal(await page.locator('.v5-checkin__row').count(), 4, "Daily Studio offers mood, energy, pain and flow");
+      assert.equal(await page.locator('.al6-today').count(), 1, "Editorial Today experience renders");
+      assert.equal(await page.locator('.al6-today__aside').count(), 1, "Editorial companion card renders");
+      assert.match(await page.locator('#v5-portal-title').innerText(), /How are you feeling today/i, "New Today heading appears");
+      assert.equal(await page.locator('.al6-today .v5-portal__action').count(), 3, "Journal, calendar and insights shortcuts remain available");
+      assert.equal(await page.locator('.al6-today .v5-checkin__choice').count() > 10, true, "Working check-in choices remain visible");
+      if (viewport.width <= 390) {
+        const editorialBounds = await page.locator('.al6-today, .al6-today__layout, .al6-today__aside, .al6-today .v5-portal__actions').evaluateAll(els => els.map(el => {
+          const rect = el.getBoundingClientRect(); return { cls: el.className, left: rect.left, right: rect.right, width: innerWidth };
+        }));
+        assert.equal(editorialBounds.every(x => x.left >= -2 && x.right <= x.width + 2), true, "Editorial mobile surfaces fit viewport: " + JSON.stringify(editorialBounds));
+      }
+
       // Fertility language must communicate uncertainty rather than guarantee safety.
       const predictionCopy = await page.locator('.status').first().innerText();
       assert.equal(/8 times in 10|fertile window has closed for this cycle/i.test(predictionCopy), false, "Prediction copy avoids unsupported certainty");
