@@ -40,6 +40,7 @@ const { spawn } = require("node:child_process");
         assert.equal(editorialBounds.every(x => x.left >= -2 && x.right <= x.width + 2), true, "Editorial mobile surfaces fit viewport: " + JSON.stringify(editorialBounds));
       }
 
+      assert.equal(await page.locator('.al6-today__layout').evaluate(el => getComputedStyle(el).animationName), "none", "Today respects reduced-motion preference");
       // Keep actual rendered screenshots for human visual review of the draft PR.
       const shotDir = path.join("artifacts", "almanac-6-screens");
       fs.mkdirSync(shotDir, { recursive: true });
@@ -47,6 +48,7 @@ const { spawn } = require("node:child_process");
       // Phase 3 editorial pages must remain reachable and preserve functional navigation.
       await page.locator('.dock__btn[data-tab="calendar"]').click();
       assert.equal(await page.locator('.al6-calendar').count(), 1, "Editorial Calendar renders");
+      assert.equal(await page.locator('.al6-calendar .cal__head').evaluate(el => getComputedStyle(el).animationName), "none", "Calendar respects reduced-motion preference");
       if (viewport.width <= 390) {
         const calendarWidth = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, viewport: innerWidth }));
         assert.equal(calendarWidth.scroll <= calendarWidth.viewport + 2, true, "Calendar must not overflow narrow viewports: " + JSON.stringify(calendarWidth));
