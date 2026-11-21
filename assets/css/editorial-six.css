@@ -125,3 +125,21 @@ button:focus-visible,a:focus-visible{outline:3px solid #99577c!important;outline
   .al6-today__layout,.al6-page-intro,.al6-insights-intro,.al6-today__aside,.al6-today__aside::before,.al6-calendar .cal__head,.al6-observation{animation:none!important}
   .al6-calendar .cal-day button,.al6-today button,.al6-observation button{transition:none!important}
 }
+
+/* Almanac 6 hierarchy consolidation: primary task first, detail on demand. */
+.al6-more{margin:22px 0;border:1px solid #e7d6db;border-radius:22px;background:#fffaf5;overflow:hidden}
+.al6-more>summary{cursor:pointer;list-style:none;padding:21px 24px;font:600 17px/1.4 Figtree,system-ui,sans-serif;color:#63475d;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.al6-more>summary::-webkit-details-marker{display:none}
+.al6-more>summary::after{content:"+";font:400 28px/1 Georgia,serif;color:#9d6a86}
+.al6-more[open]>summary::after{content:"−"}
+.al6-more[open]>summary{border-bottom:1px solid #e7d6db}
+.al6-more>summary:focus-visible{outline:3px solid #6e4b67;outline-offset:-4px}
+.al6-more>.card,.al6-more>section{margin:16px!important}
+.al6-more--insights{background:#fcf3ef}
+@media(max-width:600px){.al6-more>summary{padding:17px;font-size:15px}.al6-more>.card,.al6-more>section{margin:10px!important}}
+/* Replace legacy desktop sidebar with a compact, calm navigation rail. */
+@media(min-width:900px){
+ .side>.dock{background:#fffaf5;border:1px solid #eadbdd;border-radius:24px;padding:12px;box-shadow:0 10px 35px #6445580d}
+ .side>.dock .dock__btn{border-radius:15px}
+ .side>.dock .dock__btn[aria-current="page"],.side>.dock .dock__btn.is-active{background:#f4e2e8;color:#62425a}
+}
