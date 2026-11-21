@@ -26,6 +26,8 @@ const { spawn } = require("node:child_process");
       await page.waitForTimeout(200);
       assert.equal(await page.locator('.v5-checkin__row').count(), 4, "Daily Studio offers mood, energy, pain and flow");
       assert.equal(await page.locator('.al6-today').count(), 1, "Editorial Today experience renders");
+      assert.equal(await page.locator('.al6-today__date').count(), 1, "Today shows a human-readable date");
+      assert.equal(await page.locator('.al6-today__private').count(), 1, "Local privacy is clearly signposted");
       assert.equal(await page.locator('.al6-today__aside').count(), 1, "Editorial companion card renders");
       assert.match(await page.locator('#v5-portal-title').innerText(), /How are you feeling today/i, "New Today heading appears");
       assert.equal(await page.locator('.al6-today .v5-portal__action').count(), 3, "Journal, calendar and insights shortcuts remain available");
@@ -37,6 +39,14 @@ const { spawn } = require("node:child_process");
         assert.equal(editorialBounds.every(x => x.left >= -2 && x.right <= x.width + 2), true, "Editorial mobile surfaces fit viewport: " + JSON.stringify(editorialBounds));
       }
 
+      // Phase 3 editorial pages must remain reachable and preserve functional navigation.
+      await page.locator('.dock__btn[data-tab="calendar"]').click();
+      assert.equal(await page.locator('.al6-calendar').count(), 1, "Editorial Calendar renders");
+      assert.equal(await page.locator('.al6-calendar [data-act="cal-step"]').count(), 2, "Month navigation remains available");
+      await page.locator('.dock__btn[data-tab="insights"]').click();
+      assert.equal(await page.locator('.al6-insights-intro').count(), 1, "Editorial Insights intro renders");
+      assert.equal(await page.locator('.al6-observation').count(), 1, "Recorded observations remain visible");
+      await page.locator('.dock__btn[data-tab="today"]').click();
       // Fertility language must communicate uncertainty rather than guarantee safety.
       const predictionCopy = await page.locator('.status').first().innerText();
       assert.equal(/8 times in 10|fertile window has closed for this cycle/i.test(predictionCopy), false, "Prediction copy avoids unsupported certainty");
