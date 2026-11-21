@@ -316,10 +316,10 @@
       <h1 class="status__h">Welcome to <span class="status__ph">Almanac</span></h1>
       <p class="status__line">Log the first day of your last period and the landscape above starts following your cycle.</p>
       <div class="actions"><button class="btn" data-act="start-period" type="button">My period started today</button><button class="btn btn--ghost" data-act="pick-start" type="button">It started earlier</button></div>
-      <p class="fine">Everything stays on this device. No account, no server.</p></section>` + orbitJournal() + todayLogCard() + ritualCard() + learnTeaser();
+      <p class="fine">Everything stays on this device. No account, no server.</p></section>` + `<details class="al6-more"><summary>Explore your journal and daily rituals</summary>${orbitJournal()}${todayLogCard()}${ritualCard()}${learnTeaser()}</details>`;
     if (S.mode === "paused") return h + `<section class="card status"><p class="eyebrow">${greeting()}</p><h1 class="status__h">Predictions <span class="status__ph">paused</span></h1>
       <p class="status__line">Cycle estimates are off, which makes sense during pregnancy, postpartum or whenever your cycle isn't following its usual pattern. You can still log how you feel, and switch predictions back on in Settings.</p>
-      <div class="actions"><button class="btn" data-act="log" type="button">Log today</button></div></section>` + orbitJournal() + todayLogCard() + ritualCard() + flagsHTML();
+      <div class="actions"><button class="btn" data-act="log" type="button">Log today</button></div></section>` + `<details class="al6-more"><summary>Explore your journal and daily rituals</summary>${orbitJournal()}${todayLogCard()}${ritualCard()}</details>` + flagsHTML();
 
     const P = C.PHASES[c.phase];
     const hormonal = S.mode === "hormonal";
@@ -331,7 +331,7 @@
       <ul class="facts">${nextFact(c)}${hormonal ? "" : fertileFact(c)}</ul>
       ${hormonal ? "" : `<p class="fine">Fertile-window and ovulation dates are estimates, even with temperature or LH observations. <b>Do not use these dates as birth control or proof that pregnancy is impossible.</b></p>`}
       <div class="actions">${actionsFor(c)}</div></section>`;
-    h += orbitJournal() + todayLogCard() + ritualCard() + flagsHTML() + `<details class="card fold"><summary>Explore your next 7 days</summary>${outlookCard()}</details>` + seasonCard(c);
+    h += `<details class="al6-more"><summary>Explore your journal and daily rituals</summary>${orbitJournal()}${todayLogCard()}${ritualCard()}</details>` + flagsHTML() + `<details class="card fold"><summary>Explore your next 7 days</summary>${outlookCard()}</details>` + seasonCard(c);
     return h;
   }
   function actionsFor(c) {
@@ -526,7 +526,7 @@
   }
   function pageInsights() {
     const st = AN.stats, S = data.settings;
-    let h = sampleBanner() + `<section class="al6-insights-intro"><p class="eyebrow">YOUR PERSONAL PATTERNS</p><h1>Little details, bigger picture.</h1><p>Explore what you’ve actually recorded, at your own pace. These reflections are descriptive, not diagnoses.</p></section>` + observationObservatory() + ritualInsights();
+    let h = sampleBanner() + `<section class="al6-insights-intro"><p class="eyebrow">YOUR PERSONAL PATTERNS</p><h1>Little details, bigger picture.</h1><p>Explore what you’ve actually recorded, at your own pace. These reflections are descriptive, not diagnoses.</p></section>` + observationObservatory();
     if (st.n < 1) {
       h += `<section class="card"><h1 class="h2">Your rhythm</h1><p>Almanac needs at least two logged periods to measure a cycle. Once you have them, you'll see your average, how much it varies, and a chart here.</p></section>`;
     } else {
@@ -545,8 +545,7 @@
         <p class="fine">For comparison: in a study of over 600,000 logged cycles the average was 29.3 days, and only 13% were exactly 28. Typical adult cycles run ${r.min} to ${r.max} days.</p></section>`;
     }
     h += flagsHTML();
-    h += wheelCard() + stripsCard();
-    h += patternsCard() + symptomsCard();
+    h += `<details class="al6-more al6-more--insights"><summary>Explore deeper cycle patterns</summary>${wheelCard()}${stripsCard()}${patternsCard()}${symptomsCard()}${ritualInsights()}</details>`;
     h += `<section class="card"><h2 class="h3">Take it with you</h2>
       <p>A one-page summary of your cycles to bring to an appointment, or your predictions as calendar events.</p>
       <div class="actions"><button class="btn btn--ghost" data-act="summary" type="button">Doctor summary</button>${AN.upcoming.length ? '<button class="btn btn--ghost" data-act="ics" type="button">Add predictions to calendar</button>' : ""}</div>
