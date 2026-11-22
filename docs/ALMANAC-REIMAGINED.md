@@ -146,3 +146,55 @@ Keep the previous deployed commit identifiable. If a release has a serious regre
 - Existing automated coverage includes the five-tab responsive/focus sweep, offline reload, backup recovery, custom symptoms and invalid import rejection. Check CI for the latest commit before calling the release candidate verified.
 - **Release remains blocked on hands-on device and assistive-technology checks** listed above; no real-device testing was performed by this audit.
 - Keep PR #7 in draft. No merge or deployment until explicit approval.
+
+
+## Real-device acceptance checklist — release gate
+
+**Scope:** release candidate `816dc69` (Verify #316 and Package #100 passed). This checklist is **not evidence that any physical-device tests have run**. Use a dedicated test profile and fictional journal entries; never paste real health information into bug reports.
+
+### Test setup
+- [ ] Record device model, OS version, browser version, installed-app or browser mode, tester, test date, and result for each case.
+- [ ] Open the development-branch preview in a separate staging/test environment, **not** the existing production GitHub Pages URL. If no staging URL is available, do not use the production site as a substitute.
+- [ ] Prepare a disposable sample journal with at least two cycles, one custom symptom, a note, one temperature and an LH observation. Record the expected values for comparison.
+- [ ] Save a backup to a secure location before changing or clearing any browser data. Do not reset storage on a real user's device.
+
+### iPhone — Safari and Add to Home Screen
+- [ ] In Safari, load staging, complete onboarding, open Today / Calendar / Log / Insights / Discover, and verify each screen is readable without horizontal scrolling.
+- [ ] Use Safari Share → Add to Home Screen. Launch from the Home Screen and confirm the app opens with working navigation, icons and safe-area padding.
+- [ ] Check 320–390 px equivalent narrow layouts, portrait/landscape rotation, keyboard appearance, date selection, and that Save and navigation controls are not obscured.
+- [ ] Log an entry, fully close and reopen the Home Screen app, and confirm the same entry remains.
+- [ ] With the app successfully loaded once online, switch to Airplane Mode, reopen, visit all five tabs, and confirm previously saved entries remain visible. Restore connectivity and check for errors.
+
+### Android — Chrome installation
+- [ ] In Chrome, open staging, install via browser menu or install prompt when available, and verify app name/icon and standalone launch.
+- [ ] Exercise all five tabs in portrait and landscape, especially bottom navigation, long labels, Calendar day selection, and Settings dialog.
+- [ ] Log and edit a sample entry, force-close and reopen the installed app, and verify persistence.
+- [ ] After one online load, disable Wi-Fi and mobile data, reopen and navigate all five tabs. Reconnect and verify updates do not erase entries.
+- [ ] Confirm device back navigation and browser history do not trap the user or unexpectedly discard an unsaved note.
+
+### Backup, restore, and upgrades
+- [ ] Export the disposable test journal; confirm the downloaded JSON contains the expected test entries and settings.
+- [ ] Import into a **separate test profile/device** and confirm dates, flow, notes, custom symptoms, observations, and settings match the source. Import replaces current entries; confirm warning is visible.
+- [ ] Attempt an invalid JSON backup; confirm the app rejects it and preserves existing journal entries.
+- [ ] With a disposable corrupted-storage test profile, verify a valid backup restores successfully and a misleading empty export is blocked before recovery.
+- [ ] Upgrade an existing installed test build to the new service-worker version. Confirm fresh UI assets load online, cached shell opens offline, and `almanac.v1` data survives. Never clear production browser data for this test.
+
+### Accessibility — keyboard, VoiceOver and TalkBack
+- [ ] Navigate all five tabs with an external keyboard: logical Tab order, visible focus, no focus traps, main-content focus after tab changes.
+- [ ] Open Settings, move focus within it, close with Escape and the Close button, and confirm focus returns to a sensible location.
+- [ ] With iPhone VoiceOver and Android TalkBack, inspect navigation labels and active-tab announcements; calendar date/selection labels; input labels and errors; check-in selections; charts and text alternatives; and backup status messages.
+- [ ] Increase device text size and enable bold text or display zoom where available; verify content remains usable without clipping.
+- [ ] Enable Reduce Motion and confirm no essential information depends on animation.
+- [ ] Check contrast in bright and dim conditions, with particular attention to muted labels and selection states.
+
+### Five-tab functional sign-off
+- [ ] Today: onboarding, dashboard cards, quick check-in and optional display preferences.
+- [ ] Calendar: previous/next month, today jump, selected date, recorded versus estimated markers and explanatory caveats.
+- [ ] Log: all choices, notes, custom symptoms, temperature/LH/mucus observations, edit existing entry and reload.
+- [ ] Insights: correct summaries and observation history for the sample data; no unsupported fertility certainty.
+- [ ] Discover: search, no-results state, open/close educational topics and long text at narrow widths.
+
+### Evidence and release decision
+For each device/test case record **Pass / Fail / Blocked / Not run**, screenshot or short reproduction steps for failures (with fictional data only), and a linked GitHub issue if needed. **No unchecked item counts as passed.** Block release for data loss, failed restore, broken offline reopening, inaccessible primary navigation or major mobile clipping. Record any accepted minor issues explicitly.
+
+**Current decision: NOT READY FOR RELEASE APPROVAL** until these manual gates are signed off. Keep PR #7 draft; no merge or deployment without explicit user authorization.
