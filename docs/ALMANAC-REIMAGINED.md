@@ -138,3 +138,11 @@ Almanac Reimagined introduces a five-tab local-first cycle journal with configur
 
 ### Rollback preparation
 Keep the previous deployed commit identifiable. If a release has a serious regression, restore the previous app shell without clearing browser storage or changing the `almanac.v1` key. Confirm a rollback in a separate test profile before using it for real users.
+
+
+### Final product walkthrough and release-readiness audit — 22 November 2026
+- Reviewed implementation paths for all five tabs: Today onboarding and check-in; Calendar selection and estimates; Log entries and custom symptoms; Insights summaries; Discover search and educational cards.
+- Fixed a Today onboarding state-integrity issue: if the browser rejects the save, the in-memory onboarding flag is restored instead of appearing complete until reload. Added a browser regression test that simulates storage failure.
+- Existing automated coverage includes the five-tab responsive/focus sweep, offline reload, backup recovery, custom symptoms and invalid import rejection. Check CI for the latest commit before calling the release candidate verified.
+- **Release remains blocked on hands-on device and assistive-technology checks** listed above; no real-device testing was performed by this audit.
+- Keep PR #7 in draft. No merge or deployment until explicit approval.
