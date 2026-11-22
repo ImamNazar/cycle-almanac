@@ -103,3 +103,10 @@ body{background:radial-gradient(ellipse 65% 32% at 95% 0%,#fbe8e8 0%,transparent
 
 /* Match the earlier .choice-list button selector so 44px touch targets win. */
 .choice-list button.choice{min-height:44px}
+
+/* Mobile and keyboard accessibility hardening */
+:where(button,a,input,select,textarea,summary):focus-visible{outline:3px solid var(--focus-ring,#76516e);outline-offset:3px}
+.bottom-nav button{min-height:48px}
+.secondary,.text-button,.discover-card details summary{min-height:44px}
+@media(max-width:350px){.calendar-head .icon-button{min-width:44px;min-height:44px}.calendar-grid .cal-day{min-height:44px}}
+@media(max-width:540px){.bottom-nav{padding-bottom:calc(8px + env(safe-area-inset-bottom))}}
