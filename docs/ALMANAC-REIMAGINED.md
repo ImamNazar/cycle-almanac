@@ -56,3 +56,30 @@ Printable care reports, explicit privacy-safe selective sharing (no cloud by def
 
 ## Safety boundaries
 This is a tracking and reflection tool, not diagnosis, fertility confirmation or contraception. Ovulation estimates are not reliable birth control. Health suggestions should be qualified, nonjudgmental and evidence-aware.
+
+## Whole-product parity standard (user-approved direction)
+The Lively reference applies to the entire product, including:
+- Navigation architecture, tab placement, wayfinding, back behavior and discoverability.
+- Today/home composition, illustrations, cycle status, phase guidance and daily suggestions.
+- Calendar interactions, month switching, dates, estimates and editing.
+- Logging entry points, speed, grouped symptoms, editable preferences and history.
+- Insights, reports, journal, wellness recommendations and personalization.
+- Onboarding, empty states, settings, data controls, responsive behavior and transitions.
+
+**Implementation requirement:** Do not declare a screen finished just because its colors match. Evaluate full user journeys, interaction density, hierarchy, responsive behavior, accessibility and original illustration quality. Do not copy Lively assets, exact screens or proprietary copy.
+
+## Measurable improvements beyond reference
+- Local-first with no account and no external analytics by default.
+- Export/import, recovery and privacy controls in the primary settings flow.
+- Clearly labeled estimates, uncertainty, and flexible prediction modes.
+- Customizable symptom and dashboard choices; inclusive and nonjudgmental language.
+- Works offline and on narrow screens; reduced motion and keyboard support.
+- Evidence-aware suggestions with no false promise of health outcomes.
+
+## Mandatory acceptance walkthrough
+1. New user can understand and navigate every tab without onboarding completion.
+2. Existing user data migrates unchanged; every recorded symptom, note and period remains accessible.
+3. Log a day in under a few interactions, edit it, revisit it on the calendar, and see it in Insights.
+4. Every screen works at 320, 390, 768 and 1280 pixels without overflow or inaccessible controls.
+5. Reduced-motion, keyboard, and offline states are exercised by automated tests.
+6. No deployment or merge before feature parity, visual review and explicit approval.
