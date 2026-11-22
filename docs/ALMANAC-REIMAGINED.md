@@ -83,3 +83,29 @@ The Lively reference applies to the entire product, including:
 4. Every screen works at 320, 390, 768 and 1280 pixels without overflow or inaccessible controls.
 5. Reduced-motion, keyboard, and offline states are exercised by automated tests.
 6. No deployment or merge before feature parity, visual review and explicit approval.
+
+## Feature-parity audit — 22 November 2026
+
+Compared the rebuilt `assets/js/reimagined.js` against the existing `assets/js/app.js` and engine. **A shared data schema does not mean the UI is at feature parity.**
+
+| Capability | Reimagined status | Next action |
+| --- | --- | --- |
+| Five-tab Today / Calendar / Log / Insights / Discover | Implemented | Visual and keyboard review |
+| Period, mood, energy, pain, symptoms, notes | Implemented | Test historical edits and reload |
+| BBT, LH, cervical mucus | Implemented | Verify saved values, unit presentation and empty states |
+| Cycle history, mood and symptom charts | Implemented | Validate interpretation with sparse data |
+| First-run onboarding | Basic | Restore preference and cycle-length guidance |
+| Backup export and import | Implemented | Additional malformed-data and restore tests |
+| Offline engine and service worker | Present | Offline upgrade and cache tests |
+| Personal rituals and reflections | **Not exposed** | Rebuild private ritual controls and summaries |
+| Sample/demo mode | **Not exposed** | Add reversible sample mode without replacing real entries |
+| Rich learning library and search | **Reduced** | Rebuild educational topic browser with source context |
+| Custom dashboard / sections | **Not exposed** | Add section visibility preferences |
+| Calendar export and printable report | **Not exposed** | Restore explicit user-initiated export |
+| More detailed observation charts | **Not exposed** | Build BBT / LH / mucus visual summaries |
+| Guided settings / age and cycle preferences | **Reduced** | Restore safely with validation |
+
+### Release gates
+- Do not merge until parity decisions are documented, the major missing core features are implemented or deliberately deferred, and a real visual review is complete.
+- Preserve `almanac.v1` compatibility; never overwrite personal logs merely to show sample data.
+- Keep medical estimates uncertain and never treat them as contraception guidance.
