@@ -4,3 +4,30 @@
 @media(max-width:540px){#app{padding:0 16px}.top{height:74px}.logo{font-size:25px}.privacy{display:none}main{padding-top:27px}.hero-card{padding:30px 24px;min-height:295px;border-radius:28px}.hero-copy{max-width:78%}.hero-copy h2{font-size:42px}.hero-copy>p:not(.kicker){font-size:14px}.flower-art{transform:scale(.6) rotate(-12deg);transform-origin:center;right:-100px;top:30px;opacity:.5}.panel{padding:19px;border-radius:21px}.idea-grid{gap:10px}.idea{padding:16px;min-height:170px}.idea h3{font-size:15px}.section-heading h2{font-size:23px}.section-heading span{font-size:11px}.calendar-grid{gap:4px}.cal-day{border-radius:10px;font-size:12px}.field-grid,.discover-grid{grid-template-columns:1fr}.bottom-nav{width:100%;border-radius:20px 20px 0 0;padding:7px 3px calc(7px + env(safe-area-inset-bottom))}.bottom-nav button{font-size:10px;padding:8px 0}.bottom-nav button span{font-size:21px}.metric{padding:18px 13px}.metric strong{font-size:25px}}
 @media(max-width:340px){.hero-copy{max-width:90%}.flower-art{opacity:.25}.choice{padding:9px 11px}.idea-grid{grid-template-columns:1fr 1fr}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* Editorial polish: coherent surfaces, restrained motion and tactile feedback. */
+:root{--ease-out:cubic-bezier(.22,1,.36,1);--focus:#78528a}
+body{background:radial-gradient(ellipse 65% 32% at 95% 0%,#fbe8e8 0%,transparent 85%),radial-gradient(ellipse 55% 32% at 0% 54%,#f8f0e9 0%,transparent 90%),#fff8f2}
+.page-intro{animation:almanac-rise .65s var(--ease-out) both}
+.hero-card,.panel,.idea,.metric{transition:transform .32s var(--ease-out),box-shadow .32s var(--ease-out),border-color .25s ease}
+.hero-card{isolation:isolate;box-shadow:0 25px 60px #7c53601a}
+.hero-card::after{content:"";position:absolute;inset:0;pointer-events:none;border:1px solid #ffffff70;border-radius:inherit}
+.panel{box-shadow:0 10px 32px #684a570b}
+.panel:focus-within{border-color:#d9b6c4}
+.primary,.secondary,.text-button,.icon-button,.choice,.cal-day{transition:background-color .2s ease,color .2s ease,transform .22s var(--ease-out),box-shadow .22s ease}
+.bottom-nav{box-shadow:0 -12px 48px #4d34451c}
+.bottom-nav button{transition:background-color .2s ease,color .2s ease,transform .22s var(--ease-out)}
+.bottom-nav button[aria-current=page]{box-shadow:inset 0 0 0 1px #e9bdc9}
+.welcome-panel{border:1px solid #e7c9d4;background:linear-gradient(135deg,#fffaf8,#fceaf0)}
+.toggle-field{display:flex;align-items:center;gap:10px;margin:16px 0;font-size:14px;line-height:1.5}
+.toggle-field input{width:19px;height:19px;accent-color:#9d5775}
+@media(hover:hover) and (pointer:fine){
+.hero-card:hover,.panel:hover{box-shadow:0 22px 48px #684a5717}
+.idea:hover,.metric:hover{transform:translateY(-3px);box-shadow:0 15px 34px #684a5714}
+.primary:hover,.secondary:hover,.icon-button:hover{transform:translateY(-2px)}
+.bottom-nav button:hover{background:#f8e8eb;transform:translateY(-2px)}
+.cal-day:hover,.choice:hover{transform:translateY(-1px)}
+}
+@keyframes almanac-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:540px){.hero-card{box-shadow:0 16px 34px #7c536014}.page-intro{animation-duration:.45s}.toggle-field{align-items:flex-start}}
+@media(prefers-reduced-motion:reduce){.page-intro{animation:none!important}.hero-card,.panel,.idea,.metric,.primary,.secondary,.text-button,.icon-button,.choice,.cal-day,.bottom-nav button{transition:none!important}}
