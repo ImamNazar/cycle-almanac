@@ -31,3 +31,5 @@ body{background:radial-gradient(ellipse 65% 32% at 95% 0%,#fbe8e8 0%,transparent
 @keyframes almanac-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:540px){.hero-card{box-shadow:0 16px 34px #7c536014}.page-intro{animation-duration:.45s}.toggle-field{align-items:flex-start}}
 @media(prefers-reduced-motion:reduce){.page-intro{animation:none!important}.hero-card,.panel,.idea,.metric,.primary,.secondary,.text-button,.icon-button,.choice,.cal-day,.bottom-nav button{transition:none!important}}
+
+.calendar-tools{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:12px 0 18px}.calendar-tools .fine{margin:0}.calendar-today{padding:9px 15px;font-size:13px;white-space:nowrap}@media(max-width:540px){.calendar-tools{align-items:flex-start;gap:8px}.calendar-tools .fine{font-size:12px}}
