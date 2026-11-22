@@ -81,3 +81,22 @@ body{background:radial-gradient(ellipse 65% 32% at 95% 0%,#fbe8e8 0%,transparent
 @media(max-width:540px){.section-heading{align-items:flex-start}.calendar-head h2{font-size:clamp(18px,5vw,25px)}.calendar-grid .cal-day{min-height:44px}.calendar-tools .fine{flex:1 1 160px}.hero-copy .primary{max-width:100%}}
 @media(max-width:350px){.calendar-head{gap:5px}.calendar-grid .cal-day{min-height:40px}.calendar-head .icon-button{width:38px;height:38px}}
 @media(prefers-reduced-motion:reduce){.calendar-grid .cal-day{transition:none!important}}
+
+/* Experience 2.0 — Log, Insights and Discover */
+.choice-group{min-width:0}
+.choice-list{gap:10px}
+.choice{min-height:44px;display:inline-flex;align-items:center;justify-content:center;line-height:1.3;text-align:center}
+.choice[aria-pressed=true]{box-shadow:0 0 0 2px rgba(109,76,103,.15)}
+.field-grid{min-width:0}
+.field-grid .field{min-width:0}
+.field input,.field textarea,.field select{max-width:100%}
+.insight-bars{gap:16px}
+.insight-bar-track{height:15px;border:1px solid rgba(109,76,103,.07)}
+.insight-bar-row{grid-template-columns:minmax(80px,125px) minmax(0,1fr) minmax(30px,auto)}
+.insight-bar-row strong{white-space:nowrap}
+.discover-grid{align-items:stretch}
+.discover-card{min-width:0;overflow-wrap:anywhere;transition:transform .2s ease,box-shadow .2s ease}
+.discover-card h3{line-height:1.25}
+@media(hover:hover) and (pointer:fine){.discover-card:hover{transform:translateY(-3px);box-shadow:0 16px 36px #684a5715}}
+@media(max-width:540px){.choice-list{gap:8px}.choice{padding:10px 13px}.insight-bar-row{grid-template-columns:70px minmax(0,1fr) minmax(28px,auto);gap:8px}.discover-grid{gap:12px}}
+@media(prefers-reduced-motion:reduce){.discover-card{transition:none!important}.discover-card:hover{transform:none!important}}
