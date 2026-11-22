@@ -109,3 +109,32 @@ Compared the rebuilt `assets/js/reimagined.js` against the existing `assets/js/a
 - Do not merge until parity decisions are documented, the major missing core features are implemented or deliberately deferred, and a real visual review is complete.
 - Preserve `almanac.v1` compatibility; never overwrite personal logs merely to show sample data.
 - Keep medical estimates uncertain and never treat them as contraception guidance.
+
+
+## Release-candidate gate review — 22 November 2026
+
+**Current decision: candidate for hands-on review, not approved for release.** Latest tested commit `27cc487` passed verification #290 and packaging #87. These results cover scripted browser checks, not real-device usability, installation or comprehensive accessibility auditing.
+
+### Verified automatically
+- Navigation, logging, calendar, insights, discovery and settings across 320 / 390 / 768 / 1280 px test viewports.
+- Invalid backup rejection, valid backup restore, storage-write failure rollback and demo isolation.
+- Custom symptom handling, mood/symptom chart counts and reduced-motion page entrance.
+- Offline service-worker reload with journal retained on the same browser/device.
+
+### Manual checks required before release approval
+- [ ] Install from a supported Android browser and verify launch icon, standalone navigation and offline reopen.
+- [ ] On iPhone Safari, test Add to Home Screen, safe-area spacing, keyboard overlays, scrolling and offline reopen.
+- [ ] Navigate all five tabs using keyboard alone; check focus visibility, dialog focus management and Escape behavior.
+- [ ] Review with VoiceOver or TalkBack: form labels, status messages, calendar date labels and chart alternatives.
+- [ ] Export a real backup, store it safely, restore into a separate test profile, and compare all journal entries.
+- [ ] Verify upgrading an existing installation preserves `almanac.v1` data and refreshes cached assets.
+- [ ] Inspect actual visual layouts and content on narrow phones and tablets, including long translated or user-defined labels.
+- [ ] Decide whether calendar export / printable reports and richer onboarding are required for initial launch or explicitly deferred.
+- [ ] Review all educational and prediction wording; do not present estimates as contraception or diagnosis.
+- [ ] Obtain explicit approval before changing PR #7 from draft, merging or deploying.
+
+### Release notes (draft)
+Almanac Reimagined introduces a five-tab local-first cycle journal with configurable dashboard sections, optional observations, private reflections, custom symptoms, educational browsing, offline app shell and user-controlled backup import/export. Existing stored data must remain compatible; users should export a backup before any major upgrade.
+
+### Rollback preparation
+Keep the previous deployed commit identifiable. If a release has a serious regression, restore the previous app shell without clearing browser storage or changing the `almanac.v1` key. Confirm a rollback in a separate test profile before using it for real users.
