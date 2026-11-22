@@ -1,0 +1,13 @@
+/* Almanac Reimagined — original design tokens, independent from V5/V6. */
+:root{
+ --al-bg:#fff8f2;--al-paper:#fffdf9;--al-ink:#382b35;--al-muted:#776872;
+ --al-peach:#ffd8c5;--al-apricot:#f8b98e;--al-rose:#f5c7d4;
+ --al-lilac:#ded4fa;--al-sage:#dce8d7;--al-border:#ecded9;
+ --al-focus:#674a83;--al-radius-sm:16px;--al-radius:26px;--al-radius-lg:36px;
+ --al-shadow:0 16px 40px rgba(93,57,72,.08);
+ --al-space-1:8px;--al-space-2:12px;--al-space-3:16px;--al-space-4:24px;--al-space-5:32px;
+}
+.alr-surface{background:var(--al-paper);border:1px solid var(--al-border);border-radius:var(--al-radius);box-shadow:var(--al-shadow)}
+.alr-pill{border-radius:999px;padding:10px 16px;background:var(--al-peach);color:var(--al-ink)}
+.alr-focus:focus-visible{outline:3px solid var(--al-focus);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.alr-motion{animation:none!important;transition:none!important}}
