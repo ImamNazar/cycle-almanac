@@ -100,3 +100,6 @@ body{background:radial-gradient(ellipse 65% 32% at 95% 0%,#fbe8e8 0%,transparent
 @media(hover:hover) and (pointer:fine){.discover-card:hover{transform:translateY(-3px);box-shadow:0 16px 36px #684a5715}}
 @media(max-width:540px){.choice-list{gap:8px}.choice{padding:10px 13px}.insight-bar-row{grid-template-columns:70px minmax(0,1fr) minmax(28px,auto);gap:8px}.discover-grid{gap:12px}}
 @media(prefers-reduced-motion:reduce){.discover-card{transition:none!important}.discover-card:hover{transform:none!important}}
+
+/* Match the earlier .choice-list button selector so 44px touch targets win. */
+.choice-list button.choice{min-height:44px}
