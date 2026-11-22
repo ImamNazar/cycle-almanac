@@ -110,3 +110,21 @@ body{background:radial-gradient(ellipse 65% 32% at 95% 0%,#fbe8e8 0%,transparent
 .secondary,.text-button,.discover-card details summary{min-height:44px}
 @media(max-width:350px){.calendar-head .icon-button{min-width:44px;min-height:44px}.calendar-grid .cal-day{min-height:44px}}
 @media(max-width:540px){.bottom-nav{padding-bottom:calc(8px + env(safe-area-inset-bottom))}}
+
+/* Living Experience: a tactile, illustrated garden with optional motion */
+.living-garden{position:relative;isolation:isolate;overflow:hidden;min-height:280px;padding:26px;border-radius:30px;background:radial-gradient(circle at 80% 25%,#fff4bb 0,transparent 35%),radial-gradient(circle at 14% 90%,#e3caff 0,transparent 42%),linear-gradient(130deg,#fff2f2,#f6eaff 65%,#e9f7e9);border:1px solid #e9d8e9;box-shadow:0 14px 36px #6d476315}
+.living-garden::after{content:"";position:absolute;bottom:-40px;left:-8%;width:116%;height:105px;border-radius:50% 50% 0 0;background:#c5dfc4;opacity:.75;z-index:-1}
+.garden-copy{max-width:360px;position:relative;z-index:2}.garden-copy h2{font-size:clamp(24px,4vw,35px);margin:6px 0 8px}.garden-copy p{line-height:1.5}
+.garden-flowers{display:flex;align-items:end;justify-content:flex-end;gap:clamp(8px,2vw,25px);min-height:118px;padding:0 10px 12px}
+.garden-flower{--petal:#f48ca5;position:relative;display:grid;place-items:center;width:76px;height:76px;border:0;border-radius:50%;background:#fff9fa88;box-shadow:0 8px 18px #9c6a7b29;cursor:pointer;transform-origin:50% 95%;animation:garden-sway 4s ease-in-out infinite alternate}
+.garden-flower::after{content:"";position:absolute;top:64px;left:calc(50% - 3px);height:53px;width:6px;border-radius:8px;background:#73aa85;z-index:-1}
+.garden-flower span{font-size:68px;line-height:1;color:var(--petal);text-shadow:0 3px 0 #fff9;transition:transform .3s cubic-bezier(.2,1.5,.4,1)}
+.garden-flower:focus-visible{outline:3px solid #563c79;outline-offset:5px}
+.garden-flower:hover span{transform:scale(1.15) rotate(12deg)}
+.flower-two{--petal:#a88ae9;animation-delay:-1.4s;width:88px;height:88px}.flower-three{--petal:#f4b64f;animation-delay:-2.6s;width:66px;height:66px}
+.garden-flower.blooming span{animation:garden-bloom .65s cubic-bezier(.18,1.4,.4,1)}
+.garden-hint{position:relative;z-index:2;margin:10px 0 0;font-size:.9rem;color:#684a63}
+@keyframes garden-sway{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}
+@keyframes garden-bloom{0%{transform:scale(.6) rotate(-30deg)}55%{transform:scale(1.32) rotate(12deg)}100%{transform:scale(1) rotate(0)}}
+@media(max-width:540px){.living-garden{padding:20px;min-height:310px}.garden-flowers{justify-content:center;padding-top:14px}.garden-flower{width:68px;height:68px}.flower-two{width:78px;height:78px}.flower-three{width:60px;height:60px}.garden-flower span{font-size:60px}}
+@media(prefers-reduced-motion:reduce){.garden-flower,.garden-flower.blooming span{animation:none!important}.garden-flower span{transition:none!important}}
