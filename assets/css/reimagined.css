@@ -174,3 +174,18 @@ body[data-view="discover"] .art-symbol{color:#84b996}
 @keyframes almanac-spark{to{opacity:.4;scale:.8}}
 @media(max-width:540px){.page-intro{padding-right:92px!important}.page-intro-art{right:2px;width:80px;height:80px}.art-symbol{font-size:58px}.art-spark{font-size:20px}.insight-illustration{min-height:120px}.insight-sun{font-size:80px}.insight-leaf{font-size:65px}}
 @media(prefers-reduced-motion:reduce){.art-orbit,.art-symbol,.art-spark,.insight-sun,.insight-leaf,.insight-star{animation:none!important}.discover-art{transition:none!important}.discover-card:hover .discover-art{transform:none!important}}
+
+/* Living Experience: animated data reveals and responsive calendar interactions */
+.insight-bar-track,.cycle-history-track{position:relative;overflow:hidden}
+.insight-bar-track>span,.cycle-history-track>span{display:block;transform-origin:left center;animation:living-chart-grow .85s cubic-bezier(.2,.8,.2,1) both}
+.insight-bar-row:nth-child(2) .insight-bar-track>span,.cycle-history-row:nth-child(2) .cycle-history-track>span{animation-delay:.08s}
+.insight-bar-row:nth-child(3) .insight-bar-track>span,.cycle-history-row:nth-child(3) .cycle-history-track>span{animation-delay:.16s}
+.insight-bar-row:nth-child(4) .insight-bar-track>span,.cycle-history-row:nth-child(4) .cycle-history-track>span{animation-delay:.24s}
+.insight-bar-row:nth-child(5) .insight-bar-track>span,.cycle-history-row:nth-child(5) .cycle-history-track>span{animation-delay:.32s}
+@keyframes living-chart-grow{from{transform:scaleX(0);opacity:.3}to{transform:scaleX(1);opacity:1}}
+.calendar-grid:not(.weekdays){animation:living-calendar-appear .38s cubic-bezier(.2,.8,.2,1) both}
+.calendar-grid .cal-day{transition:background-color .2s ease,box-shadow .2s ease,transform .28s cubic-bezier(.2,1.5,.4,1)}
+.calendar-grid .cal-day.active{transform:scale(1.06);z-index:1}
+@media(hover:hover) and (pointer:fine){.calendar-grid .cal-day:hover{transform:scale(1.09);z-index:2}}
+@keyframes living-calendar-appear{from{opacity:.4;transform:translateY(10px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){.insight-bar-track>span,.cycle-history-track>span,.calendar-grid:not(.weekdays){animation:none!important}.calendar-grid .cal-day{transition:none!important}.calendar-grid .cal-day.active,.calendar-grid .cal-day:hover{transform:none!important}}
