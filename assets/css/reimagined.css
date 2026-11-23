@@ -148,3 +148,29 @@ body[data-view] .panel{animation:living-arrive .45s ease-out both}
 @keyframes living-arrive{from{opacity:.65;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:540px){.illustrated-choices .choice{min-width:65px;flex:1 1 68px;padding:10px 7px}.illustrated-choices .choice-symbol{width:42px;height:42px;font-size:26px}}
 @media(prefers-reduced-motion:reduce){body[data-view] .panel{animation:none!important}.illustrated-choices .choice,.illustrated-choices .choice-symbol{transition:none!important}.illustrated-choices .choice:hover{transform:none!important}}
+
+/* Living Experience: bespoke botanical motifs and animated editorial illustrations */
+.page-intro{position:relative;isolation:isolate;overflow:hidden;min-height:155px;padding-right:clamp(110px,22%,210px)!important}
+.page-intro-art{position:absolute;right:18px;top:50%;width:115px;height:115px;transform:translateY(-50%);display:grid;place-items:center;pointer-events:none}
+.art-orbit{position:absolute;inset:7px;border:2px dashed #b887b977;border-radius:50%;animation:almanac-orbit 36s linear infinite}
+.art-symbol{font-size:86px;line-height:1;color:#dc83a5;text-shadow:0 6px 0 #ffffff99;animation:almanac-float 3.8s ease-in-out infinite alternate}
+.art-spark{position:absolute;right:-2px;top:3px;font-size:29px;color:#e8ad60;animation:almanac-spark 2.6s ease-in-out infinite alternate}
+body[data-view="calendar"] .art-symbol{color:#a78be1}
+body[data-view="log"] .art-symbol{color:#e18a9c}
+body[data-view="insights"] .art-symbol{color:#8c99d8}
+body[data-view="discover"] .art-symbol{color:#84b996}
+.insight-illustration{position:relative;overflow:hidden;min-height:150px;margin:14px 0 22px;border-radius:28px;background:radial-gradient(circle at 62% 35%,#ffe6a7,transparent 38%),linear-gradient(115deg,#f1e6ff,#ffe6f0 65%,#e5f4e8);display:flex;align-items:center;justify-content:center}
+.insight-sun{font-size:105px;line-height:1;color:#f3b960;animation:almanac-orbit 24s linear infinite}
+.insight-leaf{position:absolute;font-size:100px;color:#7caf95;bottom:-28px;animation:almanac-float 4s ease-in-out infinite alternate}
+.leaf-a{left:12%;transform:rotate(-20deg)}.leaf-b{right:12%;animation-delay:-2s}
+.insight-star{position:absolute;top:14px;right:24%;font-size:36px;color:#aa8de1;animation:almanac-spark 2s ease-in-out infinite alternate}
+.discover-card{position:relative;overflow:hidden}
+.discover-art{display:grid;place-items:center;width:68px;height:68px;border-radius:24px;background:linear-gradient(135deg,#ffe4e9,#e7d8fa);font-size:49px;line-height:1;color:#c77eab;margin-bottom:14px;transform:rotate(-8deg);transition:transform .4s cubic-bezier(.2,1.5,.4,1)}
+.discover-card:nth-child(3n) .discover-art{background:linear-gradient(135deg,#e4f4e1,#fff1c9);color:#7db696}
+.discover-card:nth-child(4n) .discover-art{background:linear-gradient(135deg,#fbe9ca,#f5d9f3);color:#d5a45e}
+@media(hover:hover) and (pointer:fine){.discover-card:hover .discover-art{transform:rotate(8deg) scale(1.1)}}
+@keyframes almanac-orbit{to{rotate:360deg}}
+@keyframes almanac-float{to{translate:0 -9px}}
+@keyframes almanac-spark{to{opacity:.4;scale:.8}}
+@media(max-width:540px){.page-intro{padding-right:92px!important}.page-intro-art{right:2px;width:80px;height:80px}.art-symbol{font-size:58px}.art-spark{font-size:20px}.insight-illustration{min-height:120px}.insight-sun{font-size:80px}.insight-leaf{font-size:65px}}
+@media(prefers-reduced-motion:reduce){.art-orbit,.art-symbol,.art-spark,.insight-sun,.insight-leaf,.insight-star{animation:none!important}.discover-art{transition:none!important}.discover-card:hover .discover-art{transform:none!important}}
