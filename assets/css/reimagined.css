@@ -128,3 +128,23 @@ body{background:radial-gradient(ellipse 65% 32% at 95% 0%,#fbe8e8 0%,transparent
 @keyframes garden-bloom{0%{transform:scale(.6) rotate(-30deg)}55%{transform:scale(1.32) rotate(12deg)}100%{transform:scale(1) rotate(0)}}
 @media(max-width:540px){.living-garden{padding:20px;min-height:310px}.garden-flowers{justify-content:center;padding-top:14px}.garden-flower{width:68px;height:68px}.flower-two{width:78px;height:78px}.flower-three{width:60px;height:60px}.garden-flower span{font-size:60px}}
 @media(prefers-reduced-motion:reduce){.garden-flower,.garden-flower.blooming span{animation:none!important}.garden-flower span{transition:none!important}}
+
+/* Living Experience: expressive check-in controls and page-specific atmosphere */
+.illustrated-choices .choice-list{display:flex;flex-wrap:wrap;gap:12px}
+.illustrated-choices .choice{display:flex;flex-direction:column;gap:7px;min-width:76px;min-height:90px;padding:12px 10px;border-radius:22px;transition:transform .28s cubic-bezier(.2,1.5,.4,1),box-shadow .25s ease,background .25s ease}
+.illustrated-choices .choice-symbol{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;font-size:29px;line-height:1;background:linear-gradient(145deg,#fff4db,#f5dcf9);color:#8954a0;box-shadow:inset 0 1px 0 #fff9,0 4px 12px #795b8120;transition:transform .35s cubic-bezier(.2,1.5,.4,1)}
+.illustrated-choices .choice:nth-child(2n) .choice-symbol{background:linear-gradient(145deg,#ffe0e8,#f9e4f7);color:#c15b86}
+.illustrated-choices .choice:nth-child(3n) .choice-symbol{background:linear-gradient(145deg,#e4f5dc,#fff0cb);color:#659775}
+.illustrated-choices .choice-caption{font-size:.83rem;line-height:1.25}
+.illustrated-choices .choice.selected{box-shadow:0 0 0 2px #ac70be,0 10px 20px #8e6b9e20;background:#fff6ff}
+.illustrated-choices .choice.selected .choice-symbol{transform:scale(1.13) rotate(-8deg)}
+@media(hover:hover) and (pointer:fine){.illustrated-choices .choice:hover{transform:translateY(-4px)}.illustrated-choices .choice:hover .choice-symbol{transform:rotate(12deg) scale(1.08)}}
+body[data-view="calendar"] .page-intro{background:radial-gradient(ellipse at 90% 15%,#f5d9fa90,transparent 60%)}
+body[data-view="log"] .page-intro{background:radial-gradient(ellipse at 85% 10%,#ffe2d990,transparent 60%)}
+body[data-view="insights"] .page-intro{background:radial-gradient(ellipse at 85% 10%,#dfebff90,transparent 60%)}
+body[data-view="discover"] .page-intro{background:radial-gradient(ellipse at 85% 10%,#e1f4e590,transparent 60%)}
+body[data-view] .page-intro{border-radius:24px;padding:16px 18px}
+body[data-view] .panel{animation:living-arrive .45s ease-out both}
+@keyframes living-arrive{from{opacity:.65;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:540px){.illustrated-choices .choice{min-width:65px;flex:1 1 68px;padding:10px 7px}.illustrated-choices .choice-symbol{width:42px;height:42px;font-size:26px}}
+@media(prefers-reduced-motion:reduce){body[data-view] .panel{animation:none!important}.illustrated-choices .choice,.illustrated-choices .choice-symbol{transition:none!important}.illustrated-choices .choice:hover{transform:none!important}}
