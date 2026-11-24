@@ -203,3 +203,15 @@ body[data-view="discover"] .art-symbol{color:#84b996}
 .bottom-nav button[aria-current=page] svg{transform:translateY(-2px) scale(1.08)}
 @media(max-width:480px){.hero-companion{width:38%;flex-basis:38%;min-width:90px}}
 @media(prefers-reduced-motion:reduce){.companion-body,.companion-wave .companion-body,.companion-wave .companion-spark{animation:none!important}.bottom-nav button svg{transition:none!important}}
+
+.garden-flower::after{display:none}
+.garden-flower span{display:block;width:100%;height:auto}
+.garden-flower svg{display:block;width:100%;height:auto;max-height:130px;overflow:visible}
+.garden-flower .svg-petals{transform-box:fill-box;transform-origin:center}
+.garden-flower.blooming .svg-petals{animation:petal-bloom .75s cubic-bezier(.2,1.5,.4,1)}
+@keyframes petal-bloom{0%,100%{scale:1}45%{scale:1.2;rotate:12deg}}
+.discover-cover{overflow:hidden;border-radius:18px;margin-bottom:14px}
+.discover-cover svg{display:block;width:100%;height:auto}
+.cover-scene{transform-box:fill-box;transform-origin:center;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+@media(hover:hover) and (pointer:fine){.discover-card:hover .cover-scene{transform:scale(1.08) rotate(3deg)}}
+@media(prefers-reduced-motion:reduce){.garden-flower.blooming .svg-petals{animation:none!important}.cover-scene{transition:none!important}.discover-card:hover .cover-scene{transform:none!important}}
