@@ -189,3 +189,17 @@ body[data-view="discover"] .art-symbol{color:#84b996}
 @media(hover:hover) and (pointer:fine){.calendar-grid .cal-day:hover{transform:scale(1.09);z-index:2}}
 @keyframes living-calendar-appear{from{opacity:.4;transform:translateY(10px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(prefers-reduced-motion:reduce){.insight-bar-track>span,.cycle-history-track>span,.calendar-grid:not(.weekdays){animation:none!important}.calendar-grid .cal-day{transition:none!important}.calendar-grid .cal-day.active,.calendar-grid .cal-day:hover{transform:none!important}}
+
+.hero-companion{appearance:none;border:0;background:transparent;display:grid;place-items:center;flex:0 1 44%;width:44%;min-width:0;max-width:280px;padding:0;cursor:pointer;align-self:center}
+.hero-companion svg{display:block;width:100%;height:auto;overflow:visible}
+.companion-body{transform-box:fill-box;transform-origin:center bottom;animation:companion-breathe 3.5s ease-in-out 2 alternate}
+.companion-wave .companion-body{animation:companion-hello .8s ease-in-out both}
+@keyframes companion-breathe{to{transform:translateY(-3px) scaleY(1.02)}}
+@keyframes companion-hello{0%,100%{transform:rotate(0)}30%{transform:rotate(-8deg) translateY(-5px)}65%{transform:rotate(6deg)}}
+.companion-wave .companion-spark{animation:companion-glimmer .8s ease-out}
+@keyframes companion-glimmer{50%{opacity:.2;transform:translateY(-8px)}}
+.hero-companion:focus-visible{outline:3px solid #795a96;outline-offset:3px;border-radius:24px}
+.bottom-nav button svg{display:block;flex-shrink:0;margin:auto;transition:transform .25s ease}
+.bottom-nav button[aria-current=page] svg{transform:translateY(-2px) scale(1.08)}
+@media(max-width:480px){.hero-companion{width:38%;flex-basis:38%;min-width:90px}}
+@media(prefers-reduced-motion:reduce){.companion-body,.companion-wave .companion-body,.companion-wave .companion-spark{animation:none!important}.bottom-nav button svg{transition:none!important}}
