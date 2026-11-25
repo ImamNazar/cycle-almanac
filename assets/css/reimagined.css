@@ -215,3 +215,11 @@ body[data-view="discover"] .art-symbol{color:#84b996}
 .cover-scene{transform-box:fill-box;transform-origin:center;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
 @media(hover:hover) and (pointer:fine){.discover-card:hover .cover-scene{transform:scale(1.08) rotate(3deg)}}
 @media(prefers-reduced-motion:reduce){.garden-flower.blooming .svg-petals{animation:none!important}.cover-scene{transition:none!important}.discover-card:hover .cover-scene{transform:none!important}}
+
+/* Editorial illustration and tactile navigation refinement */
+.art-symbol svg{display:block;overflow:visible;filter:drop-shadow(0 5px 5px #70506d18)}
+.bottom-nav button{position:relative;isolation:isolate;border-radius:20px;transition:background-color .24s ease,transform .24s ease}
+.bottom-nav button[aria-current=page]::before{content:"";position:absolute;inset:2px 8px;border-radius:18px;background:#eadcf3;opacity:.65;z-index:-1;animation:nav-bloom .32s ease-out both}
+.bottom-nav button:active{transform:scale(.96)}
+@keyframes nav-bloom{from{opacity:0;transform:scale(.8)}to{opacity:.65;transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){.bottom-nav button,.bottom-nav button:active{transition:none!important;transform:none!important}.bottom-nav button[aria-current=page]::before{animation:none!important}}
