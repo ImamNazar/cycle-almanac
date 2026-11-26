@@ -237,3 +237,11 @@ body[data-view="today"] .hero-card::after{right:35%;bottom:-31%;background:#c2ad
 .illustrated-choices .choice[aria-pressed=true] .choice-symbol{background:#f5e5ff;box-shadow:0 0 0 2px #ac70be55,0 5px 12px #795b8120}
 .illustrated-choices .choice:active .choice-symbol{transform:scale(.92)}
 @media(prefers-reduced-motion:reduce){.hero-companion.companion-wave .companion-flower{animation:none!important}.illustrated-choices .choice:active .choice-symbol{transform:none!important}}
+
+/* Circular month overview */
+.month-explorer{display:grid;grid-template-columns:minmax(110px,190px) minmax(0,1fr);align-items:center;gap:24px;background:linear-gradient(135deg,#fff8f2,#f1e9fa)}
+.month-wheel svg{display:block;width:100%;height:auto;max-width:200px;margin:auto}
+.month-marks{transform-origin:100px 100px;animation:month-unfold .65s ease-out both}
+@keyframes month-unfold{from{opacity:.25;transform:rotate(-15deg) scale(.9)}to{opacity:1;transform:rotate(0) scale(1)}}
+@media(max-width:480px){.month-explorer{grid-template-columns:1fr;gap:8px}.month-wheel svg{max-width:160px}}
+@media(prefers-reduced-motion:reduce){.month-marks{animation:none!important}}
