@@ -1,5 +1,5 @@
 /* Versioned app-shell cache for GitHub Pages. Existing logs remain in localStorage. */
-const CACHE = "almanac-reimagined-v2";
+const CACHE = "almanac-reimagined-v3";
 const FILES = ["./","index.html","manifest.webmanifest","assets/css/reimagined.css","assets/js/engine.js","assets/js/content.js","assets/js/reimagined.js","assets/fonts/fraunces.woff2","assets/fonts/fraunces-italic.woff2","assets/fonts/figtree.woff2","assets/fonts/figtree-italic.woff2","assets/icons/favicon.svg","assets/icons/icon-192.png","assets/icons/icon-512.png","assets/icons/apple-touch-icon.png"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(FILES)).then(() => self.skipWaiting()));

@@ -110,3 +110,141 @@ body{background:radial-gradient(ellipse 65% 32% at 95% 0%,#fbe8e8 0%,transparent
 .secondary,.text-button,.discover-card details summary{min-height:44px}
 @media(max-width:350px){.calendar-head .icon-button{min-width:44px;min-height:44px}.calendar-grid .cal-day{min-height:44px}}
 @media(max-width:540px){.bottom-nav{padding-bottom:calc(8px + env(safe-area-inset-bottom))}}
+
+/* Living Experience: a tactile, illustrated garden with optional motion */
+.living-garden{position:relative;isolation:isolate;overflow:hidden;min-height:280px;padding:26px;border-radius:30px;background:radial-gradient(circle at 80% 25%,#fff4bb 0,transparent 35%),radial-gradient(circle at 14% 90%,#e3caff 0,transparent 42%),linear-gradient(130deg,#fff2f2,#f6eaff 65%,#e9f7e9);border:1px solid #e9d8e9;box-shadow:0 14px 36px #6d476315}
+.living-garden::after{content:"";position:absolute;bottom:-40px;left:-8%;width:116%;height:105px;border-radius:50% 50% 0 0;background:#c5dfc4;opacity:.75;z-index:-1}
+.garden-copy{max-width:360px;position:relative;z-index:2}.garden-copy h2{font-size:clamp(24px,4vw,35px);margin:6px 0 8px}.garden-copy p{line-height:1.5}
+.garden-flowers{display:flex;align-items:end;justify-content:flex-end;gap:clamp(8px,2vw,25px);min-height:118px;padding:0 10px 12px}
+.garden-flower{--petal:#f48ca5;position:relative;display:grid;place-items:center;width:76px;height:76px;border:0;border-radius:50%;background:#fff9fa88;box-shadow:0 8px 18px #9c6a7b29;cursor:pointer;transform-origin:50% 95%;animation:garden-sway 4s ease-in-out infinite alternate}
+.garden-flower::after{content:"";position:absolute;top:64px;left:calc(50% - 3px);height:53px;width:6px;border-radius:8px;background:#73aa85;z-index:-1}
+.garden-flower span{font-size:68px;line-height:1;color:var(--petal);text-shadow:0 3px 0 #fff9;transition:transform .3s cubic-bezier(.2,1.5,.4,1)}
+.garden-flower:focus-visible{outline:3px solid #563c79;outline-offset:5px}
+.garden-flower:hover span{transform:scale(1.15) rotate(12deg)}
+.flower-two{--petal:#a88ae9;animation-delay:-1.4s;width:88px;height:88px}.flower-three{--petal:#f4b64f;animation-delay:-2.6s;width:66px;height:66px}
+.garden-flower.blooming span{animation:garden-bloom .65s cubic-bezier(.18,1.4,.4,1)}
+.garden-hint{position:relative;z-index:2;margin:10px 0 0;font-size:.9rem;color:#684a63}
+@keyframes garden-sway{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}
+@keyframes garden-bloom{0%{transform:scale(.6) rotate(-30deg)}55%{transform:scale(1.32) rotate(12deg)}100%{transform:scale(1) rotate(0)}}
+@media(max-width:540px){.living-garden{padding:20px;min-height:310px}.garden-flowers{justify-content:center;padding-top:14px}.garden-flower{width:68px;height:68px}.flower-two{width:78px;height:78px}.flower-three{width:60px;height:60px}.garden-flower span{font-size:60px}}
+@media(prefers-reduced-motion:reduce){.garden-flower,.garden-flower.blooming span{animation:none!important}.garden-flower span{transition:none!important}}
+
+/* Living Experience: expressive check-in controls and page-specific atmosphere */
+.illustrated-choices .choice-list{display:flex;flex-wrap:wrap;gap:12px}
+.illustrated-choices .choice{display:flex;flex-direction:column;gap:7px;min-width:76px;min-height:90px;padding:12px 10px;border-radius:22px;transition:transform .28s cubic-bezier(.2,1.5,.4,1),box-shadow .25s ease,background .25s ease}
+.illustrated-choices .choice-symbol{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;font-size:29px;line-height:1;background:linear-gradient(145deg,#fff4db,#f5dcf9);color:#8954a0;box-shadow:inset 0 1px 0 #fff9,0 4px 12px #795b8120;transition:transform .35s cubic-bezier(.2,1.5,.4,1)}
+.illustrated-choices .choice:nth-child(2n) .choice-symbol{background:linear-gradient(145deg,#ffe0e8,#f9e4f7);color:#c15b86}
+.illustrated-choices .choice:nth-child(3n) .choice-symbol{background:linear-gradient(145deg,#e4f5dc,#fff0cb);color:#659775}
+.illustrated-choices .choice-caption{font-size:.83rem;line-height:1.25}
+.illustrated-choices .choice.selected{box-shadow:0 0 0 2px #ac70be,0 10px 20px #8e6b9e20;background:#fff6ff}
+.illustrated-choices .choice.selected .choice-symbol{transform:scale(1.13) rotate(-8deg)}
+@media(hover:hover) and (pointer:fine){.illustrated-choices .choice:hover{transform:translateY(-4px)}.illustrated-choices .choice:hover .choice-symbol{transform:rotate(12deg) scale(1.08)}}
+body[data-view="calendar"] .page-intro{background:radial-gradient(ellipse at 90% 15%,#f5d9fa90,transparent 60%)}
+body[data-view="log"] .page-intro{background:radial-gradient(ellipse at 85% 10%,#ffe2d990,transparent 60%)}
+body[data-view="insights"] .page-intro{background:radial-gradient(ellipse at 85% 10%,#dfebff90,transparent 60%)}
+body[data-view="discover"] .page-intro{background:radial-gradient(ellipse at 85% 10%,#e1f4e590,transparent 60%)}
+body[data-view] .page-intro{border-radius:24px;padding:16px 18px}
+body[data-view] .panel{animation:living-arrive .45s ease-out both}
+@keyframes living-arrive{from{opacity:.65;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:540px){.illustrated-choices .choice{min-width:65px;flex:1 1 68px;padding:10px 7px}.illustrated-choices .choice-symbol{width:42px;height:42px;font-size:26px}}
+@media(prefers-reduced-motion:reduce){body[data-view] .panel{animation:none!important}.illustrated-choices .choice,.illustrated-choices .choice-symbol{transition:none!important}.illustrated-choices .choice:hover{transform:none!important}}
+
+/* Living Experience: bespoke botanical motifs and animated editorial illustrations */
+.page-intro{position:relative;isolation:isolate;overflow:hidden;min-height:155px;padding-right:clamp(110px,22%,210px)!important}
+.page-intro-art{position:absolute;right:18px;top:50%;width:115px;height:115px;transform:translateY(-50%);display:grid;place-items:center;pointer-events:none}
+.art-orbit{position:absolute;inset:7px;border:2px dashed #b887b977;border-radius:50%;animation:almanac-orbit 36s linear infinite}
+.art-symbol{font-size:86px;line-height:1;color:#dc83a5;text-shadow:0 6px 0 #ffffff99;animation:almanac-float 3.8s ease-in-out infinite alternate}
+.art-spark{position:absolute;right:-2px;top:3px;font-size:29px;color:#e8ad60;animation:almanac-spark 2.6s ease-in-out infinite alternate}
+body[data-view="calendar"] .art-symbol{color:#a78be1}
+body[data-view="log"] .art-symbol{color:#e18a9c}
+body[data-view="insights"] .art-symbol{color:#8c99d8}
+body[data-view="discover"] .art-symbol{color:#84b996}
+.insight-illustration{position:relative;overflow:hidden;min-height:150px;margin:14px 0 22px;border-radius:28px;background:radial-gradient(circle at 62% 35%,#ffe6a7,transparent 38%),linear-gradient(115deg,#f1e6ff,#ffe6f0 65%,#e5f4e8);display:flex;align-items:center;justify-content:center}
+.insight-sun{font-size:105px;line-height:1;color:#f3b960;animation:almanac-orbit 24s linear infinite}
+.insight-leaf{position:absolute;font-size:100px;color:#7caf95;bottom:-28px;animation:almanac-float 4s ease-in-out infinite alternate}
+.leaf-a{left:12%;transform:rotate(-20deg)}.leaf-b{right:12%;animation-delay:-2s}
+.insight-star{position:absolute;top:14px;right:24%;font-size:36px;color:#aa8de1;animation:almanac-spark 2s ease-in-out infinite alternate}
+.discover-card{position:relative;overflow:hidden}
+.discover-art{display:grid;place-items:center;width:68px;height:68px;border-radius:24px;background:linear-gradient(135deg,#ffe4e9,#e7d8fa);font-size:49px;line-height:1;color:#c77eab;margin-bottom:14px;transform:rotate(-8deg);transition:transform .4s cubic-bezier(.2,1.5,.4,1)}
+.discover-card:nth-child(3n) .discover-art{background:linear-gradient(135deg,#e4f4e1,#fff1c9);color:#7db696}
+.discover-card:nth-child(4n) .discover-art{background:linear-gradient(135deg,#fbe9ca,#f5d9f3);color:#d5a45e}
+@media(hover:hover) and (pointer:fine){.discover-card:hover .discover-art{transform:rotate(8deg) scale(1.1)}}
+@keyframes almanac-orbit{to{rotate:360deg}}
+@keyframes almanac-float{to{translate:0 -9px}}
+@keyframes almanac-spark{to{opacity:.4;scale:.8}}
+@media(max-width:540px){.page-intro{padding-right:92px!important}.page-intro-art{right:2px;width:80px;height:80px}.art-symbol{font-size:58px}.art-spark{font-size:20px}.insight-illustration{min-height:120px}.insight-sun{font-size:80px}.insight-leaf{font-size:65px}}
+@media(prefers-reduced-motion:reduce){.art-orbit,.art-symbol,.art-spark,.insight-sun,.insight-leaf,.insight-star{animation:none!important}.discover-art{transition:none!important}.discover-card:hover .discover-art{transform:none!important}}
+
+/* Living Experience: animated data reveals and responsive calendar interactions */
+.insight-bar-track,.cycle-history-track{position:relative;overflow:hidden}
+.insight-bar-track>span,.cycle-history-track>span{display:block;transform-origin:left center;animation:living-chart-grow .85s cubic-bezier(.2,.8,.2,1) both}
+.insight-bar-row:nth-child(2) .insight-bar-track>span,.cycle-history-row:nth-child(2) .cycle-history-track>span{animation-delay:.08s}
+.insight-bar-row:nth-child(3) .insight-bar-track>span,.cycle-history-row:nth-child(3) .cycle-history-track>span{animation-delay:.16s}
+.insight-bar-row:nth-child(4) .insight-bar-track>span,.cycle-history-row:nth-child(4) .cycle-history-track>span{animation-delay:.24s}
+.insight-bar-row:nth-child(5) .insight-bar-track>span,.cycle-history-row:nth-child(5) .cycle-history-track>span{animation-delay:.32s}
+@keyframes living-chart-grow{from{transform:scaleX(0);opacity:.3}to{transform:scaleX(1);opacity:1}}
+.calendar-grid:not(.weekdays){animation:living-calendar-appear .38s cubic-bezier(.2,.8,.2,1) both}
+.calendar-grid .cal-day{transition:background-color .2s ease,box-shadow .2s ease,transform .28s cubic-bezier(.2,1.5,.4,1)}
+.calendar-grid .cal-day.active{transform:scale(1.06);z-index:1}
+@media(hover:hover) and (pointer:fine){.calendar-grid .cal-day:hover{transform:scale(1.09);z-index:2}}
+@keyframes living-calendar-appear{from{opacity:.4;transform:translateY(10px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){.insight-bar-track>span,.cycle-history-track>span,.calendar-grid:not(.weekdays){animation:none!important}.calendar-grid .cal-day{transition:none!important}.calendar-grid .cal-day.active,.calendar-grid .cal-day:hover{transform:none!important}}
+
+.hero-companion{appearance:none;border:0;background:transparent;display:grid;place-items:center;flex:0 1 44%;width:44%;min-width:0;max-width:280px;padding:0;cursor:pointer;align-self:center}
+.hero-companion svg{display:block;width:100%;height:auto;overflow:visible}
+.companion-body{transform-box:fill-box;transform-origin:center bottom;animation:companion-breathe 3.5s ease-in-out 2 alternate}
+.companion-wave .companion-body{animation:companion-hello .8s ease-in-out both}
+@keyframes companion-breathe{to{transform:translateY(-3px) scaleY(1.02)}}
+@keyframes companion-hello{0%,100%{transform:rotate(0)}30%{transform:rotate(-8deg) translateY(-5px)}65%{transform:rotate(6deg)}}
+.companion-wave .companion-spark{animation:companion-glimmer .8s ease-out}
+@keyframes companion-glimmer{50%{opacity:.2;transform:translateY(-8px)}}
+.hero-companion:focus-visible{outline:3px solid #795a96;outline-offset:3px;border-radius:24px}
+.bottom-nav button svg{display:block;flex-shrink:0;margin:auto;transition:transform .25s ease}
+.bottom-nav button[aria-current=page] svg{transform:translateY(-2px) scale(1.08)}
+@media(max-width:480px){.hero-companion{width:38%;flex-basis:38%;min-width:90px}}
+@media(prefers-reduced-motion:reduce){.companion-body,.companion-wave .companion-body,.companion-wave .companion-spark{animation:none!important}.bottom-nav button svg{transition:none!important}}
+
+.garden-flower::after{display:none}
+.garden-flower span{display:block;width:100%;height:auto}
+.garden-flower svg{display:block;width:100%;height:auto;max-height:130px;overflow:visible}
+.garden-flower .svg-petals{transform-box:fill-box;transform-origin:center}
+.garden-flower.blooming .svg-petals{animation:petal-bloom .75s cubic-bezier(.2,1.5,.4,1)}
+@keyframes petal-bloom{0%,100%{scale:1}45%{scale:1.2;rotate:12deg}}
+.discover-cover{overflow:hidden;border-radius:18px;margin-bottom:14px}
+.discover-cover svg{display:block;width:100%;height:auto}
+.cover-scene{transform-box:fill-box;transform-origin:center;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+@media(hover:hover) and (pointer:fine){.discover-card:hover .cover-scene{transform:scale(1.08) rotate(3deg)}}
+@media(prefers-reduced-motion:reduce){.garden-flower.blooming .svg-petals{animation:none!important}.cover-scene{transition:none!important}.discover-card:hover .cover-scene{transform:none!important}}
+
+/* Editorial illustration and tactile navigation refinement */
+.art-symbol svg{display:block;overflow:visible;filter:drop-shadow(0 5px 5px #70506d18)}
+.bottom-nav button{position:relative;isolation:isolate;border-radius:20px;transition:background-color .24s ease,transform .24s ease}
+.bottom-nav button[aria-current=page]::before{content:"";position:absolute;inset:2px 8px;border-radius:18px;background:#eadcf3;opacity:.65;z-index:-1;animation:nav-bloom .32s ease-out both}
+.bottom-nav button:active{transform:scale(.96)}
+@keyframes nav-bloom{from{opacity:0;transform:scale(.8)}to{opacity:.65;transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){.bottom-nav button,.bottom-nav button:active{transition:none!important;transform:none!important}.bottom-nav button[aria-current=page]::before{animation:none!important}}
+
+/* Living dashboard: layered landscape and tactile illustrated controls */
+body[data-view="today"] .hero-card{position:relative;isolation:isolate;background:radial-gradient(ellipse at 78% 20%,#ffe9b9 0,transparent 42%),linear-gradient(135deg,#f9e6ef,#e8def6 62%,#dcebdc)}
+body[data-view="today"] .hero-card::before,body[data-view="today"] .hero-card::after{content:"";position:absolute;pointer-events:none;z-index:-1;width:85%;height:45%;border-radius:50% 50% 0 0;bottom:-24%;right:-10%;background:#a9c9b5;opacity:.55}
+body[data-view="today"] .hero-card::after{right:35%;bottom:-31%;background:#c2addb;opacity:.45;width:90%;height:55%}
+.hero-companion .companion-flower{transform-box:fill-box;transform-origin:center bottom}
+.hero-companion.companion-wave .companion-flower{animation:living-flower-wave .8s ease-in-out}
+@keyframes living-flower-wave{0%,100%{rotate:0deg}35%{rotate:-12deg}70%{rotate:9deg}}
+.hero-companion .companion-spark{transform-box:fill-box;transform-origin:center}
+@media(hover:hover) and (pointer:fine){.hero-companion:hover .companion-body{filter:drop-shadow(0 5px 5px #78577b30)}}
+.illustrated-choices .choice-symbol svg{display:block;max-width:100%;height:auto;filter:drop-shadow(0 2px 1px #654b7018)}
+.illustrated-choices .choice[aria-pressed=true] .choice-symbol{background:#f5e5ff;box-shadow:0 0 0 2px #ac70be55,0 5px 12px #795b8120}
+.illustrated-choices .choice:active .choice-symbol{transform:scale(.92)}
+@media(prefers-reduced-motion:reduce){.hero-companion.companion-wave .companion-flower{animation:none!important}.illustrated-choices .choice:active .choice-symbol{transform:none!important}}
+
+/* Circular month overview */
+.month-explorer{display:grid;grid-template-columns:minmax(110px,190px) minmax(0,1fr);align-items:center;gap:24px;background:linear-gradient(135deg,#fff8f2,#f1e9fa)}
+.month-wheel svg{display:block;width:100%;height:auto;max-width:200px;margin:auto}
+.month-marks{transform-origin:100px 100px;animation:month-unfold .65s ease-out both}
+@keyframes month-unfold{from{opacity:.25;transform:rotate(-15deg) scale(.9)}to{opacity:1;transform:rotate(0) scale(1)}}
+@media(max-width:480px){.month-explorer{grid-template-columns:1fr;gap:8px}.month-wheel svg{max-width:160px}}
+@media(prefers-reduced-motion:reduce){.month-marks{animation:none!important}}
+
+/* Final editorial interaction layer */
+.phase-strip{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.phase-tile{border:1px solid #d8c9df;border-radius:18px;padding:12px;background:#fff8f5;color:#49394e}.phase-tile summary{cursor:pointer;min-height:44px}.phase-art{display:block;background:linear-gradient(145deg,#f7e5ef,#e8e9fa);border-radius:14px;text-align:center;margin-bottom:8px}.phase-art svg{height:100px;width:auto;max-width:100%}.phase-tile[open] .phase-art svg{animation:phase-reveal .5s ease-out}.view-arrival{animation:view-arrive .28s ease-out}.month-wheel{touch-action:pan-y}.date-summary ul{padding-inline-start:1.25rem}.discover-card details[open]{animation:view-arrive .25s ease-out}.phase-tile summary:focus-visible,.discover-card summary:focus-visible{outline:3px solid #79508d;outline-offset:4px}@keyframes phase-reveal{from{transform:scale(.88)}to{transform:scale(1)}}@keyframes view-arrive{from{opacity:.65;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}@media(max-width:350px){.phase-strip{grid-template-columns:1fr}}@media(prefers-reduced-motion:reduce){.view-arrival,.phase-tile[open] .phase-art svg,.discover-card details[open]{animation:none!important}}
