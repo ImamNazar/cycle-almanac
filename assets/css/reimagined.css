@@ -223,3 +223,17 @@ body[data-view="discover"] .art-symbol{color:#84b996}
 .bottom-nav button:active{transform:scale(.96)}
 @keyframes nav-bloom{from{opacity:0;transform:scale(.8)}to{opacity:.65;transform:scale(1)}}
 @media(prefers-reduced-motion:reduce){.bottom-nav button,.bottom-nav button:active{transition:none!important;transform:none!important}.bottom-nav button[aria-current=page]::before{animation:none!important}}
+
+/* Living dashboard: layered landscape and tactile illustrated controls */
+body[data-view="today"] .hero-card{position:relative;isolation:isolate;background:radial-gradient(ellipse at 78% 20%,#ffe9b9 0,transparent 42%),linear-gradient(135deg,#f9e6ef,#e8def6 62%,#dcebdc)}
+body[data-view="today"] .hero-card::before,body[data-view="today"] .hero-card::after{content:"";position:absolute;pointer-events:none;z-index:-1;width:85%;height:45%;border-radius:50% 50% 0 0;bottom:-24%;right:-10%;background:#a9c9b5;opacity:.55}
+body[data-view="today"] .hero-card::after{right:35%;bottom:-31%;background:#c2addb;opacity:.45;width:90%;height:55%}
+.hero-companion .companion-flower{transform-box:fill-box;transform-origin:center bottom}
+.hero-companion.companion-wave .companion-flower{animation:living-flower-wave .8s ease-in-out}
+@keyframes living-flower-wave{0%,100%{rotate:0deg}35%{rotate:-12deg}70%{rotate:9deg}}
+.hero-companion .companion-spark{transform-box:fill-box;transform-origin:center}
+@media(hover:hover) and (pointer:fine){.hero-companion:hover .companion-body{filter:drop-shadow(0 5px 5px #78577b30)}}
+.illustrated-choices .choice-symbol svg{display:block;max-width:100%;height:auto;filter:drop-shadow(0 2px 1px #654b7018)}
+.illustrated-choices .choice[aria-pressed=true] .choice-symbol{background:#f5e5ff;box-shadow:0 0 0 2px #ac70be55,0 5px 12px #795b8120}
+.illustrated-choices .choice:active .choice-symbol{transform:scale(.92)}
+@media(prefers-reduced-motion:reduce){.hero-companion.companion-wave .companion-flower{animation:none!important}.illustrated-choices .choice:active .choice-symbol{transform:none!important}}
