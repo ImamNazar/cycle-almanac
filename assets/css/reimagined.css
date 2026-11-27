@@ -401,3 +401,14 @@ body.no-botanical::before,body.no-botanical::after,body.no-botanical .studio-pet
 body:has(dialog[open])::before,body:has(dialog[open])::after,body:has(dialog[open]) .studio-petals{visibility:hidden}
 @media(prefers-reduced-motion:reduce){body[data-view]::before,body[data-view]::after{transition:none}}
 body.quiet-motion::before,body.quiet-motion::after{transition:none}
+
+/* Studio editorial composition: illustration on paper, not inside a tinted box. */
+body[data-view="today"] main .hero-card{background:transparent;border-radius:0;border-bottom:1px solid var(--line);padding:12px 0 24px;box-shadow:none;overflow:visible}
+body[data-view="today"] main .hero-copy{color:var(--ink)}
+body[data-view="today"] main .hero-companion{max-width:250px}
+body[data-view="calendar"] main .cal-day:not(.recorded):not(.estimated):not([class*="phase-"]){background:transparent}
+.studio-observation-art{background:transparent;color:#987987;border-bottom:1px solid var(--line);border-radius:0;height:80px;min-height:80px}
+body[data-view="insights"] main .metric{border:0;border-bottom:1px solid var(--line);border-radius:0}
+body[data-theme="dark"][data-view="calendar"] main .cal-day{color:var(--ink);background:#302831}body[data-theme="dark"][data-view="calendar"] main .cal-day.phase-winter{background:#55343f}body[data-theme="dark"][data-view="calendar"] main .cal-day.phase-spring{background:#35473b}body[data-theme="dark"][data-view="calendar"] main .cal-day.phase-summer{background:#493b58}body[data-theme="dark"][data-view="calendar"] main .cal-day.phase-autumn{background:#514330}body[data-theme="dark"][data-view="calendar"] main .cal-day.recorded{background:#87465d;color:#fff}body[data-theme="dark"][data-view="today"] main .hero-card{background:transparent;color:var(--ink)}body[data-theme="dark"][data-view="today"] main .hero-copy h2{color:var(--ink)}body[data-theme="dark"][data-view="today"] main .hero-card .kicker{color:#e4b5c7}
+@media(prefers-color-scheme:dark){body[data-theme="system"][data-view="calendar"] main .cal-day{color:var(--ink);background:#302831}body[data-theme="system"][data-view="calendar"] main .cal-day.phase-winter{background:#55343f}body[data-theme="system"][data-view="calendar"] main .cal-day.phase-spring{background:#35473b}body[data-theme="system"][data-view="calendar"] main .cal-day.phase-summer{background:#493b58}body[data-theme="system"][data-view="calendar"] main .cal-day.phase-autumn{background:#514330}body[data-theme="system"][data-view="calendar"] main .cal-day.recorded{background:#87465d;color:#fff}body[data-theme="system"][data-view="today"] main .hero-card{background:transparent;color:var(--ink)}body[data-theme="system"][data-view="today"] main .hero-copy h2{color:var(--ink)}body[data-theme="system"][data-view="today"] main .hero-card .kicker{color:#e4b5c7}}
+@media(max-width:540px){body[data-view="today"] main .hero-card{padding:4px 0 22px;gap:4px}body[data-view="today"] main .hero-companion{max-width:190px}}
