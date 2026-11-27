@@ -298,3 +298,15 @@ main .discover-cover{border-radius:10px}.phase-tile{background:transparent;borde
 .bottom-nav button svg{width:22px;height:22px}.bottom-nav button svg [fill]:not([fill="none"]){fill:currentColor;fill-opacity:.12}
 dialog{border-radius:16px;box-shadow:0 16px 60px #382e3220}
 @media(max-width:540px){#app{padding-inline:16px}.top{height:64px}main{padding-top:22px}main .page-intro h1{font-size:32px}main .hero-copy h2{font-size:30px}main .hero-card{min-height:220px}main .panel{padding:20px 0}main .calendar-grid{gap:3px}.bottom-nav{padding-inline:4px}}
+
+/* Studio screen compositions */
+.studio-orbit{max-width:290px}.studio-orbit .companion-body{transform-origin:center;animation:studio-drift 8s ease-in-out 2 alternate}.studio-orbit.companion-wave .companion-body{animation:studio-pulse .7s ease-out}
+@keyframes studio-drift{to{transform:rotate(8deg)}}@keyframes studio-pulse{50%{transform:rotate(12deg) scale(.94)}}
+.studio-phase-key{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin:16px 0}.studio-phase-key span{font-size:12px;padding:8px 3px;text-align:center;border-radius:6px;overflow-wrap:anywhere}.studio-phase-key .winter{background:#eed3da}.studio-phase-key .spring{background:#dce6d3}.studio-phase-key .summer{background:#e4dced}.studio-phase-key .autumn{background:#eee1c9}
+main .studio-date{position:sticky;top:0;z-index:4;background:var(--paper);padding:12px 0}.studio-date .link-row button{min-height:44px}
+.studio-insight-art{height:100px;overflow:hidden;border-radius:10px;background:#eee8df;margin-bottom:24px}.studio-insight-art svg{width:100%;height:100%;display:block}
+main .insight-bar-track,main .cycle-history-track{background:#eae4dc;border-radius:3px}main .insight-bar-track>span,main .cycle-history-track>span{background:#9b6678;border-radius:3px}
+main .discover-number{font:600 11px Figtree,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.12em;color:#815265}main .discover-search{margin:0 0 12px}
+main .living-garden{background:#e7e9df;border-radius:14px;box-shadow:none}main .phase-art{background:#eae5df;border-radius:8px}
+@media(max-width:540px){main .hero-card{flex-direction:column-reverse;align-items:stretch;gap:12px}main .hero-copy{max-width:none}main .studio-orbit{width:100%;max-width:210px;align-self:center;flex:auto}main .studio-date{position:static}.studio-phase-key span{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.studio-orbit .companion-body,.studio-orbit.companion-wave .companion-body{animation:none!important}}
