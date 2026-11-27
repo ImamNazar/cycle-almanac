@@ -427,3 +427,19 @@ body[data-view="discover"] main .phase-art{border-radius:5px}
 body[data-view="discover"] main .discover-card{border-radius:0;box-shadow:none}
 @media(prefers-reduced-motion:reduce){body[data-view] main .illustrated-choices .choice{transition:none}}
 body.quiet-motion main .illustrated-choices .choice{transition:none}
+
+/* Shared restrained motion vocabulary. */
+.bottom-nav button svg{transition:transform .24s cubic-bezier(.2,.7,.3,1)}
+.bottom-nav button:active svg{transform:scale(.92)}
+.bottom-nav button[aria-current=page] svg{transform:translateY(-1px)}
+.bottom-nav button[aria-current=page]::before{animation:studio-nav-ink .24s ease-out both;transform-origin:center}
+@keyframes studio-nav-ink{from{transform:scaleX(.35);opacity:.4}to{transform:scaleX(1);opacity:1}}
+.studio-orbit .companion-body{animation:studio-orbit-breathe 9s ease-in-out 2;transform-origin:center}
+@keyframes studio-orbit-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.018)}}
+.studio-orbit.companion-wave .companion-body{animation:studio-orbit-touch .48s cubic-bezier(.2,.7,.3,1)}
+@keyframes studio-orbit-touch{0%,100%{transform:scale(1)}45%{transform:scale(1.045)}}
+.garden-flower.blooming .svg-petals{animation:studio-garden-open .65s cubic-bezier(.2,.7,.3,1)}
+@keyframes studio-garden-open{0%,100%{transform:scale(1)}45%{transform:scale(1.12) rotate(3deg)}}
+@media(prefers-reduced-motion:reduce){.bottom-nav button svg{transition:none}.bottom-nav button[aria-current=page]::before,.studio-orbit .companion-body,.studio-orbit.companion-wave .companion-body,.garden-flower.blooming .svg-petals{animation:none!important}}
+body.quiet-motion .bottom-nav button svg{transition:none}
+body.quiet-motion .bottom-nav button[aria-current=page]::before,body.quiet-motion .studio-orbit .companion-body,body.quiet-motion .garden-flower.blooming .svg-petals{animation:none!important}
