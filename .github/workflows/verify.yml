@@ -25,3 +25,12 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Run browser smoke tests (mobile and desktop)
         run: node tests/browser.test.js
+      - name: Capture Studio visual acceptance screenshots
+        run: node tests/studio-visual.cjs
+      - name: Upload Studio screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: studio-screenshots
+          path: studio-screenshots/
+          if-no-files-found: warn
