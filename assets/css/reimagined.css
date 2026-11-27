@@ -443,3 +443,15 @@ body.quiet-motion main .illustrated-choices .choice{transition:none}
 @media(prefers-reduced-motion:reduce){.bottom-nav button svg{transition:none}.bottom-nav button[aria-current=page]::before,.studio-orbit .companion-body,.studio-orbit.companion-wave .companion-body,.garden-flower.blooming .svg-petals{animation:none!important}}
 body.quiet-motion .bottom-nav button svg{transition:none}
 body.quiet-motion .bottom-nav button[aria-current=page]::before,body.quiet-motion .studio-orbit .companion-body,body.quiet-motion .garden-flower.blooming .svg-petals{animation:none!important}
+
+/* Final editorial readability and atmosphere pass. */
+body[data-view="today"] main .hero-copy>p:not(.kicker){color:var(--muted);line-height:1.65}
+body[data-view="log"] main .choice-group{padding-block:8px 12px}
+body[data-view="discover"] main details summary{cursor:pointer;line-height:1.5}
+body[data-view="discover"] main .discover-card details summary{padding-block:12px;min-height:44px}
+body[data-view="calendar"] main .phase-letter{font-weight:700;opacity:1}
+body[data-view] main .page-intro>p:not(.kicker){color:var(--muted);line-height:1.65}
+body[data-view]:not(.no-botanical)::before,body[data-view]:not(.no-botanical)::after{opacity:.17}
+@media(max-width:540px){body[data-view]:not(.no-botanical)::before,body[data-view]:not(.no-botanical)::after{opacity:.095}}
+body[data-theme="dark"] .studio-observation-art{color:#c5a4b5}
+@media(prefers-color-scheme:dark){body[data-theme="system"] .studio-observation-art{color:#c5a4b5}}
