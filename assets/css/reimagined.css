@@ -412,3 +412,18 @@ body[data-view="insights"] main .metric{border:0;border-bottom:1px solid var(--l
 body[data-theme="dark"][data-view="calendar"] main .cal-day{color:var(--ink);background:#302831}body[data-theme="dark"][data-view="calendar"] main .cal-day.phase-winter{background:#55343f}body[data-theme="dark"][data-view="calendar"] main .cal-day.phase-spring{background:#35473b}body[data-theme="dark"][data-view="calendar"] main .cal-day.phase-summer{background:#493b58}body[data-theme="dark"][data-view="calendar"] main .cal-day.phase-autumn{background:#514330}body[data-theme="dark"][data-view="calendar"] main .cal-day.recorded{background:#87465d;color:#fff}body[data-theme="dark"][data-view="today"] main .hero-card{background:transparent;color:var(--ink)}body[data-theme="dark"][data-view="today"] main .hero-copy h2{color:var(--ink)}body[data-theme="dark"][data-view="today"] main .hero-card .kicker{color:#e4b5c7}
 @media(prefers-color-scheme:dark){body[data-theme="system"][data-view="calendar"] main .cal-day{color:var(--ink);background:#302831}body[data-theme="system"][data-view="calendar"] main .cal-day.phase-winter{background:#55343f}body[data-theme="system"][data-view="calendar"] main .cal-day.phase-spring{background:#35473b}body[data-theme="system"][data-view="calendar"] main .cal-day.phase-summer{background:#493b58}body[data-theme="system"][data-view="calendar"] main .cal-day.phase-autumn{background:#514330}body[data-theme="system"][data-view="calendar"] main .cal-day.recorded{background:#87465d;color:#fff}body[data-theme="system"][data-view="today"] main .hero-card{background:transparent;color:var(--ink)}body[data-theme="system"][data-view="today"] main .hero-copy h2{color:var(--ink)}body[data-theme="system"][data-view="today"] main .hero-card .kicker{color:#e4b5c7}}
 @media(max-width:540px){body[data-view="today"] main .hero-card{padding:4px 0 22px;gap:4px}body[data-view="today"] main .hero-companion{max-width:190px}}
+
+/* Journal: open illustrated selections with explicit selected states. */
+body[data-view] main .illustrated-choices .choice{position:relative;background:transparent;border:1px solid transparent;border-radius:12px;box-shadow:none;min-height:84px;padding:10px 6px;transition:background .18s ease,border-color .18s ease}
+body[data-view] main .illustrated-choices .choice .choice-symbol{background:transparent;box-shadow:none}
+body[data-view] main .illustrated-choices .choice.selected{border:1px solid currentColor;background:color-mix(in srgb,var(--ink) 7%,var(--paper));color:var(--ink)}
+body[data-view] main .illustrated-choices .choice.selected::after{content:"✓";position:absolute;right:7px;top:5px;font-size:12px;font-weight:700}
+body[data-view] main .illustrated-choices .choice:focus-visible{outline-offset:2px}
+@media(hover:hover){body[data-view] main .illustrated-choices .choice:hover{background:color-mix(in srgb,var(--ink) 5%,var(--paper))}}
+body[data-view="log"] main .choice-group{padding-block:12px;border-bottom:1px solid var(--line)}
+body[data-view="log"] main .studio-date{background:var(--paper);border-radius:0;box-shadow:none}
+body[data-view="discover"] main .phase-tile{border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent}
+body[data-view="discover"] main .phase-art{border-radius:5px}
+body[data-view="discover"] main .discover-card{border-radius:0;box-shadow:none}
+@media(prefers-reduced-motion:reduce){body[data-view] main .illustrated-choices .choice{transition:none}}
+body.quiet-motion main .illustrated-choices .choice{transition:none}
