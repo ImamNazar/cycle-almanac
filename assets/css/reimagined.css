@@ -263,3 +263,38 @@ body[data-view="today"] .hero-card::after{right:35%;bottom:-31%;background:#c2ad
 body.quiet-motion *,body.quiet-motion *::before,body.quiet-motion *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
 body.large-reading .panel p,body.large-reading .panel li,body.large-reading .page-intro p:not(.kicker),body.large-reading .field,body.large-reading .toggle-field{font-size:1.125rem;line-height:1.65;overflow-wrap:anywhere}
 body.large-reading .fine{font-size:.95rem;line-height:1.55}
+
+/* Studio: editorial foundations. Functional states remain independent of decoration. */
+:root{--ink:#382e32;--muted:#6e6264;--paper:#faf7f1;--line:#ded6cd;--rose:#eac0ca;--sage:#cad7bf;--lilac:#ccc0e0;--peach:#e6ca9d;--shadow:none;background:var(--paper)}
+body,body[data-view]{background:var(--paper);color:var(--ink)}
+#app{max-width:1120px;padding-inline:clamp(16px,4vw,48px)}
+.top{height:72px;border-bottom:1px solid var(--line)}
+.logo{font-weight:500;letter-spacing:-1.6px;font-size:30px}.logo-flower{display:none}.logo-dot{color:#9b5268}
+.privacy{font-size:12px;letter-spacing:.03em}.icon-button{background:transparent;border-color:var(--line);font-size:20px}
+main{max-width:960px;padding-top:32px}
+main .page-intro{min-height:0;margin:0 0 28px;padding:0!important;max-width:620px}
+.page-intro-art{display:none}
+main .page-intro h1{font-weight:500;font-size:clamp(30px,4vw,44px);letter-spacing:-.045em;line-height:1.1}
+.kicker{color:#815265;font-size:10px;letter-spacing:.16em;font-weight:650}
+main .panel{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none;padding:24px 0;margin:0 0 12px}
+main .panel:hover{box-shadow:none;transform:none}
+main .panel h2,main .section-heading h2,main .garden-copy h2{font-weight:500;font-size:23px;letter-spacing:-.025em}
+main .hero-card,body[data-view="today"] main .hero-card{background:#e9d9d6;border-radius:18px;box-shadow:none;padding:clamp(22px,4vw,40px);min-height:260px}
+body[data-view="today"] .hero-card::before,body[data-view="today"] .hero-card::after{display:none}
+main .hero-copy h2{font-weight:500;font-size:clamp(30px,4vw,44px);letter-spacing:-.04em}
+.primary{background:#49353f;color:#fff;border-radius:12px}.secondary{background:transparent;border-color:#bfb1ae;color:var(--ink);border-radius:12px}
+main .choice{border-radius:10px;background:transparent;border-color:var(--line)}main .choice.selected{background:#49353f;color:white}
+main .idea{border-radius:12px;min-height:140px;padding:18px}.idea.rose{background:#eed9dd}.idea.apricot{background:#eee0cc}.idea.sage{background:#e2e8da}.idea.lilac{background:#e6e0ee}
+main .metric{background:transparent;border-radius:0;border-top:1px solid var(--line);padding:18px 8px}.metric strong{font-weight:500}
+main .calendar-grid{gap:5px}main .cal-day{border-radius:7px;background:#f0ece5;font-weight:500}
+main .cal-day.phase-winter{background:#eed3da}main .cal-day.phase-spring{background:#dce6d3}main .cal-day.phase-summer{background:#e4dced}main .cal-day.phase-autumn{background:#eee1c9}main .cal-day.recorded{background:#dca1b1}
+main .cal-day.estimated{border:1px dashed #98677a}main .cal-day.active{outline:2px solid #49353f}
+main .date-select,main .symptom-guide{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:14px 0}
+main .discover-card{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none;padding:0 0 20px}
+main .discover-cover{border-radius:10px}.phase-tile{background:transparent;border:1px solid var(--line);border-radius:10px}
+.bottom-nav{background:#faf7f1f5;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;width:min(960px,100%);gap:0}
+.bottom-nav button{border-radius:0;color:#716568;font-weight:500}.bottom-nav button[aria-current=page]{background:transparent;color:#49353f;box-shadow:none;font-weight:700}
+.bottom-nav button[aria-current=page]::before{inset:auto 35% 0;height:2px;background:#49353f;border-radius:0;opacity:1}
+.bottom-nav button svg{width:22px;height:22px}.bottom-nav button svg [fill]:not([fill="none"]){fill:currentColor;fill-opacity:.12}
+dialog{border-radius:16px;box-shadow:0 16px 60px #382e3220}
+@media(max-width:540px){#app{padding-inline:16px}.top{height:64px}main{padding-top:22px}main .page-intro h1{font-size:32px}main .hero-copy h2{font-size:30px}main .hero-card{min-height:220px}main .panel{padding:20px 0}main .calendar-grid{gap:3px}.bottom-nav{padding-inline:4px}}
