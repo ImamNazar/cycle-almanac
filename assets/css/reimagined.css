@@ -332,3 +332,22 @@ main button,.bottom-nav button{transition:background-color var(--studio-fast) va
 @media(hover:hover){main .discover-card:hover .studio-art-form{transform:scale(1.08) rotate(3deg)}}
 @media(prefers-reduced-motion:reduce){main.view-arrival .page-intro,main.view-arrival>section:nth-of-type(1){animation:none!important}main .studio-art-form,main button,.bottom-nav button{transition:none!important}main button:active:not(:disabled){transform:none}}
 body.quiet-motion main.view-arrival .page-intro,body.quiet-motion main.view-arrival>section:nth-of-type(1),body.quiet-motion .studio-chart svg polyline,body.quiet-motion .studio-orbit .companion-body{animation:none!important}
+
+/* Screenshot audit: remove inherited visual noise and fix contrast */
+body[data-view] main .page-intro{background:none!important;box-shadow:none!important;overflow:visible;max-width:100%;margin-bottom:20px}
+body[data-view] main .page-intro::before,body[data-view] main .page-intro::after{display:none!important}
+body[data-view] main .page-intro p{line-height:1.55}
+body[data-view] main .metric{background:transparent!important;color:var(--ink)!important;border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:none}
+body[data-view] main .metric strong{color:var(--ink)!important}
+body[data-view] main .metric span{color:var(--muted)!important}
+body[data-view] main .hero-card{min-height:0;padding:24px;gap:16px}
+body[data-view] main .hero-companion{min-height:0;height:auto;align-self:center}
+body[data-view] main .studio-orbit{width:100%;max-width:230px}
+.demo-banner{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:12px 14px;margin-bottom:20px;border:1px solid var(--line);border-radius:12px}.demo-banner span{flex:1 1 160px}.demo-banner button{margin:0}
+body[data-view="log"] .choice-list:has(>.choice:nth-child(5):last-child){display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+body[data-view="log"] .choice-list:has(>.choice:nth-child(5):last-child)>.choice{grid-column:span 2;min-width:0;padding-inline:4px}
+body[data-view="log"] .choice-list:has(>.choice:nth-child(5):last-child)>.choice:nth-last-child(-n+2){grid-column:span 3}
+body[data-view] main .cal-day{border-radius:9px}
+body[data-view] main .discover-search{margin-bottom:8px}body[data-view] main .studio-topic-filters{margin:10px 0 18px}
+.bottom-nav svg{fill:none!important;opacity:1!important}
+@media(max-width:540px){body[data-view] main .hero-card{padding:20px;gap:8px}body[data-view] main .studio-orbit{max-width:180px}body[data-view] main .hero-companion{padding:0;margin:0}body[data-view] main .page-intro{margin-bottom:18px}body[data-view] main .page-intro h1{font-size:clamp(27px,7.5vw,32px)}}
